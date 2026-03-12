@@ -1228,169 +1228,21 @@ window.onload = () => {
     document.getElementById('report-date').value = state.today;
 };
 
-// Fungsi untuk menampilkan daftar profil
+// 1. FUNGSI RENDER DAFTAR PROFIL (Hanya satu versi)
 window.renderProfilList = () => {
-    const container = document.getElementById('profil-list-container');
-    const search = document.getElementById('search-profil').value.toLowerCase();
-    const students = state.master.siswa;
-
-    const filtered = students.filter(s => 
-        s.nama.toLowerCase().includes(search) || 
-        (s.nis && s.nis.toLowerCase().includes(search))
-    );
-
-    container.innerHTML = filtered.map(s => `
-        <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex justify-between items-center">
-            <div>
-                <h4 class="text-[10px] font-black uppercase text-slate-800">${s.nama}</h4>
-                <p class="text-[8px] font-bold text-slate-400 uppercase">${s.kelas} • NIS: ${s.nis || '-'}</p>
-            </div>
-            <button onclick="openEditor('${s.id}')" class="w-10 h-10 bg-slate-100 text-slate-600 rounded-full flex items-center justify-center active:scale-90 transition">
-                <i class="fas fa-edit"></i>
-            </button>
-        </div>
-    `).join('');
-};
-
-// Fungsi membuka form editor
-window.openEditor = async (id) => {
-    const student = state.master.siswa.find(s => s.id === id);
-    if(!student) return;
-
-    // Ambil data terbaru dari Firestore (jika pernah diedit sebelumnya)
-    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_profiles', id);
-    const docSnap = await getDoc(docRef);
-    const extraData = docSnap.exists() ? docSnap.data() : {};
-
-    document.getElementById('edit-id').value = id;
-    document.getElementById('edit-nama').value = student.nama;
-    document.getElementById('edit-nis').value = extraData.nis || student.nis || '';
-    document.getElementById('edit-hp').value = extraData.no_hp || '';
-    document.getElementById('edit-alamat').value = extraData.alamat || '';
-    document.getElementById('edit-bk').value = extraData.nama_bk || '';
-    document.getElementById('edit-wali').value = extraData.nama_wali || '';
-    document.getElementById('edit-guru-wali').value = extraData.nama_guru_wali || '';
-    document.getElementById('edit-catatan-bk').value = extraData.catatan_bk || '';
-    document.getElementById('edit-catatan-wali').value = extraData.catatan_wali || '';
-    document.getElementById('edit-catatan-mapel').value = extraData.catatan_mapel || '';
-
-    document.getElementById('editor-modal').classList.remove('hidden');
-    document.getElementById('editor-modal').classList.add('flex');
-};
-
-window.closeEditor = () => {
-    document.getElementById('editor-modal').classList.add('hidden');
-    document.getElementById('editor-modal').classList.remove('flex');
-};
-
-// Fungsi Simpan ke Firestore (U dari CRUD)
-window.saveStudentProfile = async () => {
-    const id = document.getElementById('edit-id').value;
-    const data = {
-        nis: document.getElementById('edit-nis').value,
-        no_hp: document.getElementById('edit-hp').value,
-        alamat: document.getElementById('edit-alamat').value,
-        nama_bk: document.getElementById('edit-bk').value,
-        nama_wali: document.getElementById('edit-wali').value,
-        nama_guru_wali: document.getElementById('edit-guru-wali').value,
-        catatan_bk: document.getElementById('edit-catatan-bk').value,
-        catatan_wali: document.getElementById('edit-catatan-wali').value,
-        catatan_mapel: document.getElementById('edit-catatan-mapel').value,
-        last_updated: Date.now(),
-        updated_by: state.currentUser
-    };
-
-    try {
-        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'student_profiles', id), data, { merge: true });
-        showToast("✅ Data Berhasil Diperbarui");
-        closeEditor();
-        renderProfilList();
-    } catch (e) {
-        showToast("❌ Gagal menyimpan data");
-    }
-};
-
-// Fungsi Pencarian Siswa untuk Profil
-window.renderProfilList = () => {
-    const container = document.getElementById('profil-list-container');
-    const search = document.getElementById('search-profil').value.toLowerCase();
-    
-    // Filter berdasarkan nama atau NIS (id)
-    const filtered = state.master.siswa.filter(s => 
-        s.nama.toLowerCase().includes(search) || 
-        s.id.toLowerCase().includes(search)
-    );
-
-    container.innerHTML = filtered.map(s => `
-        <div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex justify-between items-center mb-2">
-            <div>
-                <h4 class="text-[10px] font-black uppercase text-slate-800">${s.nama}</h4>
-                <p class="text-[8px] font-bold text-slate-400 uppercase">${s.kelas} • NIS: ${s.id}</p>
-            </div>
-            <button onclick="window.openEditor('${s.id}')" class="w-10 h-10 bg-red-50 text-red-600 rounded-full flex items-center justify-center">
-                <i class="fas fa-edit text-xs"></i>
-            </button>
-        </div>
-    `).join('');
-};
-
-function openSearchLayer() {
-    const layer = document.getElementById('search-layer');
-    layer.classList.remove('hidden');
-    layer.classList.add('flex');
-    document.getElementById('input-search-layer').focus();
-}
-
-function closeSearchLayer() {
-    const layer = document.getElementById('search-layer');
-    layer.classList.add('hidden');
-    layer.classList.remove('flex');
-    document.getElementById('input-search-layer').value = '';
-    // Kosongkan hasil pencarian saat ditutup
-    document.getElementById('results-layer-container').innerHTML = '';
-}
-
-// Fungsi render khusus untuk Search Layer (Overlay)
-function renderSearchLayerResults() {
-    const q = document.getElementById('input-search-layer').value.toLowerCase();
-    const container = document.getElementById('results-layer-container');
-    
-    if (q.length < 2) {
-        container.innerHTML = `<div class="text-center py-20 opacity-20 font-black text-[10px] uppercase tracking-widest">Ketik minimal 2 karakter...</div>`;
-        return;
-    }
-
-    const filtered = state.master.siswa.filter(s => 
-        (s.nama && s.nama.toLowerCase().includes(q)) || 
-        (s.id && s.id.toString().toLowerCase().includes(q))
-    );
-
-    container.innerHTML = filtered.map(s => `
-        <div class="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm flex justify-between items-center mb-3">
-            <div>
-                <h4 class="text-[11px] font-black uppercase text-slate-800">${s.nama}</h4>
-                <p class="text-[9px] font-bold text-slate-400 uppercase">${s.kelas} • NIS: ${s.id}</p>
-            </div>
-            <button onclick="closeSearchLayer(); openEditor('${s.id}')" class="w-10 h-10 bg-red-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-red-100">
-                <i class="fas fa-edit text-xs"></i>
-            </button>
-        </div>
-    `).join('') || `<div class="text-center py-20 opacity-20 font-black text-[10px]">TIDAK DITEMUKAN</div>`;
-}
-
-
-function renderProfilList() {
     const q = document.getElementById('search-profil').value.toLowerCase();
     const container = document.getElementById('profil-list-container');
     
-    // Filter data dari master siswa
+    if (!state.master.siswa) return;
+
+    // Filter data berdasarkan Nama, ID/NIS, atau Kelas
     const filtered = state.master.siswa.filter(s => 
         (s.nama && s.nama.toLowerCase().includes(q)) || 
         (s.id && s.id.toString().toLowerCase().includes(q)) ||
         (s.kelas && s.kelas.toLowerCase().includes(q))
     );
 
-    // Update Counter Total Siswa di Header
+    // Update Angka Total Siswa di Header
     const counter = document.getElementById('total-siswa-count');
     if(counter) counter.innerText = filtered.length;
 
@@ -1400,7 +1252,7 @@ function renderProfilList() {
     }
 
     container.innerHTML = filtered.map(s => `
-        <div class="bg-white p-5 rounded-[2.5rem] border border-slate-50 shadow-sm flex items-center justify-between group active:scale-[0.98] transition-all" onclick="openEditor('${s.id}')">
+        <div class="bg-white p-5 rounded-[2.5rem] border border-slate-50 shadow-sm flex items-center justify-between group active:scale-[0.98] transition-all" onclick="window.openEditor('${s.id}')">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 bg-slate-100 rounded-[1.5rem] flex items-center justify-center font-black text-slate-400 text-[10px]">
                     ${s.nama ? s.nama.substring(0, 2).toUpperCase() : '??'}
@@ -1415,9 +1267,71 @@ function renderProfilList() {
             </div>
         </div>
     `).join('');
-}
+};
+
+// 2. FUNGSI BUKA EDITOR
+window.openEditor = async (id) => {
+    const student = state.master.siswa.find(s => s.id === id);
+    if(!student) return;
+
+    try {
+        // Ambil data dari Firestore
+        const docRef = doc(db, appId, "student_profiles", id);
+        const docSnap = await getDoc(docRef);
+        const extraData = docSnap.exists() ? docSnap.data() : {};
+
+        // Isi form modal
+        document.getElementById('edit-id').value = id;
+        document.getElementById('edit-nama').value = student.nama;
+        document.getElementById('edit-nis').value = extraData.nis || student.id || '';
+        document.getElementById('edit-hp').value = extraData.no_hp || '';
+        document.getElementById('edit-alamat').value = extraData.alamat || '';
+        document.getElementById('edit-bk').value = extraData.nama_bk || '';
+        document.getElementById('edit-wali').value = extraData.nama_wali || '';
+        document.getElementById('edit-guru-wali').value = extraData.nama_guru_wali || '';
+        document.getElementById('edit-catatan-bk').value = extraData.catatan_bk || '';
+        document.getElementById('edit-catatan-wali').value = extraData.catatan_wali || '';
+        document.getElementById('edit-catatan-mapel').value = extraData.catatan_mapel || '';
+
+        // Tampilkan Modal
+        document.getElementById('editor-modal').classList.remove('hidden');
+        document.getElementById('editor-modal').classList.add('flex');
+    } catch (error) {
+        console.error("Error openEditor:", error);
+        alert("Gagal mengambil data profil");
+    }
+};
+
+// 3. FUNGSI SIMPAN
+window.saveStudentProfile = async () => {
+    const id = document.getElementById('edit-id').value;
+    const data = {
+        nis: document.getElementById('edit-nis').value,
+        no_hp: document.getElementById('edit-hp').value,
+        alamat: document.getElementById('edit-alamat').value,
+        nama_bk: document.getElementById('edit-bk').value,
+        nama_wali: document.getElementById('edit-wali').value,
+        nama_guru_wali: document.getElementById('edit-guru-wali').value,
+        catatan_bk: document.getElementById('edit-catatan-bk').value,
+        catatan_wali: document.getElementById('edit-catatan-wali').value,
+        catatan_mapel: document.getElementById('edit-catatan-mapel').value,
+        last_updated: Date.now()
+    };
+
+    try {
+        await setDoc(doc(db, appId, "student_profiles", id), data, { merge: true });
+        alert("✅ Data Berhasil Diperbarui");
+        window.closeEditor();
+        window.renderProfilList();
+    } catch (e) {
+        console.error(e);
+        alert("❌ Gagal menyimpan data");
+    }
+};
 
 
+
+// PENUTUP SCRIPT DAN HTML
     </script>
 </body>
 </html>
