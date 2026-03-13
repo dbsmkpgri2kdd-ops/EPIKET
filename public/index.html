@@ -120,42 +120,35 @@
                 <p id="display-nis" class="text-[9px] font-bold text-slate-400">NIS: -</p>
                 <div class="flex flex-wrap gap-2 mt-2">
                     <span id="display-kelas" class="text-[8px] font-black text-red-600 bg-red-50 px-3 py-1 rounded-lg border border-red-100 uppercase">-</span>
-                    <span id="display-sesi" class="text-[8px] font-black text-slate-500 bg-white px-3 py-1 rounded-lg border border-slate-200 uppercase">-</span>
+                    <span id="display-tipe" class="text-[8px] font-green text-slate-500 bg-white px-3 py-1 rounded-lg border border-slate-200 uppercase">-</span>
+                    <span id="display-sesi" class="text-[8px] font-white text-slate-500 bg-black px-3 py-1 rounded-lg border border-slate-200 uppercase">-</span>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-3 bg-slate-50/50 p-5 rounded-[2rem] border border-slate-100">
-            <div class="grid grid-cols-2 gap-4 border-b border-slate-50 pb-3">
-                <div>
-                    <span class="text-[8px] font-black text-slate-400 uppercase">Tipe</span>
-                    <p id="display-tipe" class="text-[10px] font-bold text-slate-700 uppercase">-</p>
-                </div>
-                <div>
-                    <span class="text-[8px] font-black text-slate-400 uppercase">No HP</span>
-                    <p id="display-nohp" class="text-[10px] font-bold text-slate-700">-</p>
-                </div>
-            </div>
             <div class="space-y-2 border-b border-slate-50 pb-3 text-[9px] font-bold uppercase text-slate-800">
+                <div class="flex justify-between items-center"><span>No Handphone</span><span id="display-nohp"></span></div>
+                <div class="flex justify-between items-center"><span>Alamat</span><span id="display-alamat"></span></div>
+                <div class="flex justify-between items-center"><span>Kesiswaan</span><span id="display-kesiswaan"></span></div>
                 <div class="flex justify-between items-center"><span>Guru BK</span><span id="display-guru-bk"></span></div>
                 <div class="flex justify-between items-center"><span>Wali Kelas</span><span id="display-wali-kelas"></span></div>
                 <div class="flex justify-between items-center"><span>Guru Wali</span><span id="display-guru-wali"></span></div>
-            </div>
-            <p id="display-alamat" class="text-[10px] font-bold text-slate-500 italic uppercase"></p>
         </div>
 
         <div class="grid grid-cols-5 gap-2 text-center">
-            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-a" class="font-black text-red-600 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">A</p></div>
-            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-b" class="font-black text-orange-500 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">B</p></div>
-            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-i" class="font-black text-blue-500 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">I</p></div>
-            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-s" class="font-black text-green-600 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">S</p></div>
-            <div class="bg-slate-900 p-2 rounded-2xl"><p id="rekap-t" class="font-black text-white text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-300">T</p></div>
+            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-a" class="font-black text-red-600 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">Alpa</p></div>
+            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-b" class="font-black text-orange-500 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">Bolos</p></div>
+            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-i" class="font-black text-blue-500 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">Izin</p></div>
+            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-s" class="font-black text-green-600 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">Sakit</p></div>
+            <div class="bg-slate-900 p-2 rounded-2xl"><p id="rekap-t" class="font-black text-white text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-300">Total</p></div>
         </div>
 
         <div class="space-y-3">
-            <textarea id="edit-catatan-bk" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-red-400 outline-none" rows="2" placeholder="Catatan BK..."></textarea>
-            <textarea id="edit-catatan-wali" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-orange-400 outline-none" rows="2" placeholder="Catatan Wali Kelas..."></textarea>
-            <textarea id="edit-catatan-mapel" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-blue-400 outline-none" rows="2" placeholder="Catatan Mapel..."></textarea>
+            <textarea id="edit-catatan-kesiswaan" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-orange-400 outline-none" rows="2" placeholder="Catatan Kesiswaan..."></textarea>
+            <textarea id="edit-catatan-gurubk" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-red-400 outline-none" rows="2" placeholder="Catatan BK..."></textarea>
+            <textarea id="edit-catatan-walikelas" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-orange-400 outline-none" rows="2" placeholder="Catatan Wali Kelas..."></textarea>
+            <textarea id="edit-catatan-guruwali" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-orange-400 outline-none" rows="2" placeholder="Catatan Guru Wali..."></textarea>
+            <textarea id="edit-catatan-gurumapel" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-blue-400 outline-none" rows="2" placeholder="Catatan Guru Mapel..."></textarea>
         </div>
 
         <button onclick="window.saveStudentProfile()" class="w-full bg-slate-900 text-white font-black py-5 rounded-[2rem] text-[10px] uppercase tracking-widest shadow-xl active:scale-95 transition-all">
@@ -1277,11 +1270,13 @@ window.openEditor = async (nis) => {
     document.getElementById('display-kelas').innerText = s.kelas || '-';
     document.getElementById('display-sesi').innerText = s.sesi || '-';
     document.getElementById('display-tipe').innerText = s.tipe || '-';
+    document.getElementById('display-alamat').innerText = s.alamat || '-';
     document.getElementById('display-nohp').innerText = s.no_hp || '-';
+    document.getElementById('display-kesiswaan').innerText = s.kesiswaan || '-';
     document.getElementById('display-guru-bk').innerText = s.guru_bk || '-';
     document.getElementById('display-wali-kelas').innerText = s.wali_kelas || '-';
     document.getElementById('display-guru-wali').innerText = s.guru_wali || '-';
-    document.getElementById('display-alamat').innerText = s.alamat || '-';
+
 
     // 3. Kalkulasi Rekapitulasi ABIS
     const rekap = { A: 0, B: 0, I: 0, S: 0, T: 0 };
@@ -1308,10 +1303,12 @@ window.openEditor = async (nis) => {
         const docRef = window.doc(window.db, 'artifacts', window.appId, 'public', 'notes', nis.toString());
         const snap = await window.getDoc(docRef);
         const fbData = snap.exists() ? snap.data() : {};
-        
-        document.getElementById('edit-catatan-bk').value = fbData.catatan_bk || '';
-        document.getElementById('edit-catatan-wali').value = fbData.catatan_wali || '';
-        document.getElementById('edit-catatan-mapel').value = fbData.catatan_mapel || '';
+
+        document.getElementById('edit-catatan-kesiswaan').value = fbData.catatan_kesiswaan || '';        
+        document.getElementById('edit-catatan-gurubk').value = fbData.catatan_bk || '';
+        document.getElementById('edit-catatan-walikelas').value = fbData.catatan_walikelas || '';
+        document.getElementById('edit-catatan-guruwali').value = fbData.catatan_guruwali || '';
+        document.getElementById('edit-catatan-mapel').value = fbData.catatan_gurumapel || '';
     } catch (e) { console.error("Firebase Error:", e); }
 
     document.getElementById('editor-modal').classList.remove('hidden');
@@ -1326,9 +1323,11 @@ window.closeEditor = () => {
 window.saveStudentProfile = async () => {
     const id = document.getElementById('edit-id').value;
     const data = {
-        catatan_bk: document.getElementById('edit-catatan-bk').value,
-        catatan_wali: document.getElementById('edit-catatan-wali').value,
-        catatan_mapel: document.getElementById('edit-catatan-mapel').value,
+        catatan_kesiswaan: document.getElementById('edit-catatan-kesiswaan').value,
+        catatan_gurubk: document.getElementById('edit-catatan-gurubk').value,
+        catatan_walikelas: document.getElementById('edit-catatan-walikelas').value,
+        catatan_guruwali: document.getElementById('edit-catatan-guruwali').value,
+        catatan_gurumapel: document.getElementById('edit-catatan-gurumapel').value,
         last_updated: new Date().toISOString()
     };
 
