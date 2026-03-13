@@ -72,16 +72,39 @@
 
         <main class="pb-32 p-4 max-w-md mx-auto">
 
-<div id="search-layer" class="fixed inset-0 z-[1000] bg-slate-50 hidden flex-col">
-    <div class="p-4 bg-white border-b border-slate-100 flex items-center gap-4">
-        <button onclick="closeSearchLayer()" class="text-slate-400 p-2"><i class="fas fa-arrow-left"></i></button>
-        <input type="text" id="input-search-layer" oninput="renderSearchLayerResults()" 
-               placeholder="Cari Nama atau NIS..." 
-               class="flex-1 bg-transparent border-none outline-none font-bold text-[11px] uppercase">
-    </div>
-    <div id="results-layer-container" class="flex-1 overflow-y-auto p-4 space-y-3">
-        </div>
+
+
+<!-- SEARCH SISWA BERANDA -->
+<div id="search-layer" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-start justify-center p-4">
+
+<div class="bg-white w-full max-w-xl rounded-[2rem] shadow-lg border border-slate-100 p-6">
+
+<div class="flex items-center justify-between mb-4">
+
+<h2 class="text-sm font-black text-slate-800 uppercase tracking-widest">
+Cari Siswa
+</h2>
+
+<button onclick="closeSearchLayer()" class="text-slate-400">
+<i class="fas fa-times"></i>
+</button>
+
 </div>
+
+<input
+id="home-search"
+type="text"
+placeholder="Ketik nama / NIS..."
+class="w-full p-3 rounded-xl border border-slate-200 text-sm"
+oninput="renderHomeSearch()"
+/>
+
+<div id="home-search-result"
+class="mt-4 space-y-2 max-h-[400px] overflow-y-auto"></div>
+
+</div>
+</div>
+
 
             <!-- TAB PROFIL -->
 <div id="tab-profil" class="tab-content hidden">
@@ -1251,189 +1274,57 @@ window.onload = () => {
 
 // --- FUNGSI MANAJEMEN PROFIL SISWA ---
 
-window.renderProfilList = () => {
-    const q = document.getElementById('search-profil').value.toLowerCase();
-    const container = document.getElementById('profil-list-container');
-    if (!state.master.siswa) return;
+// ===============================
+// SEARCH BERANDA
+// ===============================
 
-    const filtered = state.master.siswa.filter(s => 
-        (s.nama && s.nama.toLowerCase().includes(q)) || 
-        (s.id && s.id.toString().toLowerCase().includes(q)) ||
-        (s.kelas && s.kelas.toLowerCase().includes(q))
-    );
+function openSearchLayer(){
 
-    const counter = document.getElementById('total-siswa-count');
-    if(counter) counter.innerText = filtered.length;
+document.getElementById("search-layer").classList.remove("hidden");
+document.getElementById("search-layer").classList.add("flex");
 
-    container.innerHTML = filtered.map(s => {
-        let totalAbsen = 0;
-        Object.values(state.records).forEach(day => {
-            Object.values(day).forEach(entry => {
-                if (entry.personId === s.id && ['Alpa', 'Bolos', 'Izin', 'Sakit'].includes(entry.status)) {
-                    totalAbsen++;
-                }
-            });
-        });
+document.getElementById("home-search").focus();
 
-        return `
-            <div class="bg-white p-5 rounded-[2.5rem] border border-slate-50 shadow-sm flex items-center justify-between group active:scale-[0.98] transition-all" onclick="window.openEditor('${s.id}')">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-slate-100 rounded-[1.5rem] flex items-center justify-center font-black text-slate-400 text-[10px]">
-                        ${s.nama ? s.nama.substring(0, 2).toUpperCase() : '??'}
-                    </div>
-                    <div>
-                        <h4 class="text-[11px] font-black uppercase text-slate-800">${s.nama}</h4>
-                        <p class="text-[9px] font-bold text-red-600 uppercase tracking-tighter">${s.id} • ${s.kelas}</p>
-                        <div class="mt-1">
-                            <span class="text-[7px] font-extrabold px-2 py-0.5 rounded-full bg-red-100 text-red-600 uppercase tracking-tighter">Total Absen: ${totalAbsen}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 group-hover:text-red-500 transition-colors">
-                    <i class="fas fa-chevron-right text-[10px]"></i>
-                </div>
-            </div>
-        `;
-    }).join('');
-};
-
-window.openEditor = async (id) => {
-    const s = state.master.siswa.find(x => x.id === id);
-    if (!s) return;
-
-    // Isi Data Display
-    document.getElementById('edit-id').value = id;
-    document.getElementById('display-nama').innerText = s.nama;
-    document.getElementById('display-nis').innerText = s.id;
-    document.getElementById('display-kelas').innerText = s.kelas;
-
-    // Hitung Statistik
-    const stat = { 'Alpa': 0, 'Bolos': 0, 'Izin': 0, 'Sakit': 0 };
-    let total = 0;
-    Object.values(state.records).forEach(day => {
-        Object.values(day).forEach(entry => {
-            if (entry.personId === id && stat[entry.status] !== undefined) {
-                stat[entry.status]++;
-                total++;
-            }
-        });
-    });
-
-    document.getElementById('rekap-a').innerText = stat['Alpa'];
-    document.getElementById('rekap-b').innerText = stat['Bolos'];
-    document.getElementById('rekap-i').innerText = stat['Izin'];
-    document.getElementById('rekap-s').innerText = stat['Sakit'];
-    document.getElementById('rekap-total').innerText = total;
-
-    // Ambil Data Tambahan dari Firebase
-    try {
-        const docRef = doc(db, appId, "student_profiles", id);
-        const snap = await getDoc(docRef);
-        const d = snap.exists() ? snap.data() : {};
-        
-        document.getElementById('edit-hp').value = d.no_hp || '';
-        document.getElementById('edit-alamat').value = d.alamat || '';
-        document.getElementById('edit-bk').value = d.nama_bk || '';
-        document.getElementById('edit-wali').value = d.nama_wali || '';
-        document.getElementById('edit-catatan-bk').value = d.catatan_bk || '';
-        document.getElementById('edit-catatan-wali').value = d.catatan_wali || '';
-        document.getElementById('edit-catatan-mapel').value = d.catatan_mapel || '';
-    } catch (e) { console.error(e); }
-
-    document.getElementById('editor-modal').classList.remove('hidden');
-    document.getElementById('editor-modal').classList.add('flex');
-};
-
-window.closeEditor = () => {
-    document.getElementById('editor-modal').classList.add('hidden');
-    document.getElementById('editor-modal').classList.remove('flex');
-    document.getElementById('form-profil').reset();
-};
-
-window.saveStudentProfile = async () => {
-    const id = document.getElementById('edit-id').value;
-    if(!id) return;
-
-    const data = {
-        no_hp: document.getElementById('edit-hp').value,
-        alamat: document.getElementById('edit-alamat').value,
-        nama_bk: document.getElementById('edit-bk').value,
-        nama_wali: document.getElementById('edit-wali').value,
-        catatan_bk: document.getElementById('edit-catatan-bk').value,
-        catatan_wali: document.getElementById('edit-catatan-wali').value,
-        catatan_mapel: document.getElementById('edit-catatan-mapel').value,
-        last_updated: Date.now()
-    };
-
-    try {
-        await setDoc(doc(db, appId, "student_profiles", id), data, { merge: true });
-        showToast("✅ DATA BERHASIL DISIMPAN");
-        window.closeEditor();
-        window.renderProfilList();
-    } catch (e) {
-        alert("Gagal menyimpan ke Cloud");
-    }
-};
-
-<div id="search-layer" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden items-start justify-center p-4">
-
-<div class="bg-white w-full max-w-xl rounded-[2rem] shadow-lg border border-slate-100 p-6">
-
-<div class="flex items-center justify-between mb-4">
-
-<h2 class="text-sm font-black text-slate-800 uppercase tracking-widest">
-Cari Siswa
-</h2>
-
-<button onclick="closeSearchLayer()" class="text-slate-400">
-<i class="fas fa-times"></i>
-</button>
-
-</div>
-
-<input
-id="home-search"
-type="text"
-placeholder="Ketik nama / NIS..."
-class="w-full p-3 rounded-xl border border-slate-200 text-sm"
-oninput="renderHomeSearch()"
-/>
-
-<div id="home-search-result"
-class="mt-4 space-y-2 max-h-[400px] overflow-y-auto"></div>
-
-</div>
-
-</div>
+}
 
 function closeSearchLayer(){
 
 document.getElementById("search-layer").classList.add("hidden");
 document.getElementById("search-layer").classList.remove("flex");
 
+document.getElementById("home-search").value="";
+document.getElementById("home-search-result").innerHTML="";
+
 }
 
 function renderHomeSearch(){
 
-const q=document.getElementById("home-search").value.toLowerCase();
-const container=document.getElementById("home-search-result");
+const q = document.getElementById("home-search").value.toLowerCase();
+const result = document.getElementById("home-search-result");
 
 if(!state.master.siswa) return;
 
-const filtered=state.master.siswa.filter(s=>
+const filtered = state.master.siswa.filter(s =>
 
 (s.nama && s.nama.toLowerCase().includes(q)) ||
-(s.id && s.id.toLowerCase().includes(q))
+(s.id && s.id.toString().toLowerCase().includes(q))
 
-);
+).slice(0,20);
 
-container.innerHTML=filtered.slice(0,20).map(s=>`
+result.innerHTML = filtered.map(s=>`
 
-<div class="p-3 rounded-xl border border-slate-100 cursor-pointer hover:bg-slate-50"
+<div class="p-3 rounded-xl hover:bg-slate-50 cursor-pointer flex justify-between items-center"
 onclick="openStudentFromHome('${s.id}')">
 
-<p class="text-sm font-bold">${s.nama}</p>
-<p class="text-xs text-slate-400">${s.id} • ${s.kelas}</p>
+<div>
+
+<div class="font-bold text-sm">${s.nama}</div>
+
+<div class="text-xs text-red-500">${s.id} • ${s.kelas}</div>
+
+</div>
+
+<i class="fas fa-chevron-right text-slate-300 text-xs"></i>
 
 </div>
 
@@ -1445,15 +1336,227 @@ function openStudentFromHome(id){
 
 closeSearchLayer();
 
-switchTab("profil");
+openTab("profil");
 
 setTimeout(()=>{
 
-openEditor(id);
+window.openEditor(id);
 
-},200);
+},300);
 
 }
+
+
+
+
+
+
+// ===============================
+// RENDER LIST PROFIL
+// ===============================
+
+window.renderProfilList = () => {
+
+const q = document.getElementById('search-profil').value.toLowerCase();
+const container = document.getElementById('profil-list-container');
+
+if (!state.master.siswa) return;
+
+const filtered = state.master.siswa.filter(s => 
+(s.nama && s.nama.toLowerCase().includes(q)) || 
+(s.id && s.id.toString().toLowerCase().includes(q)) ||
+(s.kelas && s.kelas.toLowerCase().includes(q))
+);
+
+document.getElementById("total-siswa-count").innerText = filtered.length;
+
+container.innerHTML = filtered.map(s => {
+
+let totalAbsen = 0;
+
+Object.values(state.records).forEach(day => {
+
+Object.values(day).forEach(entry => {
+
+if (entry.personId === s.id && ['Alpa','Bolos','Izin','Sakit'].includes(entry.status)){
+
+totalAbsen++;
+
+}
+
+});
+
+});
+
+return `
+
+<div class="bg-white p-5 rounded-[2.5rem] border border-slate-50 shadow-sm flex items-center justify-between cursor-pointer active:scale-[0.98] transition"
+
+onclick="window.openEditor('${s.id}')">
+
+<div class="flex items-center gap-4">
+
+<div class="w-12 h-12 bg-slate-100 rounded-[1.5rem] flex items-center justify-center font-black text-slate-400 text-[10px]">
+
+${s.nama ? s.nama.substring(0,2).toUpperCase() : '??'}
+
+</div>
+
+<div>
+
+<h4 class="text-[11px] font-black uppercase text-slate-800">${s.nama}</h4>
+
+<p class="text-[9px] font-bold text-red-600">${s.id} • ${s.kelas}</p>
+
+<span class="text-[7px] font-extrabold px-2 py-0.5 rounded-full bg-red-100 text-red-600">
+Total Absen: ${totalAbsen}
+</span>
+
+</div>
+
+</div>
+
+<i class="fas fa-chevron-right text-slate-300 text-xs"></i>
+
+</div>
+
+`;
+
+}).join("");
+
+};
+
+
+
+
+
+
+// ===============================
+// EDITOR PROFIL SISWA
+// ===============================
+
+window.openEditor = async (id) => {
+
+const s = state.master.siswa.find(x => x.id === id);
+if (!s) return;
+
+document.getElementById('edit-id').value = id;
+document.getElementById('display-nama').innerText = s.nama;
+document.getElementById('display-nis').innerText = s.id;
+document.getElementById('display-kelas').innerText = s.kelas;
+
+const stat = { 'Alpa':0,'Bolos':0,'Izin':0,'Sakit':0 };
+let total = 0;
+
+Object.values(state.records).forEach(day => {
+
+Object.values(day).forEach(entry => {
+
+if(entry.personId === id && stat[entry.status] !== undefined){
+
+stat[entry.status]++;
+total++;
+
+}
+
+});
+
+});
+
+document.getElementById('rekap-a').innerText = stat['Alpa'];
+document.getElementById('rekap-b').innerText = stat['Bolos'];
+document.getElementById('rekap-i').innerText = stat['Izin'];
+document.getElementById('rekap-s').innerText = stat['Sakit'];
+document.getElementById('rekap-total').innerText = total;
+
+try{
+
+const docRef = doc(db, appId, "student_profiles", id);
+const snap = await getDoc(docRef);
+
+const d = snap.exists() ? snap.data() : {};
+
+document.getElementById('edit-hp').value = d.no_hp || '';
+document.getElementById('edit-alamat').value = d.alamat || '';
+document.getElementById('edit-bk').value = d.nama_bk || '';
+document.getElementById('edit-wali').value = d.nama_wali || '';
+document.getElementById('edit-catatan-bk').value = d.catatan_bk || '';
+document.getElementById('edit-catatan-wali').value = d.catatan_wali || '';
+document.getElementById('edit-catatan-mapel').value = d.catatan_mapel || '';
+
+}catch(e){
+
+console.error(e);
+
+}
+
+document.getElementById('editor-modal').classList.remove('hidden');
+document.getElementById('editor-modal').classList.add('flex');
+
+};
+
+
+
+
+
+
+// ===============================
+// TUTUP EDITOR
+// ===============================
+
+window.closeEditor = () => {
+
+document.getElementById('editor-modal').classList.add('hidden');
+document.getElementById('editor-modal').classList.remove('flex');
+
+document.getElementById('form-profil').reset();
+
+};
+
+
+
+
+
+
+// ===============================
+// SIMPAN PROFIL FIREBASE
+// ===============================
+
+window.saveStudentProfile = async () => {
+
+const id = document.getElementById('edit-id').value;
+if(!id) return;
+
+const data = {
+
+no_hp: document.getElementById('edit-hp').value,
+alamat: document.getElementById('edit-alamat').value,
+nama_bk: document.getElementById('edit-bk').value,
+nama_wali: document.getElementById('edit-wali').value,
+catatan_bk: document.getElementById('edit-catatan-bk').value,
+catatan_wali: document.getElementById('edit-catatan-wali').value,
+catatan_mapel: document.getElementById('edit-catatan-mapel').value,
+last_updated: Date.now()
+
+};
+
+try{
+
+await setDoc(doc(db, appId, "student_profiles", id), data, { merge:true });
+
+showToast("DATA BERHASIL DISIMPAN");
+
+window.closeEditor();
+
+window.renderProfilList();
+
+}catch(e){
+
+alert("Gagal menyimpan ke Cloud");
+
+}
+
+};
 
 // PENUTUP SCRIPT DAN HTML
     </script>
