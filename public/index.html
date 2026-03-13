@@ -77,10 +77,10 @@
     <div class="px-6 py-4 pb-24">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h2 class="text-xl font-black text-slate-800 tracking-tighter uppercase leading-none">Profil Siswa</h2>
-                <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Detail & Catatan Pembinaan</p>
+                <h2 class="text-xl font-black text-slate-800 tracking-tighter uppercase">Profil Siswa</h2>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Detail & Catatan Pembinaan</p>
             </div>
-            <div class="w-10 h-10 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 shadow-sm">
+            <div class="w-10 h-10 bg-red-50 rounded-2xl flex items-center justify-center text-red-600">
                 <i class="fas fa-address-card text-lg"></i>
             </div>
         </div>
@@ -88,7 +88,7 @@
         <div class="relative mb-6">
             <input type="text" id="search-profil" onkeyup="window.renderProfilList()" 
                    placeholder="Cari Nama atau NIS..." 
-                   class="w-full bg-white border border-slate-200 rounded-2xl py-3.5 px-6 text-[11px] font-bold focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm transition-all">
+                   class="w-full bg-white border border-slate-200 rounded-2xl py-3.5 px-6 text-[11px] font-bold focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm">
             <i class="fas fa-search absolute right-6 top-4 text-slate-300"></i>
         </div>
 
@@ -98,10 +98,10 @@
 </div>
 
 <div id="editor-modal" class="fixed inset-0 bg-black/60 z-[100] hidden items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
-    <div class="bg-white w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] p-8 space-y-6 overflow-y-auto max-h-[90vh] shadow-2xl no-scrollbar">
+    <div class="bg-white w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] p-8 space-y-6 overflow-y-auto max-h-[95vh] shadow-2xl no-scrollbar">
         
         <div class="flex justify-between items-center border-b border-slate-50 pb-4">
-            <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Editor Pembinaan Siswa</h3>
+            <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Editor Data Siswa</h3>
             <button onclick="window.closeEditor()" class="text-slate-300 hover:text-red-500 transition-colors">
                 <i class="fas fa-times-circle text-2xl"></i>
             </button>
@@ -116,16 +116,16 @@
                 </div>
             </div>
             <div class="flex-grow">
-                <input type="text" id="edit-nama" readonly class="bg-transparent border-none w-full font-black text-slate-800 uppercase text-sm focus:outline-none cursor-default">
+                <input type="text" id="edit-nama" readonly class="bg-transparent border-none w-full font-black text-slate-800 uppercase text-sm focus:outline-none">
                 <p id="display-nis" class="text-[9px] font-bold text-slate-400">NIS: -</p>
                 <div class="flex flex-wrap gap-2 mt-2">
-                    <span id="display-kelas" class="text-[8px] font-black text-red-600 bg-red-50 px-3 py-1 rounded-lg border border-red-100 uppercase">KELAS</span>
-                    <span id="display-sesi" class="text-[8px] font-black text-slate-500 bg-white px-3 py-1 rounded-lg border border-slate-200 uppercase tracking-widest">SESI</span>
+                    <span id="display-kelas" class="text-[8px] font-black text-red-600 bg-red-50 px-3 py-1 rounded-lg border border-red-100 uppercase">-</span>
+                    <span id="display-sesi" class="text-[8px] font-black text-slate-500 bg-white px-3 py-1 rounded-lg border border-slate-200 uppercase">-</span>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-3 bg-slate-50/20 p-5 rounded-[2rem] border border-slate-100">
+        <div class="grid grid-cols-1 gap-3 bg-slate-50/50 p-5 rounded-[2rem] border border-slate-100">
             <div class="grid grid-cols-2 gap-4 border-b border-slate-50 pb-3">
                 <div>
                     <span class="text-[8px] font-black text-slate-400 uppercase">Tipe</span>
@@ -136,56 +136,33 @@
                     <p id="display-nohp" class="text-[10px] font-bold text-slate-700">-</p>
                 </div>
             </div>
-            <div class="space-y-2 border-b border-slate-50 pb-3">
-                <div class="flex justify-between items-center leading-none"><span class="text-[8px] font-black text-slate-400 uppercase">Guru BK</span><span id="display-guru-bk" class="text-[9px] font-bold text-slate-800 uppercase"></span></div>
-                <div class="flex justify-between items-center leading-none"><span class="text-[8px] font-black text-slate-400 uppercase">Wali Kelas</span><span id="display-wali-kelas" class="text-[9px] font-bold text-slate-800 uppercase"></span></div>
-                <div class="flex justify-between items-center leading-none"><span class="text-[8px] font-black text-slate-400 uppercase">Guru Wali</span><span id="display-guru-wali" class="text-[9px] font-bold text-slate-800 uppercase"></span></div>
+            <div class="space-y-2 border-b border-slate-50 pb-3 text-[9px] font-bold uppercase text-slate-800">
+                <div class="flex justify-between items-center"><span>Guru BK</span><span id="display-guru-bk"></span></div>
+                <div class="flex justify-between items-center"><span>Wali Kelas</span><span id="display-wali-kelas"></span></div>
+                <div class="flex justify-between items-center"><span>Guru Wali</span><span id="display-guru-wali"></span></div>
             </div>
-            <div>
-                <span class="text-[8px] font-black text-slate-400 uppercase block mb-1">Alamat</span>
-                <p id="display-alamat" class="text-[10px] font-bold text-slate-600 italic leading-tight uppercase"></p>
-            </div>
+            <p id="display-alamat" class="text-[10px] font-bold text-slate-500 italic uppercase"></p>
         </div>
 
-        <div class="grid grid-cols-5 gap-2">
-            <div class="bg-white border border-slate-100 p-3 rounded-2xl text-center">
-                <p id="rekap-a" class="text-xs font-black text-red-600">0</p>
-                <p class="text-[7px] font-black text-slate-400 uppercase">Alpa</p>
-            </div>
-            <div class="bg-white border border-slate-100 p-3 rounded-2xl text-center">
-                <p id="rekap-b" class="text-xs font-black text-orange-500">0</p>
-                <p class="text-[7px] font-black text-slate-400 uppercase">Bolos</p>
-            </div>
-            <div class="bg-white border border-slate-100 p-3 rounded-2xl text-center">
-                <p id="rekap-i" class="text-xs font-black text-blue-500">0</p>
-                <p class="text-[7px] font-black text-slate-400 uppercase">Izin</p>
-            </div>
-            <div class="bg-white border border-slate-100 p-3 rounded-2xl text-center">
-                <p id="rekap-s" class="text-xs font-black text-green-600">0</p>
-                <p class="text-[7px] font-black text-slate-400 uppercase">Sakit</p>
-            </div>
-            <div class="bg-slate-900 p-3 rounded-2xl text-center">
-                <p id="rekap-t" class="text-xs font-black text-white">0</p>
-                <p class="text-[7px] font-black text-slate-300 uppercase">Total</p>
-            </div>
+        <div class="grid grid-cols-5 gap-2 text-center">
+            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-a" class="font-black text-red-600 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">A</p></div>
+            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-b" class="font-black text-orange-500 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">B</p></div>
+            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-i" class="font-black text-blue-500 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">I</p></div>
+            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-s" class="font-black text-green-600 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">S</p></div>
+            <div class="bg-slate-900 p-2 rounded-2xl"><p id="rekap-t" class="font-black text-white text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-300">T</p></div>
         </div>
 
-        <div class="space-y-4">
-            <div class="bg-slate-50 p-4 rounded-3xl border border-slate-100">
-                <label class="text-[9px] font-black text-slate-400 uppercase mb-2 block tracking-widest">Input Catatan Pembinaan</label>
-                <textarea id="edit-catatan-bk" class="w-full bg-white border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-red-400 outline-none mb-3" rows="2" placeholder="Catatan Guru BK..."></textarea>
-                <textarea id="edit-catatan-wali" class="w-full bg-white border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-orange-400 outline-none mb-3" rows="2" placeholder="Catatan Wali Kelas..."></textarea>
-                <textarea id="edit-catatan-mapel" class="w-full bg-white border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-blue-400 outline-none" rows="2" placeholder="Catatan Guru Mapel..."></textarea>
-            </div>
+        <div class="space-y-3">
+            <textarea id="edit-catatan-bk" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-red-400 outline-none" rows="2" placeholder="Catatan BK..."></textarea>
+            <textarea id="edit-catatan-wali" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-orange-400 outline-none" rows="2" placeholder="Catatan Wali Kelas..."></textarea>
+            <textarea id="edit-catatan-mapel" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-blue-400 outline-none" rows="2" placeholder="Catatan Mapel..."></textarea>
         </div>
 
-        <button onclick="window.saveStudentProfile()" class="w-full bg-slate-900 text-white font-black py-5 rounded-[2rem] text-[10px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all">
-            Simpan Perubahan
+        <button onclick="window.saveStudentProfile()" class="w-full bg-slate-900 text-white font-black py-5 rounded-[2rem] text-[10px] uppercase tracking-widest shadow-xl active:scale-95 transition-all">
+            Simpan Pembinaan
         </button>
     </div>
 </div>
-
-
 
 
             <!-- TAB BERANDA -->
@@ -1262,17 +1239,16 @@ window.onload = () => {
 
 
 // Fungsi untuk menampilkan daftar profil
-// --- FUNGSI RENDER LIST SISWA ---
+// --- JANGAN TULIS IMPORT LAGI DISINI ---
+
 window.renderProfilList = () => {
-    const container = document.getElementById('profil-list-container');
     const query = document.getElementById('search-profil').value.toLowerCase();
+    const container = document.getElementById('profil-list-container');
+    const data = window.state?.master?.siswa || []; // Menggunakan data dari CSV
     
-    // Gunakan window.state agar sinkron dengan data global
-    const dataSiswa = window.state?.master?.siswa || [];
-    
-    const filtered = dataSiswa.filter(s => 
-        s.nama.toLowerCase().includes(query) || 
-        s.id.toString().includes(query)
+    const filtered = data.filter(s => 
+        (s.nama?.toLowerCase().includes(query)) || 
+        (s.id?.toString().includes(query))
     );
 
     if (filtered.length === 0) {
@@ -1282,7 +1258,7 @@ window.renderProfilList = () => {
 
     container.innerHTML = filtered.map(s => `
         <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-3xl border border-slate-100 flex items-center gap-4 active:scale-95 transition-all cursor-pointer shadow-sm">
-            <div class="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400">
+            <div class="w-10 h-10 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
                 <i class="fas fa-user text-sm"></i>
             </div>
             <div class="flex-grow">
@@ -1294,31 +1270,25 @@ window.renderProfilList = () => {
     `).join('');
 };
 
-// --- FUNGSI BUKA EDITOR & REKAP ---
 window.openEditor = async (nis) => {
-    const siswa = window.state.master.siswa.find(s => s.id == nis);
-    if (!siswa) return;
+    // 1. Ambil data dari CSV (State Master)
+    const s = window.state.master.siswa.find(x => x.id == nis);
+    if (!s) return;
 
-    // Map Data Statis
-    document.getElementById('edit-id').value = siswa.id;
-    document.getElementById('edit-nama').value = siswa.nama;
-    document.getElementById('display-nis').innerText = `NIS: ${siswa.id}`;
-    document.getElementById('display-kelas').innerText = siswa.kelas || '-';
-    document.getElementById('display-sesi').innerText = siswa.sesi || 'PAGI';
-    document.getElementById('display-tipe').innerText = siswa.tipe || 'REGULER';
-    document.getElementById('display-nohp').innerText = siswa.no_hp || '-';
-    document.getElementById('display-guru-bk').innerText = siswa.guru_bk || '-';
-    document.getElementById('display-wali-kelas').innerText = siswa.wali_kelas || '-';
-    document.getElementById('display-guru-wali').innerText = siswa.guru_wali || '-';
-    document.getElementById('display-alamat').innerText = siswa.alamat || '-';
+    // 2. Isi Form Modal
+    document.getElementById('edit-id').value = s.id;
+    document.getElementById('edit-nama').value = s.nama;
+    document.getElementById('display-nis').innerText = `NIS: ${s.id}`;
+    document.getElementById('display-kelas').innerText = s.kelas || '-';
+    document.getElementById('display-sesi').innerText = s.sesi || '-';
+    document.getElementById('display-tipe').innerText = s.tipe || '-';
+    document.getElementById('display-nohp').innerText = s.no_hp || '-';
+    document.getElementById('display-guru-bk').innerText = s.guru_bk || '-';
+    document.getElementById('display-wali-kelas').innerText = s.wali_kelas || '-';
+    document.getElementById('display-guru-wali').innerText = s.guru_wali || '-';
+    document.getElementById('display-alamat').innerText = s.alamat || '-';
 
-    // Handle Foto
-    const potoCont = document.getElementById('poto-container');
-    potoCont.innerHTML = siswa.poto 
-        ? `<img src="${siswa.poto}" class="w-full h-full object-cover">` 
-        : `<i class="fas fa-user-graduate text-2xl"></i>`;
-
-    // Kalkulasi Rekap dari Firebase (window.state.records)
+    // 3. Kalkulasi Rekapitulasi ABIS
     const rekap = { A: 0, B: 0, I: 0, S: 0, T: 0 };
     Object.values(window.state.records || {}).forEach(day => {
         Object.values(day).forEach(rec => {
@@ -1337,21 +1307,17 @@ window.openEditor = async (nis) => {
     document.getElementById('rekap-s').innerText = rekap.S;
     document.getElementById('rekap-t').innerText = rekap.T;
 
-    // Load Catatan CRUD dari Firestore
+    // 4. Load Catatan dari Firebase
     try {
-        const docRef = doc(window.db, 'artifacts', window.appId, 'public', 'student_notes', nis.toString());
-        const snap = await getDoc(docRef);
-        if (snap.exists()) {
-            const fbData = snap.data();
-            document.getElementById('edit-catatan-bk').value = fbData.catatan_bk || '';
-            document.getElementById('edit-catatan-wali').value = fbData.catatan_wali || '';
-            document.getElementById('edit-catatan-mapel').value = fbData.catatan_mapel || '';
-        } else {
-            document.getElementById('edit-catatan-bk').value = '';
-            document.getElementById('edit-catatan-wali').value = '';
-            document.getElementById('edit-catatan-mapel').value = '';
-        }
-    } catch (e) { console.error("Firestore error:", e); }
+        // PERHATIKAN: Pastikan 'db' dan 'appId' sudah terdefinisi di script atas
+        const docRef = window.doc(window.db, 'artifacts', window.appId, 'public', 'notes', nis.toString());
+        const snap = await window.getDoc(docRef);
+        const fbData = snap.exists() ? snap.data() : {};
+        
+        document.getElementById('edit-catatan-bk').value = fbData.catatan_bk || '';
+        document.getElementById('edit-catatan-wali').value = fbData.catatan_wali || '';
+        document.getElementById('edit-catatan-mapel').value = fbData.catatan_mapel || '';
+    } catch (e) { console.error("Firebase Error:", e); }
 
     document.getElementById('editor-modal').classList.remove('hidden');
     document.getElementById('editor-modal').classList.add('flex');
@@ -1362,26 +1328,21 @@ window.closeEditor = () => {
     document.getElementById('editor-modal').classList.remove('flex');
 };
 
-// --- FUNGSI SIMPAN CATATAN ---
 window.saveStudentProfile = async () => {
     const id = document.getElementById('edit-id').value;
     const data = {
-        nis: id,
         catatan_bk: document.getElementById('edit-catatan-bk').value,
         catatan_wali: document.getElementById('edit-catatan-wali').value,
         catatan_mapel: document.getElementById('edit-catatan-mapel').value,
-        last_updated: new Date().toISOString(),
-        updated_by: window.state.currentUser?.nama || 'Petugas Piket'
+        last_updated: new Date().toISOString()
     };
 
     try {
-        const docRef = doc(window.db, 'artifacts', window.appId, 'public', 'student_notes', id);
-        await setDoc(docRef, data, { merge: true });
-        window.showToast("✅ Catatan Berhasil Disimpan");
+        const docRef = window.doc(window.db, 'artifacts', window.appId, 'public', 'notes', id);
+        await window.setDoc(docRef, data, { merge: true });
+        window.showToast("✅ Berhasil Disimpan");
         window.closeEditor();
-    } catch (e) {
-        window.showToast("❌ Gagal menyimpan");
-    }
+    } catch (e) { window.showToast("❌ Gagal"); }
 };
 
 </script>
