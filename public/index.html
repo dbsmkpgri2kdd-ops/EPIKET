@@ -1271,127 +1271,196 @@ window.renderProfilList = () => {
     `).join("");
 };
 
+
+
+
 // --- Fungsi Detail Profil ---
-window.openProfil = async (nis) => {
-    const siswa = state.master.siswa.find(s => s.NIS == nis);
-    if (!siswa) return;
+// --- MODUL PROFIL & EDITOR CATATAN LENGKAP ---
 
-    state.selectedStudent = siswa;
+// 1. Render Daftar Profil (Gunakan huruf kecil sesuai hasil sinkronisasi database)
+window.renderProfilList = () => {
+    const q = document.getElementById("search-profil").value.toLowerCase();
+    const siswa = state.master?.siswa || [];
+    const container = document.getElementById("profil-list-container");
 
-    // Mapping data ke UI
-    const fields = {
-        "profil-nama": siswa.Nama,
-        "profil-nis": siswa.NIS,
-        "profil-kelas": siswa.Kelas,
-        "profil-sesi": siswa.Sesi,
-        "profil-tipe": siswa.Tipe,
-        "profil-alamat": siswa.Alamat,
-        "profil-hp": siswa.NoHP,
-        "profil-bk": siswa.NamaGuruBK,
-        "profil-wali": siswa.NamaWaliKelas,
-        "profil-guruwali": siswa.NamaGuruWali
-    };
+    const filtered = siswa.filter(s =>
+        (s.nama && s.nama.toLowerCase().includes(q)) ||
+        (s.id && s.id.toString().includes(q))
+    );
 
-    Object.keys(fields).forEach(id => {
-        document.getElementById(id).innerText = fields[id];
-    });
-
-    document.getElementById("modal-profil").style.display = "flex";
-
-    loadRekapAbsensi(nis);
-    loadCatatanSiswa(nis);
+    container.innerHTML = filtered.map(s => `
+        <div onclick="openProfil('${s.id}')" class="bg-white border border-slate-100 p-4 rounded-2xl mb-3 flex items-center gap-4 active:scale-95 transition shadow-sm hover:border-red-100">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center text-red-600 font-bold shadow-inner">
+                ${s.nama ? s.nama.charAt(0).toUpperCase() : '?'}
+            </div>
+            <div class="flex-1">
+                <div class="font-bold text-sm text-slate-800 uppercase tracking-tight">${s.nama}</div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">${s.kelas} • ${s.id}</div>
+            </div>
+            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+        </div>
+    `).join("");
 };
 
-window.closeProfil = () => {
+// 2. Buka Detail Profil & Load Data
+window.openProfil = async (id) => {
+    const siswa = state.master.siswa.find(s => s.id == id);
+    if (!siswa) return;
+
+    // Simpan ke state global agar bisa diakses modul lain
+    state.selectedStudent = siswa;
+
+    // Update UI Detail (Gunakan ID elemen yang ada di HTML Anda)
+    document.getElementById("profil-nama").innerText = siswa.nama;
+    document.getElementById("profil-nis").innerText = siswa.id;
+    document.getElementById("profil-kelas").innerText = siswa.kelas;
+    document.getElementById("profil-sesi").innerText = siswa.sesi || "-";
+    document.getElementById("profil-tipe").innerText = (siswa.tipe || "Siswa").toUpperCase();
+    
+    // Tampilkan Modal
+    document.getElementById("modal-profil").classList.remove("hidden");
+    document.getElementById("modal-profil").style.display = "flex";
+
+    // Load Data Pendukung
+    loadRekapAbsensi(id);
+    loadCatatanSiswa(id);
+};
+
+// 3. Rekap Absensi (Logika Internal State)
+function loadRekapAbsensi(personId) {
+    let rekap = { izin: 0, sakit: 0, alpa: 0, bolos: 0 };
+    
+    // Hitung dari data absensi yang sudah ter-sync di state.records
+    Object.values(state.records || {}).forEach(day => {
+        ['Pagi', 'Siang'].forEach(sess => {
+            const rec = day[`${personId}_${sess}`];
+            if (rec) {
+                const status = rec.status.toLowerCase();
+                if (status === 'izin') rekap.izin++;
+                else if (status === 'sakit') rekap.sakit++;
+                else if (status === 'alpa') rekap.alpa++;
+                else if (status === 'bolos' || status === 'b') rekap.bolos++;
+            }
+        });
+    });
+
+    document.getElementById("rekap-izin").innerText = rekap.izin;
+    document.getElementById("rekap-sakit").innerText = rekap.sakit;
+    document.getElementById("rekap-alpha").innerText = rekap.alpa + rekap.bolos;
+}
+
+// 4. Modul Editor Catatan (Firebase SDK Modular v9+)
+// Import fungsi yang diperlukan jika belum ada: getDocs, addDoc, updateDoc, deleteDoc, query, where, collection
+const { getDocs, addDoc, updateDoc, deleteDoc, doc, query, where, collection, orderBy } = window.FB;
+
+window.loadCatatanSiswa = async (nis) => {
+    const container = document.getElementById("catatan-list");
+    container.innerHTML = `<div class="p-4 text-center text-[10px] text-slate-400">Memuat catatan...</div>`;
+
+    try {
+        const q = query(
+            collection(db, "catatan_siswa"), 
+            where("nis", "==", nis.toString()),
+            orderBy("tanggal", "desc")
+        );
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+            container.innerHTML = `<div class="p-8 text-center"><i class="fa-solid fa-note-sticky text-slate-200 text-3xl mb-2"></i><p class="text-[10px] text-slate-400">Belum ada catatan perilaku.</p></div>`;
+            return;
+        }
+
+        let html = "";
+        querySnapshot.forEach((docSnap) => {
+            const d = docSnap.data();
+            const date = new Date(d.tanggal).toLocaleDateString('id-ID', { day:'numeric', month:'short' });
+            
+            html += `
+                <div class="bg-slate-50 border border-slate-100 p-3 rounded-xl mb-3 relative group">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-[9px] font-bold px-2 py-0.5 bg-white border border-slate-200 rounded text-slate-500 uppercase">${d.peran}</span>
+                        <span class="text-[9px] text-slate-400 font-medium">${date}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-700 leading-relaxed mb-3">${d.catatan}</p>
+                    <div class="flex justify-between items-end">
+                        <span class="text-[8px] text-slate-400 font-bold uppercase italic">Oleh: ${d.guru || 'Admin'}</span>
+                        <div class="flex gap-2">
+                            <button onclick="editCatatan('${docSnap.id}', '${d.catatan}')" class="text-[10px] text-blue-600 font-bold p-1"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="hapusCatatan('${docSnap.id}', '${nis}')" class="text-[10px] text-red-500 font-bold p-1"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    } catch (e) {
+        console.error("Error loading notes:", e);
+        container.innerHTML = `<div class="p-4 text-red-400 text-[10px]">Gagal memuat catatan.</div>`;
+    }
+};
+
+window.tambahCatatan = async () => {
+    const s = state.selectedStudent;
+    const peran = document.getElementById("form-peran").value;
+    const input = document.getElementById("form-catatan");
+    const btn = document.querySelector("button[onclick='tambahCatatan()']");
+
+    if (!input.value.trim()) return alert("Catatan tidak boleh kosong!");
+
+    btn.disabled = true;
+    btn.innerHTML = "Menyimpan...";
+
+    try {
+        await addDoc(collection(db, "catatan_siswa"), {
+            nis: s.id.toString(),
+            nama: s.nama,
+            kelas: s.kelas,
+            peran: peran,
+            guru: state.user?.nama || "Petugas Piket",
+            catatan: input.value,
+            tanggal: new Date().toISOString()
+        });
+        
+        input.value = "";
+        loadCatatanSiswa(s.id);
+    } catch (e) {
+        alert("Gagal menambah catatan: " + e.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = "SIMPAN CATATAN";
+    }
+};
+
+window.editCatatan = async (docId, teksLama) => {
+    const teksBaru = prompt("Edit Catatan:", teksLama);
+    if (teksBaru === null || teksBaru === teksLama) return;
+
+    try {
+        const docRef = doc(db, "catatan_siswa", docId);
+        await updateDoc(docRef, { catatan: teksBaru });
+        loadCatatanSiswa(state.selectedStudent.id);
+    } catch (e) {
+        alert("Gagal mengedit: " + e.message);
+    }
+};
+
+window.hapusCatatan = async (docId, nis) => {
+    if (!confirm("Hapus catatan ini selamanya?")) return;
+
+    try {
+        await deleteDoc(doc(db, "catatan_siswa", docId));
+        loadCatatanSiswa(nis);
+    } catch (e) {
+        alert("Gagal menghapus: " + e.message);
+    }
+};
+
+// 5. Fungsi Penutup Modal
+window.closeModal = () => {
     document.getElementById("modal-profil").style.display = "none";
 };
 
-// --- Fungsi Absensi ---
-async function loadRekapAbsensi(nis) {
-    let rekap = { hadir: 0, izin: 0, sakit: 0, alpha: 0 };
 
-    const snapshot = await db.collection("absensi")
-        .where("nis", "==", nis)
-        .get();
-
-    snapshot.forEach(doc => {
-        const status = doc.data().status;
-        if (rekap.hasOwnProperty(status)) rekap[status]++;
-    });
-
-    document.getElementById("rekap-hadir").innerText = rekap.hadir;
-    document.getElementById("rekap-izin").innerText = rekap.izin;
-    document.getElementById("rekap-sakit").innerText = rekap.sakit;
-    document.getElementById("rekap-alpha").innerText = rekap.alpha;
-}
-
-// --- Fungsi Catatan Siswa ---
-async function loadCatatanSiswa(nis) {
-    const container = document.getElementById("list-catatan");
-    container.innerHTML = "<em>Memuat...</em>";
-
-    const snapshot = await db.collection("catatan_siswa")
-        .where("nis", "==", nis)
-        .get();
-
-    if (snapshot.empty) {
-        container.innerHTML = "Belum ada catatan";
-        return;
-    }
-
-    container.innerHTML = "";
-    snapshot.forEach(doc => {
-        const d = doc.data();
-        container.innerHTML += `
-            <div style="border:1px solid #ddd; padding:10px; border-radius:8px; margin-bottom:6px">
-                <div><b>${d.peran}</b> - ${d.guru}</div>
-                <div style="font-size:11px; color:#777; margin-bottom:5px">${d.tanggal}</div>
-                <div style="margin-bottom:8px">${d.catatan}</div>
-                <button onclick="editCatatan('${doc.id}')">Edit</button>
-                <button onclick="hapusCatatan('${doc.id}')">Hapus</button>
-            </div>
-        `;
-    });
-}
-
-async function tambahCatatan() {
-    const siswa = state.selectedStudent;
-    const peran = document.getElementById("form-peran").value;
-    const catatan = document.getElementById("form-catatan").value;
-
-    if (!catatan.trim()) return alert("Isi catatan");
-
-    await db.collection("catatan_siswa").add({
-        nis: siswa.NIS,
-        nama: siswa.Nama,
-        kelas: siswa.Kelas,
-        peran: peran,
-        guru: state.user?.nama || "Guru",
-        catatan: catatan,
-        tanggal: new Date().toISOString().slice(0, 10)
-    });
-
-    document.getElementById("form-catatan").value = "";
-    loadCatatanSiswa(siswa.NIS);
-}
-
-async function editCatatan(id) {
-    const teks = prompt("Edit catatan");
-    if (!teks) return;
-
-    await db.collection("catatan_siswa").doc(id).update({
-        catatan: teks
-    });
-
-    loadCatatanSiswa(state.selectedStudent.NIS);
-}
-
-async function hapusCatatan(id) {
-    if (!confirm("Hapus catatan?")) return;
-
-    await db.collection("catatan_siswa").doc(id).delete();
-    loadCatatanSiswa(state.selectedStudent.NIS);
-}
     </script>
 </body>
 </html>
