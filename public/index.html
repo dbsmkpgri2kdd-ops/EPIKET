@@ -72,113 +72,106 @@
 
         <main class="pb-32 p-4 max-w-md mx-auto">
 
-            <!-- TAB PROFIL -->
 <div id="tab-profil" class="tab-content">
-    <div class="px-6 py-4">
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <h2 class="text-xl font-black text-slate-800 tracking-tighter uppercase leading-none">Profil & Catatan</h2>
-                <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Database Pembinaan Siswa</p>
-            </div>
-            <div class="w-10 h-10 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 shadow-sm">
-                <i class="fas fa-address-card text-lg"></i>
-            </div>
-        </div>
-        
-        <div class="relative mb-6">
-            <input type="text" id="search-profil" onkeyup="window.renderProfilList()" placeholder="Cari Nama atau NIS..." 
-                   class="w-full bg-white border border-slate-200 rounded-3xl py-3.5 px-6 text-[11px] font-bold focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm transition-all">
-            <i class="fas fa-search absolute right-6 top-4 text-slate-300"></i>
-        </div>
+  <div style="padding: 15px;">
+    <input 
+      id="search-profil" 
+      type="text"
+      placeholder="🔍 Cari Nama atau NIS..." 
+      oninput="renderProfilList()" 
+      style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; outline: none; box-sizing: border-box;"
+    />
+  </div>
 
-        <div id="profil-list-container" class="space-y-3 pb-32"></div>
+  <div id="profil-list-container" style="padding: 10px;">
     </div>
 </div>
 
-<div id="editor-modal" class="fixed inset-0 bg-black/60 z-[100] hidden items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
-    <div class="bg-white w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] p-8 space-y-6 overflow-y-auto max-h-[90vh] shadow-2xl no-scrollbar">
-        
-        <div class="flex justify-between items-center">
-            <h3 class="text-xs font-black uppercase text-slate-800 tracking-widest">Detail & Pembinaan</h3>
-            <button onclick="window.closeEditor()" class="text-slate-300 hover:text-red-500 transition-colors">
-                <i class="fas fa-times-circle text-2xl"></i>
-            </button>
-        </div>
-
-        <input type="hidden" id="edit-id">
-        
-        <div class="bg-slate-50 p-5 rounded-[2rem] border border-slate-100 space-y-4">
-            <div>
-                <input type="text" id="edit-nama" readonly class="bg-transparent border-none w-full font-black text-slate-800 uppercase text-sm focus:outline-none" placeholder="NAMA SISWA">
-                <div class="flex flex-wrap gap-2 mt-2">
-                    <span id="display-kelas" class="text-[9px] font-black text-red-600 bg-red-50 px-3 py-1.5 rounded-xl border border-red-100 uppercase">KELAS</span>
-                    <span id="display-sesi" class="text-[9px] font-black text-slate-500 bg-white px-3 py-1.5 rounded-xl border border-slate-200 uppercase tracking-widest">SESI</span>
-                </div>
-            </div>
-
-            <div class="pt-3 border-t border-slate-200 space-y-2">
-                <div class="flex justify-between items-start text-[10px]">
-                    <span class="font-black text-slate-400 uppercase">Guru Wali</span>
-                    <span id="display-guru-wali" class="font-black text-slate-700 text-right w-2/3">-</span>
-                </div>
-                <div class="flex justify-between items-start text-[10px]">
-                    <span class="font-black text-slate-400 uppercase">Wali Kelas</span>
-                    <span id="display-wali-kelas" class="font-black text-slate-700 text-right w-2/3">-</span>
-                </div>
-                <div class="flex justify-between items-start text-[10px]">
-                    <span class="font-black text-slate-400 uppercase">Guru BK</span>
-                    <span id="display-guru-bk" class="font-black text-slate-700 text-right w-2/3">-</span>
-                </div>
-                <div class="pt-2">
-                    <span class="text-[8px] font-black text-slate-400 uppercase block mb-1">Alamat</span>
-                    <p id="display-alamat" class="text-[10px] font-bold text-slate-500 italic leading-tight uppercase"></p>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-5 gap-2">
-            <div class="bg-white border border-slate-100 p-3 rounded-2xl text-center shadow-sm">
-                <p id="rekap-a" class="text-sm font-black text-red-600">0</p>
-                <p class="text-[8px] font-black text-slate-400 uppercase">A</p>
-            </div>
-            <div class="bg-white border border-slate-100 p-3 rounded-2xl text-center shadow-sm">
-                <p id="rekap-b" class="text-sm font-black text-orange-500">0</p>
-                <p class="text-[8px] font-black text-slate-400 uppercase">B</p>
-            </div>
-            <div class="bg-white border border-slate-100 p-3 rounded-2xl text-center shadow-sm">
-                <p id="rekap-i" class="text-sm font-black text-blue-500">0</p>
-                <p class="text-[8px] font-black text-slate-400 uppercase">I</p>
-            </div>
-            <div class="bg-white border border-slate-100 p-3 rounded-2xl text-center shadow-sm">
-                <p id="rekap-s" class="text-sm font-black text-green-600">0</p>
-                <p class="text-[8px] font-black text-slate-400 uppercase">S</p>
-            </div>
-            <div class="bg-slate-800 p-3 rounded-2xl text-center shadow-md">
-                <p id="rekap-t" class="text-sm font-black text-white">0</p>
-                <p class="text-[8px] font-black text-slate-300 uppercase">Total</p>
-            </div>
-        </div>
-
-        <div class="space-y-4">
-            <div>
-                <label class="text-[9px] font-black text-orange-600 uppercase ml-3 mb-1 block">Catatan Guru Wali</label>
-                <textarea id="edit-catatan-wali" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-orange-400 outline-none" rows="2"></textarea>
-            </div>
-            <div>
-                <label class="text-[9px] font-black text-red-600 uppercase ml-3 mb-1 block">Catatan Guru BK</label>
-                <textarea id="edit-catatan-bk" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-red-400 outline-none" rows="2"></textarea>
-            </div>
-            <div>
-                <label class="text-[9px] font-black text-blue-600 uppercase ml-3 mb-1 block">Catatan Guru Mapel</label>
-                <textarea id="edit-catatan-mapel" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-blue-400 outline-none" rows="2"></textarea>
-            </div>
-        </div>
-
-        <button onclick="window.saveStudentProfile()" class="w-full bg-slate-900 text-white font-black py-5 rounded-[2rem] text-xs uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all">
-            Simpan ke Firebase
-        </button>
+<div id="modal-profil" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
+  
+  <div style="background: white; width: 95%; max-width: 650px; border-radius: 16px; padding: 24px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <h3 style="margin: 0;">Profil Siswa</h3>
+      <button onclick="closeProfil()" style="background: none; border: none; font-size: 20px; cursor: pointer;">✕</button>
     </div>
+
+    <div style="display: flex; gap: 20px; align-items: center; background: #f9f9f9; padding: 15px; border-radius: 12px;">
+      <div style="width: 70px; height: 70px; background: #e0e0e0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px;">
+        👤
+      </div>
+      <div>
+        <div style="font-size: 18px; font-weight: bold; color: #333;" id="profil-nama"></div>
+        <div style="color: #666; font-size: 14px;">NIS: <span id="profil-nis" style="font-weight: 500;"></span></div>
+        <div style="color: #666; font-size: 14px;">Kelas: <span id="profil-kelas" style="font-weight: 500;"></span></div>
+      </div>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px; line-height: 1.6;">
+      <div><strong>Sesi:</strong> <span id="profil-sesi"></span></div>
+      <div><strong>Tipe:</strong> <span id="profil-tipe"></span></div>
+      <div style="grid-column: span 2;"><strong>Alamat:</strong> <span id="profil-alamat"></span></div>
+      <div><strong>No. HP:</strong> <span id="profil-hp"></span></div>
+      <div><strong>Guru BK:</strong> <span id="profil-bk"></span></div>
+      <div><strong>Wali Kelas:</strong> <span id="profil-wali"></span></div>
+      <div><strong>Guru Wali:</strong> <span id="profil-guruwali"></span></div>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+    <h4 style="margin-bottom: 10px;">📊 Rekap Kehadiran</h4>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center;">
+      <div style="background: #e8f5e9; padding: 8px; border-radius: 8px; color: #2e7d32;">Hadir: <b id="rekap-hadir">0</b></div>
+      <div style="background: #fff3e0; padding: 8px; border-radius: 8px; color: #ef6c00;">Izin: <b id="rekap-izin">0</b></div>
+      <div style="background: #e3f2fd; padding: 8px; border-radius: 8px; color: #1565c0;">Sakit: <b id="rekap-sakit">0</b></div>
+      <div style="background: #ffebee; padding: 8px; border-radius: 8px; color: #c62828;">Alpha: <b id="rekap-alpha">0</b></div>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+    <h4 style="margin-bottom: 10px;">📝 Catatan Pembinaan</h4>
+    <div id="list-catatan" style="font-size: 13px; margin-bottom: 15px; background: #fcfcfc; border: 1px solid #f0f0f0; padding: 10px; border-radius: 8px;">
+      Belum ada catatan
+    </div>
+
+    <div style="background: #f5f5f5; padding: 15px; border-radius: 12px;">
+      <h4 style="margin-top: 0; margin-bottom: 10px;">Tambah Catatan Baru</h4>
+      
+      <select id="form-peran" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd; margin-bottom: 8px;">
+        <option>Guru BK</option>
+        <option>Guru Wali</option>
+        <option>Wali Kelas</option>
+        <option>Guru Mapel</option>
+      </select>
+
+      <textarea 
+        id="form-catatan" 
+        placeholder="Tulis detail pembinaan di sini..." 
+        style="width: 100%; height: 80px; padding: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-family: sans-serif; resize: vertical;"
+      ></textarea>
+
+      <button 
+        onclick="tambahCatatan()" 
+        style="width: 100%; margin-top: 10px; padding: 10px; background: #007bff; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;"
+      >
+        Simpan Catatan
+      </button>
+    </div>
+
+    <button 
+      onclick="closeProfil()" 
+      style="width: 100%; margin-top: 15px; padding: 10px; background: #eee; color: #333; border: none; border-radius: 8px; cursor: pointer;"
+    >
+      Tutup Jendela
+    </button>
+
+  </div>
 </div>
+
+
+
 
             <!-- TAB BERANDA -->
             <div id="tab-dashboard" class="tab-content active space-y-6">
@@ -1254,121 +1247,151 @@ window.onload = () => {
 
 
 // Fungsi untuk menampilkan daftar profil
-// 1. Fungsi Render List Siswa
-// 1. Fungsi Render List (Tab Profil)
+// --- Fungsi Render Daftar Profil ---
 window.renderProfilList = () => {
-    const q = document.getElementById('search-profil').value.toLowerCase();
-    const container = document.getElementById('profil-list-container');
-    
-    if (!state.students || state.students.length === 0) {
-        container.innerHTML = '<p class="text-center text-[10px] text-slate-400 italic py-10 tracking-widest">DATABASE SEDANG DIMUAT...</p>';
-        return;
-    }
+    const q = document.getElementById("search-profil").value.toLowerCase();
+    const siswa = state.master?.siswa || [];
+    const container = document.getElementById("profil-list-container");
 
-    // Filter Nama atau NIS (Gunakan Header NIS dan Nama sesuai CSV)
-    const filtered = state.students.filter(s => 
-        (s.Nama && s.Nama.toLowerCase().includes(q)) || 
+    const filtered = siswa.filter(s =>
+        (s.Nama && s.Nama.toLowerCase().includes(q)) ||
         (s.NIS && s.NIS.toString().includes(q))
     );
 
     container.innerHTML = filtered.map(s => `
-        <div onclick="window.openEditor('${s.NIS}')" class="bg-white p-5 rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center justify-between active:scale-[0.98] transition-all cursor-pointer hover:border-red-100 group">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-red-50 group-hover:text-red-500 transition-all">
-                    <i class="fas fa-user text-sm"></i>
-                </div>
-                <div>
-                    <h4 class="font-black text-slate-800 text-[11px] leading-tight uppercase">${s.Nama}</h4>
-                    <p class="text-[9px] font-bold text-slate-400 mt-1 uppercase tracking-widest">${s.Kelas} • ${s.NIS}</p>
-                </div>
+        <div onclick="openProfil('${s.NIS}')" style="border:1px solid #eee; padding:10px; border-radius:10px; margin-bottom:8px; cursor:pointer; display:flex; align-items:center; gap:10px">
+            <div style="width:35px; height:35px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center">
+                👤
             </div>
-            <i class="fas fa-chevron-right text-[10px] text-slate-200 group-hover:text-red-400 mr-2"></i>
+            <div>
+                <div style="font-weight:bold; font-size:13px">${s.Nama}</div>
+                <div style="font-size:11px; color:#777">${s.Kelas} • ${s.NIS}</div>
+            </div>
         </div>
-    `).join('');
+    `).join("");
 };
 
-// 2. Fungsi Buka Editor (Gabungkan CSV & Firebase)
-window.openEditor = async (id) => {
-    const student = state.students.find(s => s.NIS.toString() === id.toString());
-    if (!student) return;
+// --- Fungsi Detail Profil ---
+window.openProfil = async (nis) => {
+    const siswa = state.master.siswa.find(s => s.NIS == nis);
+    if (!siswa) return;
 
-    // Masukkan data dari CSV ke Modal
-    document.getElementById('edit-id').value = student.NIS;
-    document.getElementById('edit-nama').value = student.Nama;
-    document.getElementById('display-kelas').innerText = student.Kelas;
-    document.getElementById('display-sesi').innerText = student.Sesi || 'Pagi';
-    document.getElementById('display-guru-wali').innerText = student.NamaGuruWali || '-';
-    document.getElementById('display-wali-kelas').innerText = student.NamaWaliKelas || '-';
-    document.getElementById('display-guru-bk').innerText = student.NamaGuruBK || '-';
-    document.getElementById('display-alamat').innerText = student.Alamat || '';
+    state.selectedStudent = siswa;
 
-    // Reset Form Catatan & Rekap
-    document.getElementById('edit-catatan-wali').value = 'Memuat...';
-    document.getElementById('edit-catatan-bk').value = 'Memuat...';
-    document.getElementById('edit-catatan-mapel').value = 'Memuat...';
-    ['a','b','i','s','t'].forEach(r => document.getElementById(`rekap-${r}`).innerText = '0');
-
-    // Ambil Catatan Dinamis dari Firebase
-    try {
-        const { doc, getDoc } = window.FirebaseFirestore;
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_profiles', id.toString());
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            document.getElementById('edit-catatan-wali').value = data.catatan_wali || '';
-            document.getElementById('edit-catatan-bk').value = data.catatan_bk || '';
-            document.getElementById('edit-catatan-mapel').value = data.catatan_mapel || '';
-            
-            // Jika ada data rekap absensi di Firebase
-            if (data.rekap) {
-                document.getElementById('rekap-a').innerText = data.rekap.A || 0;
-                document.getElementById('rekap-b').innerText = data.rekap.B || 0;
-                document.getElementById('rekap-i').innerText = data.rekap.I || 0;
-                document.getElementById('rekap-s').innerText = data.rekap.S || 0;
-                document.getElementById('rekap-t').innerText = data.rekap.Total || 0;
-            }
-        } else {
-            document.getElementById('edit-catatan-wali').value = '';
-            document.getElementById('edit-catatan-bk').value = '';
-            document.getElementById('edit-catatan-mapel').value = '';
-        }
-    } catch (e) {
-        console.error("Firebase Error:", e);
-    }
-
-    document.getElementById('editor-modal').classList.replace('hidden', 'flex');
-};
-
-// 3. Fungsi Tutup & Simpan
-window.closeEditor = () => {
-    document.getElementById('editor-modal').classList.replace('flex', 'hidden');
-};
-
-window.saveStudentProfile = async () => {
-    const id = document.getElementById('edit-id').value;
-    const data = {
-        nis: id,
-        nama: document.getElementById('edit-nama').value,
-        catatan_wali: document.getElementById('edit-catatan-wali').value,
-        catatan_bk: document.getElementById('edit-catatan-bk').value,
-        catatan_mapel: document.getElementById('edit-catatan-mapel').value,
-        last_updated: new Date().toISOString()
+    // Mapping data ke UI
+    const fields = {
+        "profil-nama": siswa.Nama,
+        "profil-nis": siswa.NIS,
+        "profil-kelas": siswa.Kelas,
+        "profil-sesi": siswa.Sesi,
+        "profil-tipe": siswa.Tipe,
+        "profil-alamat": siswa.Alamat,
+        "profil-hp": siswa.NoHP,
+        "profil-bk": siswa.NamaGuruBK,
+        "profil-wali": siswa.NamaWaliKelas,
+        "profil-guruwali": siswa.NamaGuruWali
     };
 
-    try {
-        const { doc, setDoc } = window.FirebaseFirestore;
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_profiles', id);
-        await setDoc(docRef, data, { merge: true });
-        
-        if (window.showToast) window.showToast("✅ DATA BERHASIL DISIMPAN");
-        else alert("Data Berhasil Disimpan");
-        
-        window.closeEditor();
-    } catch (e) {
-        alert("Gagal menyimpan ke database.");
-    }
+    Object.keys(fields).forEach(id => {
+        document.getElementById(id).innerText = fields[id];
+    });
+
+    document.getElementById("modal-profil").style.display = "flex";
+
+    loadRekapAbsensi(nis);
+    loadCatatanSiswa(nis);
 };
+
+window.closeProfil = () => {
+    document.getElementById("modal-profil").style.display = "none";
+};
+
+// --- Fungsi Absensi ---
+async function loadRekapAbsensi(nis) {
+    let rekap = { hadir: 0, izin: 0, sakit: 0, alpha: 0 };
+
+    const snapshot = await db.collection("absensi")
+        .where("nis", "==", nis)
+        .get();
+
+    snapshot.forEach(doc => {
+        const status = doc.data().status;
+        if (rekap.hasOwnProperty(status)) rekap[status]++;
+    });
+
+    document.getElementById("rekap-hadir").innerText = rekap.hadir;
+    document.getElementById("rekap-izin").innerText = rekap.izin;
+    document.getElementById("rekap-sakit").innerText = rekap.sakit;
+    document.getElementById("rekap-alpha").innerText = rekap.alpha;
+}
+
+// --- Fungsi Catatan Siswa ---
+async function loadCatatanSiswa(nis) {
+    const container = document.getElementById("list-catatan");
+    container.innerHTML = "<em>Memuat...</em>";
+
+    const snapshot = await db.collection("catatan_siswa")
+        .where("nis", "==", nis)
+        .get();
+
+    if (snapshot.empty) {
+        container.innerHTML = "Belum ada catatan";
+        return;
+    }
+
+    container.innerHTML = "";
+    snapshot.forEach(doc => {
+        const d = doc.data();
+        container.innerHTML += `
+            <div style="border:1px solid #ddd; padding:10px; border-radius:8px; margin-bottom:6px">
+                <div><b>${d.peran}</b> - ${d.guru}</div>
+                <div style="font-size:11px; color:#777; margin-bottom:5px">${d.tanggal}</div>
+                <div style="margin-bottom:8px">${d.catatan}</div>
+                <button onclick="editCatatan('${doc.id}')">Edit</button>
+                <button onclick="hapusCatatan('${doc.id}')">Hapus</button>
+            </div>
+        `;
+    });
+}
+
+async function tambahCatatan() {
+    const siswa = state.selectedStudent;
+    const peran = document.getElementById("form-peran").value;
+    const catatan = document.getElementById("form-catatan").value;
+
+    if (!catatan.trim()) return alert("Isi catatan");
+
+    await db.collection("catatan_siswa").add({
+        nis: siswa.NIS,
+        nama: siswa.Nama,
+        kelas: siswa.Kelas,
+        peran: peran,
+        guru: state.user?.nama || "Guru",
+        catatan: catatan,
+        tanggal: new Date().toISOString().slice(0, 10)
+    });
+
+    document.getElementById("form-catatan").value = "";
+    loadCatatanSiswa(siswa.NIS);
+}
+
+async function editCatatan(id) {
+    const teks = prompt("Edit catatan");
+    if (!teks) return;
+
+    await db.collection("catatan_siswa").doc(id).update({
+        catatan: teks
+    });
+
+    loadCatatanSiswa(state.selectedStudent.NIS);
+}
+
+async function hapusCatatan(id) {
+    if (!confirm("Hapus catatan?")) return;
+
+    await db.collection("catatan_siswa").doc(id).delete();
+    loadCatatanSiswa(state.selectedStudent.NIS);
+}
     </script>
 </body>
 </html>
