@@ -1227,7 +1227,7 @@ window.onload = () => {
 
 
 // Fungsi untuk menampilkan daftar profil
-
+// --- JANGAN TULIS IMPORT LAGI DISINI ---
 
 window.renderProfilList = () => {
     const query = document.getElementById('search-profil').value.toLowerCase();
@@ -1235,8 +1235,8 @@ window.renderProfilList = () => {
     const data = window.state?.master?.siswa || []; // Menggunakan data dari CSV
     
     const filtered = data.filter(s => 
-        (s.Nama && s.Nama.toLowerCase().includes(query)) || 
-        (s.NIS && s.NIS.toString().includes(query))
+        (s.nama?.toLowerCase().includes(query)) || 
+        (s.id?.toString().includes(query))
     );
 
     if (filtered.length === 0) {
@@ -1245,13 +1245,13 @@ window.renderProfilList = () => {
     }
 
     container.innerHTML = filtered.map(s => `
-        <div onclick="window.openEditor('${s.NIS}')" class="bg-white p-4 rounded-3xl border border-slate-100 flex items-center gap-4 active:scale-95 transition-all cursor-pointer shadow-sm">
+        <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-3xl border border-slate-100 flex items-center gap-4 active:scale-95 transition-all cursor-pointer shadow-sm">
             <div class="w-10 h-10 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
                 <i class="fas fa-user text-sm"></i>
             </div>
             <div class="flex-grow">
-                <h4 class="text-[11px] font-black uppercase text-slate-800">${s.Nama}</h4>
-                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">${s.Kelas} • ${s.NIS}</p>
+                <h4 class="text-[11px] font-black uppercase text-slate-800">${s.nama}</h4>
+                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">${s.kelas} • ${s.id}</p>
             </div>
             <i class="fas fa-chevron-right text-slate-200 text-xs"></i>
         </div>
@@ -1260,22 +1260,22 @@ window.renderProfilList = () => {
 
 window.openEditor = async (nis) => {
     // 1. Ambil data dari CSV (State Master)
-    const s = window.state.master.siswa.find(x => x.NIS == nis);
+    const s = window.state.master.siswa.find(x => x.id == nis);
     if (!s) return;
 
     // 2. Isi Form Modal
-    document.getElementById('edit-id').value = s.NIS;
+    document.getElementById('edit-id').value = s.id;
     document.getElementById('edit-nama').value = s.nama;
-    document.getElementById('display-nis').innerText = `NIS: ${s.NIS}`;
+    document.getElementById('display-nis').innerText = `NIS: ${s.id}`;
     document.getElementById('display-kelas').innerText = s.kelas || '-';
-    document.getElementById('display-sesi').innerText = s.Sesi || '-';
-    document.getElementById('display-tipe').innerText = s.Tipe || '-';
-    document.getElementById('display-alamat').innerText = s.Alamat || '-';
-    document.getElementById('display-nohp').innerText = s.No_HP || '-';
-    document.getElementById('display-kesiswaan').innerText = s.Kesiswaan || '-';
-    document.getElementById('display-guru-bk').innerText = s.Guru_BK || '-';
-    document.getElementById('display-wali-kelas').innerText = s.Wali_Kelas || '-';
-    document.getElementById('display-guru-wali').innerText = s.Guru_Wali || '-';
+    document.getElementById('display-sesi').innerText = s.sesi || '-';
+    document.getElementById('display-tipe').innerText = s.tipe || '-';
+    document.getElementById('display-alamat').innerText = s.alamat || '-';
+    document.getElementById('display-nohp').innerText = s.no_hp || '-';
+    document.getElementById('display-kesiswaan').innerText = s.kesiswaan || '-';
+    document.getElementById('display-guru-bk').innerText = s.guru_bk || '-';
+    document.getElementById('display-wali-kelas').innerText = s.wali_kelas || '-';
+    document.getElementById('display-guru-wali').innerText = s.guru_wali || '-';
 
 
     // 3. Kalkulasi Rekapitulasi ABIS
