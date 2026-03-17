@@ -71,7 +71,7 @@
         </header>
 
         <main class="pb-32 p-4 max-w-md mx-auto">
-            <!-- TAB PROFIL -->
+
 <div id="tab-profil" class="tab-content">
     <div class="px-6 py-4 pb-24">
         <div class="flex items-center justify-between mb-6">
@@ -91,14 +91,12 @@
             <i class="fas fa-search absolute right-6 top-4 text-slate-300"></i>
         </div>
 
-        <div id="profil-list-container" class="space-y-3">
-            </div>
+        <div id="profil-list-container" class="space-y-3"></div>
     </div>
 </div>
 
 <div id="editor-modal" class="fixed inset-0 bg-black/60 z-[100] hidden items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
     <div class="bg-white w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] p-8 space-y-6 overflow-y-auto max-h-[95vh] shadow-2xl no-scrollbar">
-        
         <div class="flex justify-between items-center border-b border-slate-50 pb-4">
             <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Editor Data Siswa</h3>
             <button onclick="window.closeEditor()" class="text-slate-300 hover:text-red-500 transition-colors">
@@ -108,71 +106,43 @@
 
         <input type="hidden" id="edit-id">
         
-        <div class="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 flex gap-4 shadow-sm">
-            <div class="flex-shrink-0">
-                <div id="poto-container" class="w-16 h-16 bg-white border-2 border-red-100 rounded-2xl flex items-center justify-center text-red-600 overflow-hidden shadow-sm">
-                    <i class="fas fa-user-graduate text-2xl"></i>
-                </div>
-            </div>
+        <div class="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 flex gap-4">
             <div class="flex-grow">
                 <input type="text" id="edit-nama" readonly class="bg-transparent border-none w-full font-black text-slate-800 uppercase text-sm focus:outline-none">
                 <p id="display-nis" class="text-[9px] font-bold text-slate-400">NIS: -</p>
-                <div class="flex flex-wrap gap-2 mt-2">
-                    <span id="display-kelas" class="text-[8px] font-black text-red-600 bg-red-50 px-3 py-1 rounded-lg border border-red-100 uppercase">-</span>
-                    <span id="display-sesi" class="text-[8px] font-black text-slate-500 bg-white px-3 py-1 rounded-lg border border-slate-200 uppercase">-</span>
-                </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 gap-3 bg-slate-50/50 p-5 rounded-[2rem] border border-slate-100">
             <div class="grid grid-cols-2 gap-4 border-b border-slate-50 pb-3">
-                <div>
-                    <span class="text-[8px] font-black text-slate-400 uppercase">Tipe</span>
-                    <p id="display-tipe" class="text-[10px] font-bold text-slate-700 uppercase">-</p>
-                </div>
-                <div>
-                    <span class="text-[8px] font-black text-slate-400 uppercase">No HP</span>
-                    <p id="display-nohp" class="text-[10px] font-bold text-slate-700">-</p>
-                </div>
+                <div><span class="text-[8px] font-black text-slate-400 uppercase">No HP</span><p id="display-nohp" class="text-[10px] font-bold text-slate-700">-</p></div>
+                <div><span class="text-[8px] font-black text-slate-400 uppercase">Tipe</span><p id="display-tipe" class="text-[10px] font-bold text-slate-700">-</p></div>
             </div>
-            <div class="space-y-2 border-b border-slate-50 pb-3 text-[9px] font-bold uppercase text-slate-800">
-                <div class="flex justify-between items-center"><span>Guru BK</span><span id="display-guru-bk"></span></div>
-                <div class="flex justify-between items-center"><span>Wali Kelas</span><span id="display-wali-kelas"></span></div>
-                <div class="flex justify-between items-center"><span>Guru Wali</span><span id="display-guru-wali"></span></div>
+            <div class="text-[9px] font-bold uppercase text-slate-800 space-y-1">
+                <div class="flex justify-between"><span>Guru BK:</span><span id="display-guru-bk">-</span></div>
+                <div class="flex justify-between"><span>Wali Kelas:</span><span id="display-wali-kelas">-</span></div>
             </div>
-            <p id="display-alamat" class="text-[10px] font-bold text-slate-500 italic uppercase"></p>
+            <p id="display-alamat" class="text-[10px] font-bold text-slate-500 italic uppercase">-</p>
         </div>
 
         <div class="grid grid-cols-5 gap-2 text-center">
-            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-a" class="font-black text-red-600 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">A</p></div>
-            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-b" class="font-black text-orange-500 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">B</p></div>
-            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-i" class="font-black text-blue-500 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">I</p></div>
-            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-s" class="font-black text-green-600 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">S</p></div>
-            <div class="bg-slate-900 p-2 rounded-2xl"><p id="rekap-t" class="font-black text-white text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-300">T</p></div>
+            <div class="bg-white border p-2 rounded-2xl"><p id="rekap-a" class="font-black text-red-600 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">A</p></div>
+            <div class="bg-white border p-2 rounded-2xl"><p id="rekap-b" class="font-black text-orange-500 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">B</p></div>
+            <div class="bg-white border p-2 rounded-2xl"><p id="rekap-i" class="font-black text-blue-500 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">I</p></div>
+            <div class="bg-white border p-2 rounded-2xl"><p id="rekap-s" class="font-black text-green-600 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">S</p></div>
+            <div class="bg-slate-900 p-2 rounded-2xl"><p id="rekap-t" class="font-black text-white text-xs">0</p><p class="text-[7px] uppercase font-bold text-white">T</p></div>
         </div>
 
         <div class="space-y-3">
-            <textarea id="edit-catatan-bk" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-red-400 outline-none" rows="2" placeholder="Catatan BK..."></textarea>
-            <textarea id="edit-catatan-wali" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-orange-400 outline-none" rows="2" placeholder="Catatan Wali Kelas..."></textarea>
-            <textarea id="edit-catatan-mapel" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-blue-400 outline-none" rows="2" placeholder="Catatan Mapel..."></textarea>
+            <textarea id="edit-catatan-bk" class="w-full bg-slate-50 border rounded-2xl p-4 text-[11px]" rows="2" placeholder="Catatan BK..."></textarea>
+            <textarea id="edit-catatan-wali" class="w-full bg-slate-50 border rounded-2xl p-4 text-[11px]" rows="2" placeholder="Catatan Wali Kelas..."></textarea>
         </div>
 
-	<button onclick="saveStudentProfile(document.getElementById('edit-id').value)" 
-	    class="w-full bg-red-600 text-white py-4 rounded-2xl font-black text-xs uppercase shadow-lg active:scale-95 transition">SIMPAN CATATAN</button>
+        <button onclick="window.saveStudentProfile(document.getElementById('edit-id').value)" class="w-full bg-red-600 text-white font-black py-4 rounded-[2rem] text-[10px] uppercase shadow-xl">
+            Simpan Catatan Pembinaan
+        </button>
     </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1280,121 +1250,93 @@ window.onload = () => {
 
 
 
-
+// --- RENDER LIST SISWA ---
 window.renderProfilList = () => {
     const container = document.getElementById('profil-list-container');
     const search = document.getElementById('search-profil').value.toLowerCase();
+    const filtered = state.master.siswa.filter(s => s.nama.toLowerCase().includes(search) || s.id.includes(search));
     
-    const filtered = state.master.siswa.filter(s => 
-        s.nama.toLowerCase().includes(search) || 
-        s.id.toLowerCase().includes(search) ||
-        s.kelas.toLowerCase().includes(search)
-    );
-
-    if(filtered.length === 0) {
-        container.innerHTML = `<div class="text-center py-10 opacity-30 font-black text-[10px] uppercase">Siswa tidak ditemukan</div>`;
-        return;
-    }
-
     container.innerHTML = filtered.map(s => `
-        <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-4 active:scale-95 transition-all cursor-pointer">
-            <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 font-black text-xs">
-                ${s.nama.charAt(0)}
-            </div>
+        <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-[2rem] border border-slate-100 flex items-center gap-4 cursor-pointer">
+            <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-red-600 font-bold">${s.nama.charAt(0)}</div>
             <div class="flex-grow">
                 <h4 class="text-[11px] font-black text-slate-800 uppercase">${s.nama}</h4>
-                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">${s.kelas} • ${s.id}</p>
+                <p class="text-[9px] text-slate-400 uppercase">${s.kelas} • ${s.id}</p>
             </div>
-            <i class="fas fa-chevron-right text-slate-200 text-xs mr-2"></i>
+            <i class="fas fa-chevron-right text-slate-200"></i>
         </div>
     `).join('');
 };
 
-
+// --- BUKA EDITOR & HITUNG REKAP (SAFE READ) ---
 window.openEditor = async (id) => {
-    const student = state.master.siswa.find(s => s.id === id);
-    if (!student) return;
+    const s = state.master.siswa.find(x => x.id === id);
+    if (!s) return;
 
-    // Helper untuk mengisi teks dengan aman
-    const setSafeText = (id, text) => {
-        const el = document.getElementById(id);
-        if (el) el.innerText = text || '-';
-    };
+    // Isi Info Dasar
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-nama').value = s.nama;
+    document.getElementById('display-nis').innerText = `NIS: ${s.id}`;
+    document.getElementById('display-nohp').innerText = s.nohp || '-';
+    document.getElementById('display-alamat').innerText = s.alamat || '-';
+    document.getElementById('display-guru-bk').innerText = s.guruBK || '-';
+    document.getElementById('display-wali-kelas').innerText = s.waliKelas || '-';
+    document.getElementById('display-tipe').innerText = (s.tipe || 'Siswa').toUpperCase();
 
-    // 1. Isi Identitas Dasar
-    const nameInput = document.getElementById('edit-nama');
-    if (nameInput) nameInput.value = student.nama;
-    
-    const idInput = document.getElementById('edit-id');
-    if (idInput) idInput.value = id;
-
-    setSafeText('display-nis', `NIS: ${student.id}`);
-    setSafeText('display-kelas', student.kelas);
-    setSafeText('display-sesi', student.sesi);
-    
-    // 2. Isi Detail Profil (Data dari CSV)
-    setSafeText('display-nohp', student.nohp);
-    setSafeText('display-alamat', student.alamat);
-    setSafeText('display-guru-bk', student.guruBK);
-    setSafeText('display-wali-kelas', student.waliKelas);
-    setSafeText('display-guru-wali', student.guruWali);
-    setSafeText('display-tipe', (student.tipe || 'SISWA').toUpperCase());
-
-    // 3. Load Catatan Pembinaan dari Firestore
-    try {
-        const noteRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id);
-        const snap = await getDoc(noteRef);
-        const note = snap.exists() ? snap.data() : {};
-        
-        if(document.getElementById('edit-catatan-bk')) document.getElementById('edit-catatan-bk').value = note.catatanBK || '';
-        if(document.getElementById('edit-catatan-wali')) document.getElementById('edit-catatan-wali').value = note.catatanWali || '';
-        if(document.getElementById('edit-catatan-mapel')) document.getElementById('edit-catatan-mapel').value = note.catatanMapel || '';
-    } catch (e) { console.error("Gagal load catatan:", e); }
-
-    // 4. Hitung Rekap Absensi
+    // HITUNG REKAP DARI DATA YANG SUDAH ADA (state.records)
+    // Kami hanya membaca, tidak mengubah data absensi harian
     let rekap = { A: 0, B: 0, I: 0, S: 0, T: 0 };
     Object.values(state.records).forEach(day => {
-        // Cek absen di sesi aktif (Pagi/Siang)
-        const rec = day[`${id}_${student.sesi}`]; 
-        if (rec) {
-            if (rec.status === 'Alpa') rekap.A++;
-            else if (rec.status === 'Bolos') rekap.B++;
-            else if (rec.status === 'Izin') rekap.I++;
-            else if (rec.status === 'Sakit') rekap.S++;
-            rekap.T++;
-        }
+        ['Pagi', 'Siang'].forEach(sess => {
+            const entry = day[`${id}_${sess}`];
+            if (entry) {
+                if (entry.status === 'Alpa') rekap.A++;
+                else if (entry.status === 'Bolos') rekap.B++;
+                else if (entry.status === 'Izin') rekap.I++;
+                else if (entry.status === 'Sakit') rekap.S++;
+                rekap.T++;
+            }
+        });
     });
 
-    setSafeText('rekap-a', rekap.A);
-    setSafeText('rekap-b', rekap.B);
-    setSafeText('rekap-i', rekap.I);
-    setSafeText('rekap-s', rekap.S);
-    setSafeText('rekap-t', rekap.T);
+    document.getElementById('rekap-a').innerText = rekap.A;
+    document.getElementById('rekap-b').innerText = rekap.B;
+    document.getElementById('rekap-i').innerText = rekap.I;
+    document.getElementById('rekap-s').innerText = rekap.S;
+    document.getElementById('rekap-t').innerText = rekap.T;
 
-    const modal = document.getElementById('editor-modal');
-    if (modal) modal.style.display = 'flex';
+    // AMBIL CATATAN DARI PATH BARU (student_notes)
+    const noteSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id));
+    if (noteSnap.exists()) {
+        const d = noteSnap.data();
+        document.getElementById('edit-catatan-bk').value = d.catatanBK || '';
+        document.getElementById('edit-catatan-wali').value = d.catatanWali || '';
+    } else {
+        document.getElementById('edit-catatan-bk').value = '';
+        document.getElementById('edit-catatan-wali').value = '';
+    }
+
+    document.getElementById('editor-modal').style.display = 'flex';
 };
 
+// --- SIMPAN CATATAN KE PATH BARU (TERPISAH DARI ABSENSI) ---
 window.saveStudentProfile = async (id) => {
-    const data = {
-        catatanBK: document.getElementById('edit-catatan-bk').value,
-        catatanWali: document.getElementById('edit-catatan-wali').value,
-        catatanMapel: document.getElementById('edit-catatan-mapel').value,
-        lastUpdate: Date.now(),
-        updatedBy: state.currentUser
-    };
-
-    // Menggunakan path 'student_notes' agar tidak menimpa 'attendance_records'
-    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id);
-
     try {
         showToast("⏳ Menyimpan...");
-        await setDoc(docRef, data, { merge: true });
-        showToast("✅ Catatan Berhasil Disimpan");
+        const data = {
+            catatanBK: document.getElementById('edit-catatan-bk').value,
+            catatanWali: document.getElementById('edit-catatan-wali').value,
+            lastUpdate: Date.now()
+        };
+        // DISIMPAN KE 'student_notes', bukan ke 'attendance_records'
+        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id), data, { merge: true });
+        showToast("✅ Berhasil Disimpan");
     } catch (e) {
-        showToast("❌ Gagal menyimpan");
+        showToast("❌ Gagal");
     }
 };
+
+window.closeEditor = () => document.getElementById('editor-modal').style.display = 'none';
 
 
     </script>
