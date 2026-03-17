@@ -220,65 +220,57 @@
 
 
 
-  <div id="session-card" class="relative overflow-hidden p-6 text-white shadow-xl bg-slate-900 rounded-[2.5rem]">
-        <div class="relative z-10">
-            <div class="flex items-center gap-2 mb-1">
-                <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                <p class="text-[9px] font-black opacity-60 uppercase tracking-wider">Sesi Saat Ini</p>
-            </div>
-            <div class="mb-4">
-                <h3 id="active-session-display" class="text-3xl font-black leading-none uppercase">MEMUAT...</h3>
-                <p id="dashboard-date" class="text-[9px] text-slate-500 font-bold mt-1 uppercase"></p>
-            </div>
-            <div class="inline-flex items-center gap-2 px-4 py-2 border bg-white/10 backdrop-blur-md rounded-2xl text-[10px] font-bold border-white/10">
-                <i class="far fa-clock"></i>
-                <span id="session-time-badge">--:--</span>
-            </div>
-        </div>
-        <i id="session-bg-icon" class="absolute fas fa-sun -right-4 -bottom-4 text-9xl opacity-10 rotate-12"></i>
-    </div>
+                <div id="session-card" class="bg-slate-900 rounded-[2.5rem] p-6 text-white overflow-hidden relative shadow-xl">
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                            <p class="text-[9px] font-black opacity-60 uppercase">Sesi Saat Ini</p>
+                        </div>
+                        <h3 id="active-session-display" class="text-3xl font-black mb-4">MEMUAT...</h3>
+                        <div class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl text-[10px] font-bold border border-white/10 inline-flex items-center gap-2">
+                            <i class="far fa-clock"></i>
+                            <span id="session-time-badge">--:--</span>
+                        </div>
+                    </div>
+                    <i id="session-bg-icon" class="fas fa-sun absolute -right-4 -bottom-4 text-9xl opacity-10 rotate-12"></i>
+                </div>
 
-    <div class="space-y-4">
-        <div class="flex items-center justify-between px-2">
-            <h2 class="font-black text-slate-800 text-[11px] uppercase tracking-wider flex items-center gap-2">
-                <i class="fas fa-fire text-red-500"></i> DATA POPULER (6 BLN)
-            </h2>
-        </div>
-        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-            <div class="bg-green-600 border-b border-slate-100">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr>
-                            <th class="px-4 py-3 text-[8px] font-black text-white uppercase">Nama & Kelas</th>
-                            <th class="px-2 py-3 text-[8px] font-black text-white uppercase text-center w-8">B</th>
-                            <th class="px-2 py-3 text-[8px] font-black text-white uppercase text-center w-8">A</th>
-                            <th class="px-2 py-3 text-[8px] font-black text-white uppercase text-center w-8">I</th>
-                            <th class="px-2 py-3 text-[8px] font-black text-white uppercase text-center w-8">S</th>
-                            <th class="px-2 py-3 text-[8px] font-black text-white uppercase text-center w-10">T</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
-            <div class="max-h-[320px] overflow-y-auto no-scrollbar">
-                <table class="w-full text-left border-collapse">
-                    <tbody id="popular-data-body" class="divide-y divide-slate-50">
-                        </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between px-2">
+                        <h2 class="font-black text-slate-800 text-[11px] uppercase tracking-wider flex items-center gap-2">
+                            <i class="fas fa-fire text-red-500"></i> DATA POPULER (6 BLN)
+                        </h2>
+                    </div>
+                    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+                        <div class="bg-slate-50 border-b border-slate-100">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-3 text-[8px] font-black text-slate-400 uppercase">Nama & Kelas</th>
+                                        <th class="px-2 py-3 text-[8px] font-black text-slate-400 uppercase text-center w-8">B</th>
+                                        <th class="px-2 py-3 text-[8px] font-black text-slate-400 uppercase text-center w-8">A</th>
+                                        <th class="px-2 py-3 text-[8px] font-black text-slate-400 uppercase text-center w-8">I</th>
+                                        <th class="px-2 py-3 text-[8px] font-black text-slate-400 uppercase text-center w-8">S</th>
+                                        <th class="px-2 py-3 text-[8px] font-black text-red-600 uppercase text-center w-10">T</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="max-h-[320px] overflow-y-auto custom-scrollbar">
+                            <table class="w-full text-left border-collapse">
+                                <tbody id="popular-data-body" class="divide-y divide-slate-50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="space-y-4">
-        <div class="flex justify-between items-center px-2">
-            <h2 class="font-black text-slate-800 text-[11px] uppercase flex items-center gap-2 tracking-wider">
-                <i class="fas fa-history text-red-500"></i> Aktivitas Terbaru
-            </h2>
-        </div>
-        <div id="recent-logs" class="space-y-3">
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center px-2">
+                        <h2 class="font-black text-slate-800 text-[11px] uppercase flex items-center gap-2 tracking-wider"><i class="fas fa-history text-red-500"></i> Aktivitas Terbaru</h2>
+                    </div>
+                    <div id="recent-logs" class="space-y-3"></div>
+                </div>
             </div>
-    </div>
-
-</div>
 
             <!-- TAB LAPOR -->
             <div id="tab-absensi" class="tab-content">
@@ -448,6 +440,10 @@
                     </div>
                 </div>
             </div>
+
+
+
+
         </main>
 
         <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-slate-100 px-4 pb-9 pt-3 z-50 rounded-t-[2.5rem] shadow-lg">
@@ -544,7 +540,6 @@
             if(tab === 'download') updateClassListDropdown();
             refreshUI();
         };
-
         
 
         window.updateSessionUI = (s) => {
@@ -615,72 +610,34 @@
         };
 
 
-        window.renderPopularData = () => {
-            const body = document.getElementById('popular-data-body');
-            const agg = {};
+window.renderPopularData = () => {
+    const container = document.getElementById('popular-container');
+    if(!container) return;
+    
+    const dayData = state.records[state.today] || {};
+    const stats = { Alpa: 0, Bolos: 0, Izin: 0, Sakit: 0 };
+    
+    Object.values(dayData).forEach(rec => {
+        if (stats[rec.status] !== undefined) stats[rec.status]++;
+    });
 
-            // 🔥 BATAS 6 BULAN TERAKHIR
-            const today = new Date();
-            const sixMonthsAgo = new Date();
-            sixMonthsAgo.setMonth(today.getMonth() - 6);
+    const items = [
+        { label: 'ALPA', count: stats.Alpa, color: 'bg-red-500' },
+        { label: 'BOLOS', count: stats.Bolos, color: 'bg-orange-500' },
+        { label: 'IZIN', count: stats.Izin, color: 'bg-blue-500' },
+        { label: 'SAKIT', count: stats.Sakit, color: 'bg-yellow-500' }
+    ];
 
-            Object.keys(state.records).forEach(dateStr => {
-                  const recordDate = new Date(dateStr + 'T00:00:00');
-
-                  if (recordDate < sixMonthsAgo) return;
-
-                  Object.values(state.records[dateStr] || {}).forEach(rec => {
-                      const person = state.master.siswa.find(s => s.id === rec.personId);
-                      if (!person) return;
-
-                      if (!agg[rec.personId]) {
-                          agg[rec.personId] = { B: 0, A: 0, I: 0, S: 0, T: 0 };
-                      }
-
-                      if (rec.status === 'Bolos') { agg[rec.personId].B++; agg[rec.personId].T++; }
-                      else if (rec.status === 'Alpa') { agg[rec.personId].A++; agg[rec.personId].T++; }
-                      else if (rec.status === 'Izin') { agg[rec.personId].I++; agg[rec.personId].T++; }
-                      else if (rec.status === 'Sakit') { agg[rec.personId].S++; agg[rec.personId].T++; }
-                  });
-              });
-
-
-            const sorted = Object.entries(agg)
-                .map(([id, data]) => ({ id, ...data }))
-                .sort((a, b) => b.T - a.T)
-                .slice(0, 100); // ✅ TOP 100 SAJA
-
-            if (sorted.length === 0) {
-                body.innerHTML = `
-                  <tr>
-                    <td colspan="6" class="text-center py-8 text-[8px] font-bold text-slate-300 italic uppercase">
-                      Belum ada data 6 bulan terakhir
-                    </td>
-                  </tr>`;
-                return;
-            }
-
-            body.innerHTML = sorted.map(item => {
-                const s = state.master.siswa.find(x => x.id === item.id);
-                if (!s) return '';
-
-                return `
-                <tr class="border-b border-slate-50">
-                    <td class="px-4 py-3">
-                        <p class="text-[9px] font-black uppercase text-slate-800">${s.nama}</p>
-                        <p class="text-[7px] font-bold text-slate-400 uppercase">${s.kelas}</p>
-                    </td>
-                    <td class="text-center text-[9px] font-bold w-8 text-orange-600">${item.B}</td>
-                    <td class="text-center text-[9px] font-bold w-8 text-red-600">${item.A}</td>
-                    <td class="text-center text-[9px] font-bold w-8 text-blue-600">${item.I}</td>
-                    <td class="text-center text-[9px] font-bold w-8 text-green-600">${item.S}</td>
-                    <td class="text-center w-10">
-                        <span class="text-[10px] font-black text-red-600">${item.T}</span>
-                    </td>
-                </tr>`;
-            }).join('');
-        };
-
+    container.innerHTML = items.map(item => `
+        <div class="min-w-[100px] bg-white p-3 rounded-3xl border border-slate-100 shadow-sm">
+            <div class="flex items-center gap-2 mb-1">
+                <div class="w-2 h-2 rounded-full ${item.color}"></div>
+                <span class="text-[8px] font-black text-slate-400 uppercase">${item.label}</span>
+            </div>
+            <div class="text-xl font-black text-slate-800">${item.count}</div>
+        </div>
+    `).join('');
+};
 
         window.renderRecentLogs = () => {
             const container = document.getElementById('recent-logs');
@@ -1102,63 +1059,49 @@ function downloadXLSX(wb, filename) {
         };
 
 
-// --- LOGIKA SINKRONISASI DINAMIS ---
+        // Fungsi Helper Sinkronisasi Tanpa Toast Berlebih
 const autoSyncData = async (url) => {
     if (!url) return;
     let exportUrl = url.includes('/edit') ? url.split('/edit')[0] + '/export?format=csv' : url;
-    
     try {
         const res = await fetch(exportUrl);
         if (!res.ok) return;
         const csv = await res.text();
         const lines = csv.split('\n').filter(r => r.trim() !== '');
         
-        // 1. Ambil Header (Baris Pertama) dan bersihkan (lowercase)
+        // Ambil Header (Baris 1) dan bersihkan
         const headers = lines[0].match(/(".*?"|[^",\r\n]+)(?=\s*,|\s*$)/g)
                         ?.map(h => h.trim().replace(/^"|"$/g, '').toLowerCase()) || [];
 
         const gtk = [], siswa = [];
-        
-        // 2. Proses baris data (mulai dari index 1)
         lines.slice(1).forEach(row => {
             const cells = row.match(/(".*?"|[^",\r\n]+)(?=\s*,|\s*$)/g)
                          ?.map(x => x.trim().replace(/^"|"$/g, '')) || [];
-            
             if(cells.length < 2) return;
 
-            // Mapping data secara otomatis berdasarkan nama header
             let item = {};
-            headers.forEach((header, index) => {
-                item[header] = cells[index] || '-';
-            });
+            headers.forEach((header, index) => { item[header] = cells[index] || '-'; });
 
-            // Normalisasi agar properti utama selalu ada (Backwards Compatibility)
-            const normalizedItem = {
+            // Normalisasi Properti Utama
+            const normalized = {
                 ...item,
-                id: item.id || item.nis || cells[0], // Gunakan kolom 'id', 'nis', atau kolom pertama
+                id: item.id || item.nis || cells[0],
                 nama: item.nama || cells[1],
                 kelas: item.kelas || '-',
                 sesi: item.sesi || 'Pagi',
                 tipe: (item.tipe || 'siswa').toLowerCase().trim()
             };
 
-            if (normalizedItem.tipe === 'guru') gtk.push(normalizedItem); 
-            else siswa.push(normalizedItem);
+            if (normalized.tipe === 'guru') gtk.push(normalized); else siswa.push(normalized);
         });
 
-        // Simpan ke State Global & LocalStorage
         state.master = { gtk, siswa };
         localStorage.setItem('absensi_gtk', JSON.stringify(gtk));
         localStorage.setItem('absensi_siswa', JSON.stringify(siswa));
-        
         refreshUI();
-        console.log("✅ Sync Berhasil: Data dipetakan otomatis berdasarkan header.");
-    } catch (e) { 
-        console.error("❌ Sync Gagal:", e); 
-        showToast("⚠️ Gagal Sinkronisasi Database");
-    }
+        console.log("✅ Master Data Dynamic Synced");
+    } catch (e) { console.error("Auto-sync failed", e); }
 };
-
 
         window.saveAndSync = async () => {
             const url = document.getElementById('sheet-url').value.trim();
@@ -1173,9 +1116,13 @@ const autoSyncData = async (url) => {
         window.logout = () => { localStorage.clear(); location.reload(); };
 
         window.refreshUI = () => {
-            renderAttendanceList(); renderPopularData(); renderRecentLogs(); renderReport(); renderProfilList();
+            renderAttendanceList(); renderPopularData(); renderRecentLogs(); renderReport();
             document.getElementById('dashboard-date').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        };
+        };if(typeof renderProfilList === 'function') renderProfilList(); // Pastikan render profil ikut terpanggil
+    
+	    const elDate = document.getElementById('dashboard-date');
+	    if(elDate) elDate.innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+	};
 
         window.markAbsen = async (id, status) => {
             const rid = `${state.today}_${id}_${state.activeSession}`;
@@ -1302,32 +1249,36 @@ window.renderProfilList = () => {
 };
 
 // 2. Membuka Editor & Menghitung Rekap Real-time
+// MEMBUKA EDITOR
 window.openEditor = async (id) => {
     const s = state.master.siswa.find(x => x.id === id);
     if(!s) return;
 
-    // A. Isi Identitas (Dinamis dari CSV)
+    // Isi Form Identitas
     document.getElementById('edit-id').value = s.id;
     document.getElementById('edit-nama').value = s.nama;
     document.getElementById('display-nis').innerText = `NIS: ${s.id}`;
     document.getElementById('display-kelas').innerText = s.kelas;
-    document.getElementById('display-tipe').innerText = s.tipe.toUpperCase();
-    document.getElementById('display-sesi').innerText = s.sesi.toUpperCase();
     
-    // Data Detail Tambahan (Cek berbagai kemungkinan nama header)
-    document.getElementById('display-nohp').innerText = s.nohp || s['no hp'] || s['whatsapp'] || '-';
-    document.getElementById('display-alamat').innerText = s.alamat || '-';
-    document.getElementById('display-kesiswaan').innerText = s.kesiswaan || '-';
-    document.getElementById('display-guru-bk').innerText = s.gurubk || s['guru bk'] || '-';
-    document.getElementById('display-wali-kelas').innerText = s.walikelas || s['wali kelas'] || '-';
-    document.getElementById('display-guru-wali').innerText = s.guruwali || s['guru wali'] || '-';
+    // Mapping detail tambahan secara dinamis
+    const fields = {
+        'display-nohp': s.nohp || s['no hp'] || s['whatsapp'],
+        'display-alamat': s.alamat,
+        'display-kesiswaan': s.kesiswaan,
+        'display-guru-bk': s.gurubk || s['guru bk'],
+        'display-wali-kelas': s.walikelas || s['wali kelas'],
+        'display-guru-wali': s.guruwali || s['guru wali']
+    };
+    Object.keys(fields).forEach(key => {
+        const el = document.getElementById(key);
+        if(el) el.innerText = fields[key] || '-';
+    });
 
-    // B. Hitung Rekap Absensi Akumulatif
+    // Hitung Rekap dari state.records (Local)
     let rekap = { A: 0, B: 0, I: 0, S: 0, T: 0 };
-    Object.keys(state.records).forEach(date => {
-        ['Pagi', 'Siang'].forEach(sess => {
-            const rec = state.records[date][`${id}_${sess}`];
-            if(rec) {
+    Object.values(state.records).forEach(day => {
+        Object.values(day).forEach(rec => {
+            if(rec.personId === id) {
                 if(rec.status === 'Alpa') rekap.A++;
                 else if(rec.status === 'Bolos') rekap.B++;
                 else if(rec.status === 'Izin') rekap.I++;
@@ -1336,32 +1287,26 @@ window.openEditor = async (id) => {
             }
         });
     });
-
+    
     document.getElementById('rekap-a').innerText = rekap.A;
     document.getElementById('rekap-b').innerText = rekap.B;
     document.getElementById('rekap-i').innerText = rekap.I;
     document.getElementById('rekap-s').innerText = rekap.S;
     document.getElementById('rekap-t').innerText = rekap.T;
 
-    // C. Tarik Catatan Pembinaan dari Firestore
-    showToast("⏳ Memuat Catatan...");
-    const noteRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id);
-    const noteSnap = await getDoc(noteRef);
+    // Ambil Catatan dari Folder Terpisah
+    const noteSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id));
     const notes = noteSnap.exists() ? noteSnap.data() : {};
     
-    document.getElementById('edit-catatan-kesiswaan').value = notes.kesiswaan || '';
-    document.getElementById('edit-catatan-gurubk').value = notes.gurubk || '';
-    document.getElementById('edit-catatan-walikelas').value = notes.walikelas || '';
-    document.getElementById('edit-catatan-guruwali').value = notes.guruwali || '';
-    document.getElementById('edit-catatan-gurumapel').value = notes.gurumapel || '';
+    const noteMap = ['kesiswaan', 'gurubk', 'walikelas', 'guruwali', 'gurumapel'];
+    noteMap.forEach(f => {
+        document.getElementById(`edit-catatan-${f}`).value = notes[f] || '';
+    });
 
-    // D. Tampilkan Modal
-    const modal = document.getElementById('editor-modal');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
+    document.getElementById('editor-modal').classList.replace('hidden', 'flex');
 };
 
-// 3. Simpan Perubahan Catatan
+// SIMPAN CATATAN KE FOLDER TERPISAH
 window.saveStudentProfile = async () => {
     const id = document.getElementById('edit-id').value;
     const payload = {
@@ -1376,14 +1321,12 @@ window.saveStudentProfile = async () => {
 
     try {
         showToast("⏳ Menyimpan...");
+        // Path: public/data/student_notes/{id}
         await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id), payload, { merge: true });
-        showToast("✅ Berhasil Disimpan");
-        document.getElementById('editor-modal').classList.add('hidden');
-    } catch (e) {
-        showToast("❌ Gagal Menyimpan");
-    }
+        showToast("✅ Catatan Tersimpan");
+        document.getElementById('editor-modal').classList.replace('flex', 'hidden');
+    } catch (e) { showToast("❌ Gagal"); }
 };
-
 </script>
 </body>
 </html>
