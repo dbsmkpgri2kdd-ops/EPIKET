@@ -1315,48 +1315,64 @@ window.openEditor = async (id) => {
     const student = state.master.siswa.find(s => s.id === id);
     if (!student) return;
 
+    // Helper untuk mengisi teks dengan aman
+    const setSafeText = (id, text) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = text || '-';
+    };
+
     // 1. Isi Identitas Dasar
-    document.getElementById('edit-id').value = id;
-    document.getElementById('edit-nama').value = student.nama;
-    document.getElementById('display-nis').innerText = `NIS: ${student.id}`;
-    document.getElementById('display-kelas').innerText = student.kelas;
-    document.getElementById('display-sesi').innerText = student.sesi;
+    const nameInput = document.getElementById('edit-nama');
+    if (nameInput) nameInput.value = student.nama;
+    
+    const idInput = document.getElementById('edit-id');
+    if (idInput) idInput.value = id;
+
+    setSafeText('display-nis', `NIS: ${student.id}`);
+    setSafeText('display-kelas', student.kelas);
+    setSafeText('display-sesi', student.sesi);
     
     // 2. Isi Detail Profil (Data dari CSV)
-    document.getElementById('display-nohp').innerText = student.nohp;
-    document.getElementById('display-alamat').innerText = student.alamat;
-    document.getElementById('display-guru-bk').innerText = student.guruBK;
-    document.getElementById('display-wali-kelas').innerText = student.waliKelas;
-    document.getElementById('display-guru-wali').innerText = student.guruWali;
+    setSafeText('display-nohp', student.nohp);
+    setSafeText('display-alamat', student.alamat);
+    setSafeText('display-guru-bk', student.guruBK);
+    setSafeText('display-wali-kelas', student.waliKelas);
+    setSafeText('display-guru-wali', student.guruWali);
+    setSafeText('display-tipe', (student.tipe || 'SISWA').toUpperCase());
 
-    // 3. Load Catatan Pembinaan dari Koleksi 'student_notes' (Koleksi Baru)
-    const noteRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id);
-    const snap = await getDoc(noteRef);
-    const note = snap.exists() ? snap.data() : {};
-    
-    document.getElementById('edit-catatan-bk').value = note.catatanBK || '';
-    document.getElementById('edit-catatan-wali').value = note.catatanWali || '';
-    document.getElementById('edit-catatan-mapel').value = note.catatanMapel || '';
+    // 3. Load Catatan Pembinaan dari Firestore
+    try {
+        const noteRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id);
+        const snap = await getDoc(noteRef);
+        const note = snap.exists() ? snap.data() : {};
+        
+        if(document.getElementById('edit-catatan-bk')) document.getElementById('edit-catatan-bk').value = note.catatanBK || '';
+        if(document.getElementById('edit-catatan-wali')) document.getElementById('edit-catatan-wali').value = note.catatanWali || '';
+        if(document.getElementById('edit-catatan-mapel')) document.getElementById('edit-catatan-mapel').value = note.catatanMapel || '';
+    } catch (e) { console.error("Gagal load catatan:", e); }
 
-    // 4. Hitung Rekap Absensi 4 Bulan Terakhir
+    // 4. Hitung Rekap Absensi
     let rekap = { A: 0, B: 0, I: 0, S: 0, T: 0 };
     Object.values(state.records).forEach(day => {
-        const rec = day[`${id}_${state.activeSession}`];
+        // Cek absen di sesi aktif (Pagi/Siang)
+        const rec = day[`${id}_${student.sesi}`]; 
         if (rec) {
             if (rec.status === 'Alpa') rekap.A++;
-            if (rec.status === 'Bolos') rekap.B++;
-            if (rec.status === 'Izin') rekap.I++;
-            if (rec.status === 'Sakit') rekap.S++;
+            else if (rec.status === 'Bolos') rekap.B++;
+            else if (rec.status === 'Izin') rekap.I++;
+            else if (rec.status === 'Sakit') rekap.S++;
             rekap.T++;
         }
     });
-    document.getElementById('rekap-a').innerText = rekap.A;
-    document.getElementById('rekap-b').innerText = rekap.B;
-    document.getElementById('rekap-i').innerText = rekap.I;
-    document.getElementById('rekap-s').innerText = rekap.S;
-    document.getElementById('rekap-t').innerText = rekap.T;
 
-    document.getElementById('editor-modal').style.display = 'flex';
+    setSafeText('rekap-a', rekap.A);
+    setSafeText('rekap-b', rekap.B);
+    setSafeText('rekap-i', rekap.I);
+    setSafeText('rekap-s', rekap.S);
+    setSafeText('rekap-t', rekap.T);
+
+    const modal = document.getElementById('editor-modal');
+    if (modal) modal.style.display = 'flex';
 };
 
 window.saveStudentProfile = async (id) => {
