@@ -1186,7 +1186,6 @@ const autoSyncData = async (url) => {
                 document.getElementById('login-screen').classList.remove('active');
                 document.getElementById('app-content').classList.add('active');
                 document.getElementById('display-name').innerText = state.currentUser;
-                document.getElementById('welcome-name').innerText = state.currentUser;
                 document.getElementById('modal-name').innerText = state.currentUser;
                 document.getElementById('user-photo').src = `https://ui-avatars.com/api/?name=${state.currentUser}&background=ef4444&color=fff&bold=true`;
                 document.getElementById('modal-photo').src = `https://ui-avatars.com/api/?name=${state.currentUser}&background=ef4444&color=fff&bold=true`;
