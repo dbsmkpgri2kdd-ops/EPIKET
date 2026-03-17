@@ -208,22 +208,6 @@
         </div>
     </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   <div id="session-card" class="relative overflow-hidden p-6 text-white shadow-xl bg-slate-900 rounded-[2.5rem]">
         <div class="relative z-10">
             <div class="flex items-center gap-2 mb-1">
@@ -475,8 +459,6 @@
     </div>
 
     <div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white px-6 py-3 rounded-2xl text-[10px] font-black opacity-0 transition-all pointer-events-none z-[200]"></div>
-
-
 
 
 
@@ -1229,117 +1211,6 @@ window.onload = () => {
     document.getElementById('report-date').value = state.today;
 };
 
-
-
-
-
-// Fungsi untuk menampilkan daftar profil
-// --- JANGAN TULIS IMPORT LAGI DISINI ---
-
-window.renderProfilList = () => {
-    const query = document.getElementById('search-profil').value.toLowerCase();
-    const container = document.getElementById('profil-list-container');
-    const data = window.state?.master?.siswa || []; // Menggunakan data dari CSV
-    
-    const filtered = data.filter(s => 
-        (s.nama?.toLowerCase().includes(query)) || 
-        (s.id?.toString().includes(query))
-    );
-
-    if (filtered.length === 0) {
-        container.innerHTML = `<div class="text-center py-10 opacity-30 font-black text-[9px] uppercase tracking-widest">Siswa tidak ditemukan</div>`;
-        return;
-    }
-
-    container.innerHTML = filtered.map(s => `
-        <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-3xl border border-slate-100 flex items-center gap-4 active:scale-95 transition-all cursor-pointer shadow-sm">
-            <div class="w-10 h-10 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
-                <i class="fas fa-user text-sm"></i>
-            </div>
-            <div class="flex-grow">
-                <h4 class="text-[11px] font-black uppercase text-slate-800">${s.nama}</h4>
-                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">${s.kelas} • ${s.id}</p>
-            </div>
-            <i class="fas fa-chevron-right text-slate-200 text-xs"></i>
-        </div>
-    `).join('');
-};
-
-window.openEditor = async (nis) => {
-    // 1. Ambil data dari CSV (State Master)
-    const s = window.state.master.siswa.find(x => x.id == nis);
-    if (!s) return;
-
-    // 2. Isi Form Modal
-    document.getElementById('edit-id').value = s.id;
-    document.getElementById('edit-nama').value = s.nama;
-    document.getElementById('display-nis').innerText = `NIS: ${s.id}`;
-    document.getElementById('display-kelas').innerText = s.kelas || '-';
-    document.getElementById('display-sesi').innerText = s.sesi || '-';
-    document.getElementById('display-tipe').innerText = s.tipe || '-';
-    document.getElementById('display-nohp').innerText = s.no_hp || '-';
-    document.getElementById('display-guru-bk').innerText = s.guru_bk || '-';
-    document.getElementById('display-wali-kelas').innerText = s.wali_kelas || '-';
-    document.getElementById('display-guru-wali').innerText = s.guru_wali || '-';
-    document.getElementById('display-alamat').innerText = s.alamat || '-';
-
-    // 3. Kalkulasi Rekapitulasi ABIS
-    const rekap = { A: 0, B: 0, I: 0, S: 0, T: 0 };
-    Object.values(window.state.records || {}).forEach(day => {
-        Object.values(day).forEach(rec => {
-            if(rec.personId == nis) {
-                if(rec.status === 'Alpa') rekap.A++;
-                else if(rec.status === 'Bolos') rekap.B++;
-                else if(rec.status === 'Izin') rekap.I++;
-                else if(rec.status === 'Sakit') rekap.S++;
-                rekap.T++;
-            }
-        });
-    });
-    document.getElementById('rekap-a').innerText = rekap.A;
-    document.getElementById('rekap-b').innerText = rekap.B;
-    document.getElementById('rekap-i').innerText = rekap.I;
-    document.getElementById('rekap-s').innerText = rekap.S;
-    document.getElementById('rekap-t').innerText = rekap.T;
-
-    // 4. Load Catatan dari Firebase
-    try {
-        // PERHATIKAN: Pastikan 'db' dan 'appId' sudah terdefinisi di script atas
-        const docRef = window.doc(window.db, 'artifacts', window.appId, 'public', 'notes', nis.toString());
-        const snap = await window.getDoc(docRef);
-        const fbData = snap.exists() ? snap.data() : {};
-        
-        document.getElementById('edit-catatan-bk').value = fbData.catatan_bk || '';
-        document.getElementById('edit-catatan-wali').value = fbData.catatan_wali || '';
-        document.getElementById('edit-catatan-mapel').value = fbData.catatan_mapel || '';
-    } catch (e) { console.error("Firebase Error:", e); }
-
-    document.getElementById('editor-modal').classList.remove('hidden');
-    document.getElementById('editor-modal').classList.add('flex');
-};
-
-window.closeEditor = () => {
-    document.getElementById('editor-modal').classList.add('hidden');
-    document.getElementById('editor-modal').classList.remove('flex');
-};
-
-window.saveStudentProfile = async () => {
-    const id = document.getElementById('edit-id').value;
-    const data = {
-        catatan_bk: document.getElementById('edit-catatan-bk').value,
-        catatan_wali: document.getElementById('edit-catatan-wali').value,
-        catatan_mapel: document.getElementById('edit-catatan-mapel').value,
-        last_updated: new Date().toISOString()
-    };
-
-    try {
-        const docRef = window.doc(window.db, 'artifacts', window.appId, 'public', 'notes', id);
-        await window.setDoc(docRef, data, { merge: true });
-        window.showToast("✅ Berhasil Disimpan");
-        window.closeEditor();
-    } catch (e) { window.showToast("❌ Gagal"); }
-};
-
-</script>
+    </script>
 </body>
 </html>
