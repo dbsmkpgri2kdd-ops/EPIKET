@@ -50,10 +50,7 @@
                 <button id="btn-login-action" class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg active:scale-95 transition">Masuk</button>
             </div>
         </div>
-
     </div>
-
-
 
     <!-- App Content -->
     <div id="app-content">
@@ -123,35 +120,42 @@
                 <p id="display-nis" class="text-[9px] font-bold text-slate-400">NIS: -</p>
                 <div class="flex flex-wrap gap-2 mt-2">
                     <span id="display-kelas" class="text-[8px] font-black text-red-600 bg-red-50 px-3 py-1 rounded-lg border border-red-100 uppercase">-</span>
-                    <span id="display-tipe" class="text-[8px] font-green text-slate-500 bg-white px-3 py-1 rounded-lg border border-slate-200 uppercase">-</span>
-                    <span id="display-sesi" class="text-[8px] font-white text-slate-500 bg-black px-3 py-1 rounded-lg border border-slate-200 uppercase">-</span>
+                    <span id="display-sesi" class="text-[8px] font-black text-slate-500 bg-white px-3 py-1 rounded-lg border border-slate-200 uppercase">-</span>
                 </div>
             </div>
         </div>
 
+        <div class="grid grid-cols-1 gap-3 bg-slate-50/50 p-5 rounded-[2rem] border border-slate-100">
+            <div class="grid grid-cols-2 gap-4 border-b border-slate-50 pb-3">
+                <div>
+                    <span class="text-[8px] font-black text-slate-400 uppercase">Tipe</span>
+                    <p id="display-tipe" class="text-[10px] font-bold text-slate-700 uppercase">-</p>
+                </div>
+                <div>
+                    <span class="text-[8px] font-black text-slate-400 uppercase">No HP</span>
+                    <p id="display-nohp" class="text-[10px] font-bold text-slate-700">-</p>
+                </div>
+            </div>
             <div class="space-y-2 border-b border-slate-50 pb-3 text-[9px] font-bold uppercase text-slate-800">
-                <div class="flex justify-between items-center"><span>No Handphone</span><span id="display-nohp"></span></div>
-                <div class="flex justify-between items-center"><span>Alamat</span><span id="display-alamat"></span></div>
-                <div class="flex justify-between items-center"><span>Kesiswaan</span><span id="display-kesiswaan"></span></div>
                 <div class="flex justify-between items-center"><span>Guru BK</span><span id="display-guru-bk"></span></div>
                 <div class="flex justify-between items-center"><span>Wali Kelas</span><span id="display-wali-kelas"></span></div>
                 <div class="flex justify-between items-center"><span>Guru Wali</span><span id="display-guru-wali"></span></div>
+            </div>
+            <p id="display-alamat" class="text-[10px] font-bold text-slate-500 italic uppercase"></p>
         </div>
 
         <div class="grid grid-cols-5 gap-2 text-center">
-            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-a" class="font-black text-red-600 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">Alpa</p></div>
-            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-b" class="font-black text-orange-500 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">Bolos</p></div>
-            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-i" class="font-black text-blue-500 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">Izin</p></div>
-            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-s" class="font-black text-green-600 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">Sakit</p></div>
-            <div class="bg-slate-900 p-2 rounded-2xl"><p id="rekap-t" class="font-black text-white text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-300">Total</p></div>
+            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-a" class="font-black text-red-600 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">A</p></div>
+            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-b" class="font-black text-orange-500 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">B</p></div>
+            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-i" class="font-black text-blue-500 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">I</p></div>
+            <div class="bg-white border border-slate-100 p-2 rounded-2xl"><p id="rekap-s" class="font-black text-green-600 text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-400">S</p></div>
+            <div class="bg-slate-900 p-2 rounded-2xl"><p id="rekap-t" class="font-black text-white text-xs">0</p><p class="text-[7px] uppercase font-bold text-slate-300">T</p></div>
         </div>
 
         <div class="space-y-3">
-            <textarea id="edit-catatan-kesiswaan" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-orange-400 outline-none" rows="2" placeholder="Catatan Kesiswaan..."></textarea>
-            <textarea id="edit-catatan-gurubk" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-red-400 outline-none" rows="2" placeholder="Catatan BK..."></textarea>
-            <textarea id="edit-catatan-walikelas" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-orange-400 outline-none" rows="2" placeholder="Catatan Wali Kelas..."></textarea>
-            <textarea id="edit-catatan-guruwali" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-orange-400 outline-none" rows="2" placeholder="Catatan Guru Wali..."></textarea>
-            <textarea id="edit-catatan-gurumapel" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-blue-400 outline-none" rows="2" placeholder="Catatan Guru Mapel..."></textarea>
+            <textarea id="edit-catatan-bk" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-red-400 outline-none" rows="2" placeholder="Catatan BK..."></textarea>
+            <textarea id="edit-catatan-wali" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-orange-400 outline-none" rows="2" placeholder="Catatan Wali Kelas..."></textarea>
+            <textarea id="edit-catatan-mapel" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-[11px] font-semibold focus:ring-2 focus:ring-blue-400 outline-none" rows="2" placeholder="Catatan Mapel..."></textarea>
         </div>
 
         <button onclick="window.saveStudentProfile()" class="w-full bg-slate-900 text-white font-black py-5 rounded-[2rem] text-[10px] uppercase tracking-widest shadow-xl active:scale-95 transition-all">
@@ -220,57 +224,65 @@
 
 
 
-                <div id="session-card" class="bg-slate-900 rounded-[2.5rem] p-6 text-white overflow-hidden relative shadow-xl">
-                    <div class="relative z-10">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                            <p class="text-[9px] font-black opacity-60 uppercase">Sesi Saat Ini</p>
-                        </div>
-                        <h3 id="active-session-display" class="text-3xl font-black mb-4">MEMUAT...</h3>
-                        <div class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl text-[10px] font-bold border border-white/10 inline-flex items-center gap-2">
-                            <i class="far fa-clock"></i>
-                            <span id="session-time-badge">--:--</span>
-                        </div>
-                    </div>
-                    <i id="session-bg-icon" class="fas fa-sun absolute -right-4 -bottom-4 text-9xl opacity-10 rotate-12"></i>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between px-2">
-                        <h2 class="font-black text-slate-800 text-[11px] uppercase tracking-wider flex items-center gap-2">
-                            <i class="fas fa-fire text-red-500"></i> DATA POPULER (6 BLN)
-                        </h2>
-                    </div>
-                    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-                        <div class="bg-slate-50 border-b border-slate-100">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr>
-                                        <th class="px-4 py-3 text-[8px] font-black text-slate-400 uppercase">Nama & Kelas</th>
-                                        <th class="px-2 py-3 text-[8px] font-black text-slate-400 uppercase text-center w-8">B</th>
-                                        <th class="px-2 py-3 text-[8px] font-black text-slate-400 uppercase text-center w-8">A</th>
-                                        <th class="px-2 py-3 text-[8px] font-black text-slate-400 uppercase text-center w-8">I</th>
-                                        <th class="px-2 py-3 text-[8px] font-black text-slate-400 uppercase text-center w-8">S</th>
-                                        <th class="px-2 py-3 text-[8px] font-black text-red-600 uppercase text-center w-10">T</th>
-                                    </tr>
-                                </thead>
-                            </table>
-                        </div>
-                        <div class="max-h-[320px] overflow-y-auto custom-scrollbar">
-                            <table class="w-full text-left border-collapse">
-                                <tbody id="popular-data-body" class="divide-y divide-slate-50"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center px-2">
-                        <h2 class="font-black text-slate-800 text-[11px] uppercase flex items-center gap-2 tracking-wider"><i class="fas fa-history text-red-500"></i> Aktivitas Terbaru</h2>
-                    </div>
-                    <div id="recent-logs" class="space-y-3"></div>
-                </div>
+  <div id="session-card" class="relative overflow-hidden p-6 text-white shadow-xl bg-slate-900 rounded-[2.5rem]">
+        <div class="relative z-10">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                <p class="text-[9px] font-black opacity-60 uppercase tracking-wider">Sesi Saat Ini</p>
             </div>
+            <div class="mb-4">
+                <h3 id="active-session-display" class="text-3xl font-black leading-none uppercase">MEMUAT...</h3>
+                <p id="dashboard-date" class="text-[9px] text-slate-500 font-bold mt-1 uppercase"></p>
+            </div>
+            <div class="inline-flex items-center gap-2 px-4 py-2 border bg-white/10 backdrop-blur-md rounded-2xl text-[10px] font-bold border-white/10">
+                <i class="far fa-clock"></i>
+                <span id="session-time-badge">--:--</span>
+            </div>
+        </div>
+        <i id="session-bg-icon" class="absolute fas fa-sun -right-4 -bottom-4 text-9xl opacity-10 rotate-12"></i>
+    </div>
+
+    <div class="space-y-4">
+        <div class="flex items-center justify-between px-2">
+            <h2 class="font-black text-slate-800 text-[11px] uppercase tracking-wider flex items-center gap-2">
+                <i class="fas fa-fire text-red-500"></i> DATA POPULER (6 BLN)
+            </h2>
+        </div>
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+            <div class="bg-green-600 border-b border-slate-100">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3 text-[8px] font-black text-white uppercase">Nama & Kelas</th>
+                            <th class="px-2 py-3 text-[8px] font-black text-white uppercase text-center w-8">B</th>
+                            <th class="px-2 py-3 text-[8px] font-black text-white uppercase text-center w-8">A</th>
+                            <th class="px-2 py-3 text-[8px] font-black text-white uppercase text-center w-8">I</th>
+                            <th class="px-2 py-3 text-[8px] font-black text-white uppercase text-center w-8">S</th>
+                            <th class="px-2 py-3 text-[8px] font-black text-white uppercase text-center w-10">T</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="max-h-[320px] overflow-y-auto no-scrollbar">
+                <table class="w-full text-left border-collapse">
+                    <tbody id="popular-data-body" class="divide-y divide-slate-50">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-4">
+        <div class="flex justify-between items-center px-2">
+            <h2 class="font-black text-slate-800 text-[11px] uppercase flex items-center gap-2 tracking-wider">
+                <i class="fas fa-history text-red-500"></i> Aktivitas Terbaru
+            </h2>
+        </div>
+        <div id="recent-logs" class="space-y-3">
+            </div>
+    </div>
+
+</div>
 
             <!-- TAB LAPOR -->
             <div id="tab-absensi" class="tab-content">
@@ -440,10 +452,6 @@
                     </div>
                 </div>
             </div>
-
-
-
-
         </main>
 
         <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-slate-100 px-4 pb-9 pt-3 z-50 rounded-t-[2.5rem] shadow-lg">
@@ -540,6 +548,7 @@
             if(tab === 'download') updateClassListDropdown();
             refreshUI();
         };
+
         
 
         window.updateSessionUI = (s) => {
@@ -610,34 +619,72 @@
         };
 
 
-window.renderPopularData = () => {
-    const container = document.getElementById('popular-container');
-    if(!container) return;
-    
-    const dayData = state.records[state.today] || {};
-    const stats = { Alpa: 0, Bolos: 0, Izin: 0, Sakit: 0 };
-    
-    Object.values(dayData).forEach(rec => {
-        if (stats[rec.status] !== undefined) stats[rec.status]++;
-    });
+        window.renderPopularData = () => {
+            const body = document.getElementById('popular-data-body');
+            const agg = {};
 
-    const items = [
-        { label: 'ALPA', count: stats.Alpa, color: 'bg-red-500' },
-        { label: 'BOLOS', count: stats.Bolos, color: 'bg-orange-500' },
-        { label: 'IZIN', count: stats.Izin, color: 'bg-blue-500' },
-        { label: 'SAKIT', count: stats.Sakit, color: 'bg-yellow-500' }
-    ];
+            // 🔥 BATAS 6 BULAN TERAKHIR
+            const today = new Date();
+            const sixMonthsAgo = new Date();
+            sixMonthsAgo.setMonth(today.getMonth() - 6);
 
-    container.innerHTML = items.map(item => `
-        <div class="min-w-[100px] bg-white p-3 rounded-3xl border border-slate-100 shadow-sm">
-            <div class="flex items-center gap-2 mb-1">
-                <div class="w-2 h-2 rounded-full ${item.color}"></div>
-                <span class="text-[8px] font-black text-slate-400 uppercase">${item.label}</span>
-            </div>
-            <div class="text-xl font-black text-slate-800">${item.count}</div>
-        </div>
-    `).join('');
-};
+            Object.keys(state.records).forEach(dateStr => {
+                  const recordDate = new Date(dateStr + 'T00:00:00');
+
+                  if (recordDate < sixMonthsAgo) return;
+
+                  Object.values(state.records[dateStr] || {}).forEach(rec => {
+                      const person = state.master.siswa.find(s => s.id === rec.personId);
+                      if (!person) return;
+
+                      if (!agg[rec.personId]) {
+                          agg[rec.personId] = { B: 0, A: 0, I: 0, S: 0, T: 0 };
+                      }
+
+                      if (rec.status === 'Bolos') { agg[rec.personId].B++; agg[rec.personId].T++; }
+                      else if (rec.status === 'Alpa') { agg[rec.personId].A++; agg[rec.personId].T++; }
+                      else if (rec.status === 'Izin') { agg[rec.personId].I++; agg[rec.personId].T++; }
+                      else if (rec.status === 'Sakit') { agg[rec.personId].S++; agg[rec.personId].T++; }
+                  });
+              });
+
+
+            const sorted = Object.entries(agg)
+                .map(([id, data]) => ({ id, ...data }))
+                .sort((a, b) => b.T - a.T)
+                .slice(0, 100); // ✅ TOP 100 SAJA
+
+            if (sorted.length === 0) {
+                body.innerHTML = `
+                  <tr>
+                    <td colspan="6" class="text-center py-8 text-[8px] font-bold text-slate-300 italic uppercase">
+                      Belum ada data 6 bulan terakhir
+                    </td>
+                  </tr>`;
+                return;
+            }
+
+            body.innerHTML = sorted.map(item => {
+                const s = state.master.siswa.find(x => x.id === item.id);
+                if (!s) return '';
+
+                return `
+                <tr class="border-b border-slate-50">
+                    <td class="px-4 py-3">
+                        <p class="text-[9px] font-black uppercase text-slate-800">${s.nama}</p>
+                        <p class="text-[7px] font-bold text-slate-400 uppercase">${s.kelas}</p>
+                    </td>
+                    <td class="text-center text-[9px] font-bold w-8 text-orange-600">${item.B}</td>
+                    <td class="text-center text-[9px] font-bold w-8 text-red-600">${item.A}</td>
+                    <td class="text-center text-[9px] font-bold w-8 text-blue-600">${item.I}</td>
+                    <td class="text-center text-[9px] font-bold w-8 text-green-600">${item.S}</td>
+                    <td class="text-center w-10">
+                        <span class="text-[10px] font-black text-red-600">${item.T}</span>
+                    </td>
+                </tr>`;
+            }).join('');
+        };
+
 
         window.renderRecentLogs = () => {
             const container = document.getElementById('recent-logs');
@@ -1058,50 +1105,29 @@ function downloadXLSX(wb, filename) {
             } else { showToast("❌ Sandi Salah"); } 
         };
 
-
         // Fungsi Helper Sinkronisasi Tanpa Toast Berlebih
-const autoSyncData = async (url) => {
-    if (!url) return;
-    let exportUrl = url.includes('/edit') ? url.split('/edit')[0] + '/export?format=csv' : url;
-    try {
-        const res = await fetch(exportUrl);
-        if (!res.ok) return;
-        const csv = await res.text();
-        const lines = csv.split('\n').filter(r => r.trim() !== '');
-        
-        // Ambil Header (Baris 1) dan bersihkan
-        const headers = lines[0].match(/(".*?"|[^",\r\n]+)(?=\s*,|\s*$)/g)
-                        ?.map(h => h.trim().replace(/^"|"$/g, '').toLowerCase()) || [];
-
-        const gtk = [], siswa = [];
-        lines.slice(1).forEach(row => {
-            const cells = row.match(/(".*?"|[^",\r\n]+)(?=\s*,|\s*$)/g)
-                         ?.map(x => x.trim().replace(/^"|"$/g, '')) || [];
-            if(cells.length < 2) return;
-
-            let item = {};
-            headers.forEach((header, index) => { item[header] = cells[index] || '-'; });
-
-            // Normalisasi Properti Utama
-            const normalized = {
-                ...item,
-                id: item.id || item.nis || cells[0],
-                nama: item.nama || cells[1],
-                kelas: item.kelas || '-',
-                sesi: item.sesi || 'Pagi',
-                tipe: (item.tipe || 'siswa').toLowerCase().trim()
-            };
-
-            if (normalized.tipe === 'guru') gtk.push(normalized); else siswa.push(normalized);
-        });
-
-        state.master = { gtk, siswa };
-        localStorage.setItem('absensi_gtk', JSON.stringify(gtk));
-        localStorage.setItem('absensi_siswa', JSON.stringify(siswa));
-        refreshUI();
-        console.log("✅ Master Data Dynamic Synced");
-    } catch (e) { console.error("Auto-sync failed", e); }
-};
+        const autoSyncData = async (url) => {
+            if (!url) return;
+            let exportUrl = url.includes('/edit') ? url.split('/edit')[0] + '/export?format=csv' : url;
+            try {
+                const res = await fetch(exportUrl);
+                if (!res.ok) return;
+                const csv = await res.text();
+                const rows = csv.split('\n').slice(1).filter(r => r.trim() !== '');
+                const gtk = [], siswa = [];
+                rows.forEach(row => {
+                    const c = row.match(/(".*?"|[^",\r\n]+)(?=\s*,|\s*$)/g)?.map(x => x.trim().replace(/^"|"$/g, '')) || [];
+                    if(c.length < 2) return;
+                    const item = { id: c[0], nama: c[1], kelas: c[2] || '-', sesi: (c[3] || 'Pagi'), tipe: (c[4] || 'siswa').toLowerCase().trim() };
+                    if (item.tipe === 'guru') gtk.push(item); else siswa.push(item);
+                });
+                state.master = { gtk, siswa };
+                localStorage.setItem('absensi_gtk', JSON.stringify(gtk));
+                localStorage.setItem('absensi_siswa', JSON.stringify(siswa));
+                refreshUI();
+                console.log("Master Data Auto-Synced");
+            } catch (e) { console.error("Auto-sync failed", e); }
+        };
 
         window.saveAndSync = async () => {
             const url = document.getElementById('sheet-url').value.trim();
@@ -1118,10 +1144,7 @@ const autoSyncData = async (url) => {
         window.refreshUI = () => {
             renderAttendanceList(); renderPopularData(); renderRecentLogs(); renderReport();
             document.getElementById('dashboard-date').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        };if(typeof renderProfilList === 'function') renderProfilList(); // Pastikan render profil ikut terpanggil
-    
-	    const elDate = document.getElementById('dashboard-date');
-	    if(elDate) elDate.innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        };
 
         window.markAbsen = async (id, status) => {
             const rid = `${state.today}_${id}_${state.activeSession}`;
@@ -1211,73 +1234,60 @@ window.onload = () => {
 
 
 // Fungsi untuk menampilkan daftar profil
+// --- JANGAN TULIS IMPORT LAGI DISINI ---
 
-
-// --- LOGIKA TAB PROFIL ---
-
-// 1. Render Daftar Siswa di Tab Profil
 window.renderProfilList = () => {
+    const query = document.getElementById('search-profil').value.toLowerCase();
     const container = document.getElementById('profil-list-container');
-    const search = document.getElementById('search-profil').value.toLowerCase();
+    const data = window.state?.master?.siswa || []; // Menggunakan data dari CSV
     
-    // Filter dari data master siswa
-    const filtered = state.master.siswa.filter(s => 
-        s.nama.toLowerCase().includes(search) || 
-        s.id.toString().includes(search)
+    const filtered = data.filter(s => 
+        (s.nama?.toLowerCase().includes(query)) || 
+        (s.id?.toString().includes(query))
     );
 
-    if(filtered.length === 0) {
-        container.innerHTML = `<div class="text-center py-10 opacity-30 font-black text-[10px]">DATA TIDAK DITEMUKAN</div>`;
+    if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-center py-10 opacity-30 font-black text-[9px] uppercase tracking-widest">Siswa tidak ditemukan</div>`;
         return;
     }
 
     container.innerHTML = filtered.map(s => `
-        <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between active:scale-95 transition-all cursor-pointer mb-2">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center text-xs font-black">
-                    ${s.nama.substring(0,1)}
-                </div>
-                <div>
-                    <h4 class="text-[10px] font-black uppercase text-slate-800">${s.nama}</h4>
-                    <p class="text-[8px] font-bold text-slate-400 uppercase">NIS: ${s.id} • ${s.kelas}</p>
-                </div>
+        <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-3xl border border-slate-100 flex items-center gap-4 active:scale-95 transition-all cursor-pointer shadow-sm">
+            <div class="w-10 h-10 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
+                <i class="fas fa-user text-sm"></i>
             </div>
-            <span class="text-[10px] text-slate-200">➔</span>
+            <div class="flex-grow">
+                <h4 class="text-[11px] font-black uppercase text-slate-800">${s.nama}</h4>
+                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">${s.kelas} • ${s.id}</p>
+            </div>
+            <i class="fas fa-chevron-right text-slate-200 text-xs"></i>
         </div>
     `).join('');
 };
 
-// 2. Membuka Editor & Menghitung Rekap Real-time
-// MEMBUKA EDITOR
-window.openEditor = async (id) => {
-    const s = state.master.siswa.find(x => x.id === id);
-    if(!s) return;
+window.openEditor = async (nis) => {
+    // 1. Ambil data dari CSV (State Master)
+    const s = window.state.master.siswa.find(x => x.id == nis);
+    if (!s) return;
 
-    // Isi Form Identitas
+    // 2. Isi Form Modal
     document.getElementById('edit-id').value = s.id;
     document.getElementById('edit-nama').value = s.nama;
     document.getElementById('display-nis').innerText = `NIS: ${s.id}`;
-    document.getElementById('display-kelas').innerText = s.kelas;
-    
-    // Mapping detail tambahan secara dinamis
-    const fields = {
-        'display-nohp': s.nohp || s['no hp'] || s['whatsapp'],
-        'display-alamat': s.alamat,
-        'display-kesiswaan': s.kesiswaan,
-        'display-guru-bk': s.gurubk || s['guru bk'],
-        'display-wali-kelas': s.walikelas || s['wali kelas'],
-        'display-guru-wali': s.guruwali || s['guru wali']
-    };
-    Object.keys(fields).forEach(key => {
-        const el = document.getElementById(key);
-        if(el) el.innerText = fields[key] || '-';
-    });
+    document.getElementById('display-kelas').innerText = s.kelas || '-';
+    document.getElementById('display-sesi').innerText = s.sesi || '-';
+    document.getElementById('display-tipe').innerText = s.tipe || '-';
+    document.getElementById('display-nohp').innerText = s.no_hp || '-';
+    document.getElementById('display-guru-bk').innerText = s.guru_bk || '-';
+    document.getElementById('display-wali-kelas').innerText = s.wali_kelas || '-';
+    document.getElementById('display-guru-wali').innerText = s.guru_wali || '-';
+    document.getElementById('display-alamat').innerText = s.alamat || '-';
 
-    // Hitung Rekap dari state.records (Local)
-    let rekap = { A: 0, B: 0, I: 0, S: 0, T: 0 };
-    Object.values(state.records).forEach(day => {
+    // 3. Kalkulasi Rekapitulasi ABIS
+    const rekap = { A: 0, B: 0, I: 0, S: 0, T: 0 };
+    Object.values(window.state.records || {}).forEach(day => {
         Object.values(day).forEach(rec => {
-            if(rec.personId === id) {
+            if(rec.personId == nis) {
                 if(rec.status === 'Alpa') rekap.A++;
                 else if(rec.status === 'Bolos') rekap.B++;
                 else if(rec.status === 'Izin') rekap.I++;
@@ -1286,46 +1296,50 @@ window.openEditor = async (id) => {
             }
         });
     });
-    
     document.getElementById('rekap-a').innerText = rekap.A;
     document.getElementById('rekap-b').innerText = rekap.B;
     document.getElementById('rekap-i').innerText = rekap.I;
     document.getElementById('rekap-s').innerText = rekap.S;
     document.getElementById('rekap-t').innerText = rekap.T;
 
-    // Ambil Catatan dari Folder Terpisah
-    const noteSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id));
-    const notes = noteSnap.exists() ? noteSnap.data() : {};
-    
-    const noteMap = ['kesiswaan', 'gurubk', 'walikelas', 'guruwali', 'gurumapel'];
-    noteMap.forEach(f => {
-        document.getElementById(`edit-catatan-${f}`).value = notes[f] || '';
-    });
+    // 4. Load Catatan dari Firebase
+    try {
+        // PERHATIKAN: Pastikan 'db' dan 'appId' sudah terdefinisi di script atas
+        const docRef = window.doc(window.db, 'artifacts', window.appId, 'public', 'notes', nis.toString());
+        const snap = await window.getDoc(docRef);
+        const fbData = snap.exists() ? snap.data() : {};
+        
+        document.getElementById('edit-catatan-bk').value = fbData.catatan_bk || '';
+        document.getElementById('edit-catatan-wali').value = fbData.catatan_wali || '';
+        document.getElementById('edit-catatan-mapel').value = fbData.catatan_mapel || '';
+    } catch (e) { console.error("Firebase Error:", e); }
 
-    document.getElementById('editor-modal').classList.replace('hidden', 'flex');
+    document.getElementById('editor-modal').classList.remove('hidden');
+    document.getElementById('editor-modal').classList.add('flex');
 };
 
-// SIMPAN CATATAN KE FOLDER TERPISAH
+window.closeEditor = () => {
+    document.getElementById('editor-modal').classList.add('hidden');
+    document.getElementById('editor-modal').classList.remove('flex');
+};
+
 window.saveStudentProfile = async () => {
     const id = document.getElementById('edit-id').value;
-    const payload = {
-        kesiswaan: document.getElementById('edit-catatan-kesiswaan').value,
-        gurubk: document.getElementById('edit-catatan-gurubk').value,
-        walikelas: document.getElementById('edit-catatan-walikelas').value,
-        guruwali: document.getElementById('edit-catatan-guruwali').value,
-        gurumapel: document.getElementById('edit-catatan-gurumapel').value,
-        lastUpdate: Date.now(),
-        updatedBy: state.currentUser
+    const data = {
+        catatan_bk: document.getElementById('edit-catatan-bk').value,
+        catatan_wali: document.getElementById('edit-catatan-wali').value,
+        catatan_mapel: document.getElementById('edit-catatan-mapel').value,
+        last_updated: new Date().toISOString()
     };
 
     try {
-        showToast("⏳ Menyimpan...");
-        // Path: public/data/student_notes/{id}
-        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id), payload, { merge: true });
-        showToast("✅ Catatan Tersimpan");
-        document.getElementById('editor-modal').classList.replace('flex', 'hidden');
-    } catch (e) { showToast("❌ Gagal"); }
+        const docRef = window.doc(window.db, 'artifacts', window.appId, 'public', 'notes', id);
+        await window.setDoc(docRef, data, { merge: true });
+        window.showToast("✅ Berhasil Disimpan");
+        window.closeEditor();
+    } catch (e) { window.showToast("❌ Gagal"); }
 };
+
 </script>
 </body>
 </html>
