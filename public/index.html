@@ -1122,7 +1122,6 @@ const autoSyncData = async (url) => {
     
 	    const elDate = document.getElementById('dashboard-date');
 	    if(elDate) elDate.innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-	};
 
         window.markAbsen = async (id, status) => {
             const rid = `${state.today}_${id}_${state.activeSession}`;
