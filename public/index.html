@@ -72,6 +72,7 @@
 
         <main class="pb-32 p-4 max-w-md mx-auto">
 
+
             <!-- TAB PROFIL -->
 <div id="tab-profil" class="tab-content">
     <div class="px-6 py-4 pb-24">
@@ -154,6 +155,14 @@
         </button>
     </div>
 </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -428,6 +437,7 @@
 
         <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-slate-100 px-4 pb-9 pt-3 z-50 rounded-t-[2.5rem] shadow-lg">
             <div class="max-w-md mx-auto flex justify-between items-center px-4">
+		<button onclick="switchTab('profil')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="nav-profil"><i class="fas fa-address-card text-lg"></i><span class="text-[7px] font-black">PROFIL</span></button>
                 <button onclick="switchTab('dashboard')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="nav-dashboard"><i class="fas fa-house-chimney text-lg"></i><span class="text-[7px] font-black">BERANDA</span></button>
                 <button onclick="switchTab('absensi')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="nav-absensi"><i class="fas fa-user-check text-lg"></i><span class="text-[7px] font-black">LAPOR</span></button>
                 <button onclick="switchTab('laporan')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="nav-laporan"><i class="fas fa-file-waveform text-lg"></i><span class="text-[7px] font-black">REKAP</span></button>
@@ -518,6 +528,7 @@
             }
 
             if(tab === 'download') updateClassListDropdown();
+            if(tab === 'profil') window.renderProfilList();
             refreshUI();
         };
 
@@ -1068,6 +1079,27 @@ function downloadXLSX(wb, filename) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         //DATABASE SYNC LOGIC (SINKRONISASI OTOMATIS)
         window.unlockDb = () => { 
             const pass = document.getElementById('kesiswaan-pass').value;
@@ -1078,28 +1110,43 @@ function downloadXLSX(wb, filename) {
         };
 
         // Fungsi Helper Sinkronisasi Tanpa Toast Berlebih
-        const autoSyncData = async (url) => {
-            if (!url) return;
-            let exportUrl = url.includes('/edit') ? url.split('/edit')[0] + '/export?format=csv' : url;
-            try {
-                const res = await fetch(exportUrl);
-                if (!res.ok) return;
-                const csv = await res.text();
-                const rows = csv.split('\n').slice(1).filter(r => r.trim() !== '');
-                const gtk = [], siswa = [];
-                rows.forEach(row => {
-                    const c = row.match(/(".*?"|[^",\r\n]+)(?=\s*,|\s*$)/g)?.map(x => x.trim().replace(/^"|"$/g, '')) || [];
-                    if(c.length < 2) return;
-                    const item = { id: c[0], nama: c[1], kelas: c[2] || '-', sesi: (c[3] || 'Pagi'), tipe: (c[4] || 'siswa').toLowerCase().trim() };
-                    if (item.tipe === 'guru') gtk.push(item); else siswa.push(item);
-                });
-                state.master = { gtk, siswa };
-                localStorage.setItem('absensi_gtk', JSON.stringify(gtk));
-                localStorage.setItem('absensi_siswa', JSON.stringify(siswa));
-                refreshUI();
-                console.log("Master Data Auto-Synced");
-            } catch (e) { console.error("Auto-sync failed", e); }
-        };
+const autoSyncData = async (url) => {
+    if (!url) return;
+    let exportUrl = url.includes('/edit') ? url.split('/edit')[0] + '/export?format=csv' : url;
+    try {
+        const res = await fetch(exportUrl);
+        const csv = await res.text();
+        const rows = csv.split('\n').slice(1).filter(r => r.trim() !== '');
+        const gtk = [], siswa = [];
+        
+        rows.forEach(row => {
+            const c = row.match(/(".*?"|[^",\r\n]+)(?=\s*,|\s*$)/g)?.map(x => x.trim().replace(/^"|"$/g, '')) || [];
+            if(c.length < 2) return;
+
+            // Mapping berdasarkan kolom A=0, B=1, C=2, dst.
+            const item = { 
+                id: c[0],           // NIS (Kolom A)
+                nama: c[1],         // NAMA (Kolom B)
+                kelas: c[2] || '-', // KELAS (Kolom C)
+                sesi: c[3] || 'Pagi', // SESI (Kolom D)
+                tipe: (c[4] || 'siswa').toLowerCase().trim(), // TIPE (Kolom E)
+                alamat: c[5] || '-',    // ALAMAT (Kolom F)
+                nohp: c[6] || '-',      // NO HP (Kolom G)
+                guruBK: c[7] || '-',    // GURU BK (Kolom H)
+                waliKelas: c[8] || '-', // WALI KELAS (Kolom I)
+                guruWali: c[9] || '-',  // GURU WALI (Kolom J)
+                kesiswaan: c[10] || '-' // KESISWAAN (Kolom K)
+            };
+
+            if (item.tipe === 'guru') gtk.push(item); else siswa.push(item);
+        });
+
+        state.master = { gtk, siswa };
+        localStorage.setItem('absensi_gtk', JSON.stringify(gtk));
+        localStorage.setItem('absensi_siswa', JSON.stringify(siswa));
+        refreshUI();
+    } catch (e) { console.error("Sync Error:", e); }
+};
 
         window.saveAndSync = async () => {
             const url = document.getElementById('sheet-url').value.trim();
@@ -1139,7 +1186,6 @@ function downloadXLSX(wb, filename) {
                 document.getElementById('login-screen').classList.remove('active');
                 document.getElementById('app-content').classList.add('active');
                 document.getElementById('display-name').innerText = state.currentUser;
-                document.getElementById('welcome-name').innerText = state.currentUser;
                 document.getElementById('modal-name').innerText = state.currentUser;
                 document.getElementById('user-photo').src = `https://ui-avatars.com/api/?name=${state.currentUser}&background=ef4444&color=fff&bold=true`;
                 document.getElementById('modal-photo').src = `https://ui-avatars.com/api/?name=${state.currentUser}&background=ef4444&color=fff&bold=true`;
@@ -1214,104 +1260,21 @@ window.onload = () => {
 
 
 
-// --- RENDER LIST SISWA ---
-// RENDER LIST DI TAB PROFIL
-window.renderProfilList = () => {
-    const container = document.getElementById('profil-list-container');
-    const search = document.getElementById('search-profil').value.toLowerCase();
-    const filtered = state.master.siswa.filter(s => s.nama.toLowerCase().includes(search) || s.id.includes(search));
-    
-    container.innerHTML = filtered.map(s => `
-        <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-4 active:scale-95 transition-all cursor-pointer">
-            <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 font-black text-xs">${s.nama.charAt(0)}</div>
-            <div class="flex-grow">
-                <h4 class="text-[11px] font-black text-slate-800 uppercase">${s.nama}</h4>
-                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">${s.kelas} • ${s.id}</p>
-            </div>
-            <i class="fas fa-chevron-right text-slate-200 text-xs"></i>
-        </div>
-    `).join('');
-};
 
-// BUKA EDITOR MODAL (AMBIL PROFIL + REKAP + CATATAN)
-window.openEditor = async (id) => {
-    const student = state.master.siswa.find(s => s.id === id);
-    if (!student) return;
 
-    // 1. ISI DATA DARI MASTER (Pasti Tampil)
-    document.getElementById('edit-id').value = id;
-    document.getElementById('edit-nama').value = student.nama;
-    document.getElementById('display-nis').innerText = `NIS: ${student.id}`;
-    document.getElementById('display-kelas').innerText = student.kelas;
-    document.getElementById('display-sesi').innerText = student.sesi;
-    document.getElementById('display-tipe').innerText = student.tipe.toUpperCase();
-    document.getElementById('display-nohp').innerText = student.nohp;
-    document.getElementById('display-alamat').innerText = student.alamat;
-    document.getElementById('display-kesiswaan').innerText = student.kesiswaan;
-    document.getElementById('display-guru-bk').innerText = student.guruBK;
-    document.getElementById('display-wali-kelas').innerText = student.waliKelas;
-    document.getElementById('display-guru-wali').innerText = student.guruWali;
 
-    // 2. HITUNG REKAP (Dari data 4 bulan di state.records)
-    let rekap = { A: 0, B: 0, I: 0, S: 0, T: 0 };
-    Object.values(state.records).forEach(day => {
-        ['Pagi', 'Siang'].forEach(sess => {
-            const entry = day[`${id}_${sess}`];
-            if (entry) {
-                if (entry.status === 'Alpa') rekap.A++;
-                else if (entry.status === 'Bolos') rekap.B++;
-                else if (entry.status === 'Izin') rekap.I++;
-                else if (entry.status === 'Sakit') rekap.S++;
-                rekap.T++;
-            }
-        });
-    });
-    document.getElementById('rekap-a').innerText = rekap.A;
-    document.getElementById('rekap-b').innerText = rekap.B;
-    document.getElementById('rekap-i').innerText = rekap.I;
-    document.getElementById('rekap-s').innerText = rekap.S;
-    document.getElementById('rekap-t').innerText = rekap.T;
 
-    // 3. LOAD CATATAN DARI FIREBASE (Jika ada)
-    try {
-        const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id));
-        if (snap.exists()) {
-            const d = snap.data();
-            document.getElementById('edit-catatan-kesiswaan').value = d.catatanKesiswaan || '';
-            document.getElementById('edit-catatan-bk').value = d.catatanBK || '';
-            document.getElementById('edit-catatan-guruwali').value = d.catatanGuruWali || '';
-            document.getElementById('edit-catatan-walikelas').value = d.catatanWaliKelas || '';
-            document.getElementById('edit-catatan-mapel').value = d.catatanMapel || '';
-        } else {
-            document.getElementById('edit-catatan-kesiswaan').value = '';
-            document.getElementById('edit-catatan-bk').value = '';
-            document.getElementById('edit-catatan-walikelas').value = '';
-            document.getElementById('edit-catatan-guruwali').value = '';
-            document.getElementById('edit-catatan-mapel').value = '';
-        }
-    } catch (e) { console.error(e); }
 
-    document.getElementById('editor-modal').style.display = 'flex';
-};
 
-// SIMPAN CATATAN PEMBINAAN (PATH TERPISAH)
-window.saveStudentProfile = async (id) => {
-    const data = {
-        catatanKesiswaan: document.getElementById('edit-catatan-kesiswaan').value,
-        catatanBK: document.getElementById('edit-catatan-bk').value,
-        catatanGuruWali: document.getElementById('edit-catatan-guruwali').value,
-        catatanWaliKelas: document.getElementById('edit-catatan-walikelas').value,
-        catatanMapel: document.getElementById('edit-catatan-mapel').value,
-        lastUpdate: Date.now()
-    };
-    try {
-        showToast("⏳ Menyimpan...");
-        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id), data, { merge: true });
-        showToast("✅ Berhasil Disimpan");
-    } catch (e) { showToast("❌ Gagal"); }
-};
 
-window.closeEditor = () => document.getElementById('editor-modal').style.display = 'none';
+
+
+
+
+
+
+
+
 
 
 
