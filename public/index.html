@@ -428,6 +428,7 @@
 
         <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-slate-100 px-4 pb-9 pt-3 z-50 rounded-t-[2.5rem] shadow-lg">
             <div class="max-w-md mx-auto flex justify-between items-center px-4">
+                <button onclick="switchTab('profil')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="nav-dashboard"><i class="fas fa-house-chimney text-lg"></i><span class="text-[7px] font-black">PROFIL</span></button>
                 <button onclick="switchTab('dashboard')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="nav-dashboard"><i class="fas fa-house-chimney text-lg"></i><span class="text-[7px] font-black">BERANDA</span></button>
                 <button onclick="switchTab('absensi')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="nav-absensi"><i class="fas fa-user-check text-lg"></i><span class="text-[7px] font-black">LAPOR</span></button>
                 <button onclick="switchTab('laporan')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="nav-laporan"><i class="fas fa-file-waveform text-lg"></i><span class="text-[7px] font-black">REKAP</span></button>
@@ -503,24 +504,43 @@
         };
 
 
-        // --- LOGIKA NAVIGASI ---
-        window.switchTab = (tab) => {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active', 'text-red-600'));
-            
-            document.getElementById(`tab-${tab}`).classList.add('active');
-            document.getElementById(`nav-${tab}`).classList.add('active', 'text-red-600');
+// --- LOGIKA NAVIGASI ---
+window.switchTab = (tab) => {
+    // 1. Sembunyikan semua konten tab
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    // 2. Reset semua tombol navigasi
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active', 'text-red-600'));
 
-            if (tab !== 'config') {
-                document.getElementById('kesiswaan-lock').classList.remove('hidden');
-                document.getElementById('kesiswaan-content').classList.add('hidden');
-                document.getElementById('kesiswaan-pass').value = '';
-            }
+    // 3. Cari elemen tujuan (Tambahkan pengecekan agar tidak error jika ID belum ada)
+    const targetTab = document.getElementById(`tab-${tab}`);
+    const targetNav = document.getElementById(`nav-${tab}`);
 
-            if(tab === 'download') updateClassListDropdown();
-            refreshUI();
-        };
+    if (targetTab) targetTab.classList.add('active');
+    if (targetNav) targetNav.classList.add('active', 'text-red-600');
 
+    // 4. Logika Keamanan/Lock (Tetap dipertahankan)
+    if (tab !== 'config') {
+        const lock = document.getElementById('kesiswaan-lock');
+        const content = document.getElementById('kesiswaan-content');
+        const passInput = document.getElementById('kesiswaan-pass');
+        
+        if(lock) lock.classList.remove('hidden');
+        if(content) content.classList.add('hidden');
+        if(passInput) passInput.value = '';
+    }
+
+    // 5. Logika Khusus Tab
+    if (tab === 'download') updateClassListDropdown();
+    
+    // Jika pindah ke tab profil, jalankan fungsi render list siswa
+    if (tab === 'profil' && typeof window.renderProfilList === 'function') {
+        window.renderProfilList();
+    }
+
+    refreshUI();
+    window.scrollTo(0, 0); // Opsional: Agar tampilan kembali ke atas saat ganti tab
+};
         
 
         window.updateSessionUI = (s) => {
