@@ -1303,29 +1303,18 @@ window.onload = () => {
 
 
 
-// --- RENDER LIST DI TAB PROFIL ---
+
+
+
+// RENDER LIST DI TAB PROFIL
 window.renderProfilList = () => {
     const container = document.getElementById('profil-list-container');
-    const searchInput = document.getElementById('search-profil');
-    if (!container || !searchInput) return;
-
-    const search = searchInput.value.toLowerCase();
-    
-    // Pastikan data siswa ada
-    const students = (window.state && window.state.master) ? window.state.master.siswa : [];
-    
-    // Perbaikan: Tambahkan String() pada s.id agar tidak error jika ID berupa angka
-    const filtered = students.filter(s => 
-        (s.nama && s.nama.toLowerCase().includes(search)) || 
-        (s.id && String(s.id).includes(search))
-    );
+    const search = document.getElementById('search-profil').value.toLowerCase();
+    const filtered = state.master.siswa.filter(s => s.nama.toLowerCase().includes(search) || s.id.includes(search));
     
     container.innerHTML = filtered.map(s => `
-        <div onclick="window.openEditor('${s.id}')" 
-             class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-4 active:scale-95 transition-all cursor-pointer">
-            <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 font-black text-xs">
-                ${s.nama ? s.nama.charAt(0).toUpperCase() : '?'}
-            </div>
+        <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-4 active:scale-95 transition-all cursor-pointer">
+            <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 font-black text-xs">${s.nama.charAt(0)}</div>
             <div class="flex-grow">
                 <h4 class="text-[11px] font-black text-slate-800 uppercase">${s.nama}</h4>
                 <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">${s.kelas} • ${s.id}</p>
@@ -1335,23 +1324,24 @@ window.renderProfilList = () => {
     `).join('');
 };
 
-// --- BUKA EDITOR MODAL ---
+// BUKA EDITOR MODAL (AMBIL PROFIL + REKAP + CATATAN)
 window.openEditor = async (id) => {
-    const student = window.state.master.siswa.find(s => String(s.id) === String(id));
+    const student = state.master.siswa.find(s => s.id === id);
     if (!student) return;
 
-    // 1. Isi Data Dasar
+    // 1. ISI DATA DARI MASTER (Pasti Tampil)
     document.getElementById('edit-id').value = id;
-    document.getElementById('edit-nama').value = student.nama || '';
+    document.getElementById('edit-nama').value = student.nama;
     document.getElementById('display-nis').innerText = `NIS: ${student.id}`;
-    document.getElementById('display-kelas').innerText = student.kelas || '-';
-    document.getElementById('display-sesi').innerText = student.sesi || '-';
-    document.getElementById('display-tipe').innerText = (student.tipe || '-').toUpperCase();
-    document.getElementById('display-alamat').innerText = student.alamat || '-';
-    document.getElementById('display-kesiswaan').innerText = student.kesiswaan || '-';
-    document.getElementById('display-guru-bk').innerText = student.guruBK || '-';
-    document.getElementById('display-wali-kelas').innerText = student.waliKelas || '-';
-    document.getElementById('display-guru-wali').innerText = student.guruWali || '-';
+    document.getElementById('display-kelas').innerText = student.kelas;
+    document.getElementById('display-sesi').innerText = student.sesi;
+    document.getElementById('display-tipe').innerText = student.tipe.toUpperCase();
+    document.getElementById('display-nohp').innerText = student.nohp;
+    document.getElementById('display-alamat').innerText = student.alamat;
+    document.getElementById('display-kesiswaan').innerText = student.kesiswaan;
+    document.getElementById('display-guru-bk').innerText = student.guruBK;
+    document.getElementById('display-wali-kelas').innerText = student.waliKelas;
+    document.getElementById('display-guru-wali').innerText = student.guruWali;
 
     // 2. Foto Profil (Avatar)
     const photoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(student.nama)}&background=ef4444&color=fff&font-size=0.4&bold=true`;
