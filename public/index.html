@@ -120,28 +120,26 @@
 </div>
 
 <div id="editor-modal" class="fixed inset-0 bg-slate-900/60 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white w-full max-w-lg h-[90vh] overflow-hidden rounded-[2.5rem] shadow-2xl flex flex-col animation-slide-up">
+    <div class="bg-white w-full max-w-lg h-[90vh] overflow-hidden rounded-[2.5rem] shadow-2xl flex flex-col">
         
         <div class="flex justify-between items-center p-6 border-b border-slate-100 flex-shrink-0">
-            <button onclick="window.closeEditor()" class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600 transition-colors">
+            <button onclick="window.closeEditor()" class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400">
                 <i class="fas fa-arrow-left"></i>
             </button>
-            <h3 class="font-extrabold text-slate-900 text-[10px] uppercase tracking-[0.2em]">Profil & Riwayat Pembinaan</h3>
+            <h3 class="font-extrabold text-slate-900 text-[10px] uppercase tracking-[0.2em]">Data Lengkap Siswa</h3>
             <div class="w-10"></div>
         </div>
 
         <input type="hidden" id="edit-id">
 
-        <div class="flex-grow overflow-y-auto p-6 space-y-8 no-scrollbar">
+        <div class="flex-grow overflow-y-auto p-6 space-y-6 no-scrollbar">
             
             <div class="text-center pt-2">
-                <div class="relative w-24 h-24 mx-auto mb-4">
+                <div class="relative w-20 h-20 mx-auto mb-3">
                     <img id="display-foto" src="" class="w-full h-full rounded-full object-cover border-4 border-white shadow-md ring-1 ring-slate-100">
-                    <div class="absolute bottom-1 right-1 w-5 h-5 bg-green-500 rounded-full border-4 border-white shadow"></div>
                 </div>
-                <h2 id="edit-nama-display" class="font-extrabold text-slate-950 uppercase text-lg tracking-tight mb-1">...</h2>
-                <p id="display-nis" class="text-[9px] font-bold text-slate-400 tracking-widest uppercase mb-4"></p>
-                
+                <h2 id="edit-nama-display" class="font-extrabold text-slate-950 uppercase text-base tracking-tight mb-1">...</h2>
+                <p id="display-nis" class="text-[8px] font-bold text-slate-400 tracking-widest uppercase mb-3"></p>
                 <div class="flex items-center justify-center gap-2">
                     <span id="display-kelas" class="px-3 py-1 bg-slate-100 text-slate-700 font-extrabold text-[8px] uppercase rounded-full">...</span>
                     <span id="display-sesi" class="px-3 py-1 bg-slate-100 text-slate-700 font-extrabold text-[8px] uppercase rounded-full">...</span>
@@ -149,111 +147,107 @@
                 </div>
             </div>
 
-            <div class="bg-gradient-to-br from-red-600 to-red-700 p-6 rounded-[2rem] text-white shadow-xl shadow-red-100/50 space-y-4">
-                <div class="flex items-center justify-between gap-4 p-3 bg-white/10 rounded-2xl border border-white/10">
+            <div class="bg-gradient-to-br from-red-600 to-red-700 p-5 rounded-[2rem] text-white shadow-xl shadow-red-100/50 space-y-3">
+                <div class="flex items-center justify-between p-3 bg-white/10 rounded-2xl border border-white/10">
                     <div class="flex items-center gap-3">
-                        <i class="fab fa-whatsapp text-xl opacity-80"></i>
+                        <i class="fab fa-whatsapp text-lg opacity-80"></i>
                         <div>
-                            <p class="opacity-70 text-[7px] font-bold uppercase tracking-wider mb-0.5">WhatsApp Siswa</p>
+                            <p class="opacity-70 text-[7px] font-bold uppercase tracking-wider">WA Siswa</p>
                             <p id="display-nohp" class="text-xs font-extrabold">...</p>
                         </div>
                     </div>
-                    <a id="display-nohp-link" href="#" target="_blank" class="text-[9px] font-extrabold text-red-600 bg-white px-4 py-2 rounded-full shadow-sm active:scale-95 transition-all">HUBUNGI</a>
+                    <a id="display-nohp-link" href="#" target="_blank" class="text-[8px] font-extrabold text-red-600 bg-white px-3 py-1.5 rounded-full">HUBUNGI</a>
                 </div>
 
-                <div class="flex items-center justify-between gap-4 p-3 bg-white/10 rounded-2xl border border-white/10">
+                <div class="flex items-center justify-between p-3 bg-white/10 rounded-2xl border border-white/10">
                     <div class="flex items-center gap-3">
-                        <i class="fas fa-user-friends text-xl opacity-80"></i>
+                        <i class="fas fa-user-friends text-lg opacity-80"></i>
                         <div>
-                            <p class="opacity-70 text-[7px] font-bold uppercase tracking-wider mb-0.5">Ortu: <span id="display-orangtua" class="font-black uppercase">...</span></p>
+                            <p class="opacity-70 text-[7px] font-bold uppercase tracking-wider">Nama Ortu: <span id="display-orangtua" class="font-black uppercase">...</span></p>
                             <p id="display-hp-orangtua" class="text-xs font-extrabold">...</p>
                         </div>
                     </div>
-                    <a id="display-hp-ortu-link" href="#" target="_blank" class="text-[9px] font-extrabold text-red-600 bg-white px-4 py-2 rounded-full shadow-sm active:scale-95 transition-all">WA ORTU</a>
+                    <a id="display-hp-ortu-link" href="#" target="_blank" class="text-[8px] font-extrabold text-red-600 bg-white px-3 py-1.5 rounded-full">WA ORTU</a>
                 </div>
 
-                <div class="pt-3 border-t border-white/15">
-                    <p class="opacity-70 text-[7px] font-bold uppercase mb-1 tracking-wider">Alamat Tinggal</p>
-                    <p id="display-alamat" class="text-[10px] leading-relaxed italic opacity-95">...</p>
+                <div class="pt-2 border-t border-white/15 px-1">
+                    <p id="display-alamat" class="text-[9px] leading-relaxed italic opacity-90 text-center">...</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-5 gap-2">
-                <div class="bg-white p-3 rounded-2xl text-center border border-slate-100 shadow-sm">
-                    <p class="text-[8px] font-extrabold text-red-600 mb-0.5">A</p>
-                    <p id="rekap-a" class="text-lg font-black text-slate-900">0</p>
+                <div class="bg-white p-2 rounded-xl text-center border border-slate-100 shadow-sm">
+                    <p class="text-[7px] font-extrabold text-red-500">A</p>
+                    <p id="rekap-a" class="text-sm font-black text-slate-900">0</p>
                 </div>
-                <div class="bg-white p-3 rounded-2xl text-center border border-slate-100 shadow-sm">
-                    <p class="text-[8px] font-extrabold text-orange-600 mb-0.5">B</p>
-                    <p id="rekap-b" class="text-lg font-black text-slate-900">0</p>
+                <div class="bg-white p-2 rounded-xl text-center border border-slate-100 shadow-sm">
+                    <p class="text-[7px] font-extrabold text-orange-500">B</p>
+                    <p id="rekap-b" class="text-sm font-black text-slate-900">0</p>
                 </div>
-                <div class="bg-white p-3 rounded-2xl text-center border border-slate-100 shadow-sm">
-                    <p class="text-[8px] font-extrabold text-sky-600 mb-0.5">I</p>
-                    <p id="rekap-i" class="text-lg font-black text-slate-900">0</p>
+                <div class="bg-white p-2 rounded-xl text-center border border-slate-100 shadow-sm">
+                    <p class="text-[7px] font-extrabold text-sky-500">I</p>
+                    <p id="rekap-i" class="text-sm font-black text-slate-900">0</p>
                 </div>
-                <div class="bg-white p-3 rounded-2xl text-center border border-slate-100 shadow-sm">
-                    <p class="text-[8px] font-extrabold text-green-600 mb-0.5">S</p>
-                    <p id="rekap-s" class="text-lg font-black text-slate-900">0</p>
+                <div class="bg-white p-2 rounded-xl text-center border border-slate-100 shadow-sm">
+                    <p class="text-[7px] font-extrabold text-green-500">S</p>
+                    <p id="rekap-s" class="text-sm font-black text-slate-900">0</p>
                 </div>
-                <div class="bg-slate-900 p-3 rounded-2xl text-center shadow-lg">
-                    <p class="text-[8px] font-extrabold text-white/50 mb-0.5">TOT</p>
-                    <p id="rekap-t" class="text-lg font-black text-white">0</p>
+                <div class="bg-slate-900 p-2 rounded-xl text-center">
+                    <p class="text-[7px] font-extrabold text-white/50">TOT</p>
+                    <p id="rekap-t" class="text-sm font-black text-white">0</p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-3">
-                    <div class="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center text-[10px] font-black italic">K</div>
-                    <div>
-                        <p class="text-[7px] font-extrabold text-slate-400 uppercase">Kesiswaan</p>
-                        <p id="display-kesiswaan" class="text-[9px] font-bold text-slate-700">...</p>
+            <div class="bg-slate-50 p-4 rounded-[1.5rem] border border-slate-100">
+                <div class="grid grid-cols-2 gap-y-3 gap-x-4">
+                    <div class="flex flex-col">
+                        <span class="text-[7px] font-black text-red-400 uppercase">Kesiswaan</span>
+                        <span id="display-kesiswaan" class="text-[9px] font-bold text-slate-700 truncate">...</span>
                     </div>
-                </div>
-                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-3">
-                    <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-[10px] font-black italic">BK</div>
-                    <div>
-                        <p class="text-[7px] font-extrabold text-slate-400 uppercase">Guru BK</p>
-                        <p id="display-guru-bk" class="text-[9px] font-bold text-slate-700">...</p>
+                    <div class="flex flex-col border-l border-slate-200 pl-3">
+                        <span class="text-[7px] font-black text-purple-400 uppercase">Guru BK</span>
+                        <span id="display-guru-bk" class="text-[9px] font-bold text-slate-700 truncate">...</span>
                     </div>
-                </div>
-                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-3">
-                    <div class="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center text-[10px] font-black italic">WK</div>
-                    <div>
-                        <p class="text-[7px] font-extrabold text-slate-400 uppercase">Wali Kelas</p>
-                        <p id="display-wali-kelas" class="text-[9px] font-bold text-slate-700">...</p>
+                    <div class="flex flex-col border-t border-slate-200 pt-2">
+                        <span class="text-[7px] font-black text-orange-400 uppercase">Wali Kelas</span>
+                        <span id="display-wali-kelas" class="text-[9px] font-bold text-slate-700 truncate">...</span>
                     </div>
-                </div>
-                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-3">
-                    <div class="w-8 h-8 bg-green-100 text-green-600 rounded-lg flex items-center justify-center text-[10px] font-black italic">GW</div>
-                    <div>
-                        <p class="text-[7px] font-extrabold text-slate-400 uppercase">Guru Wali</p>
-                        <p id="display-guru-wali" class="text-[9px] font-bold text-slate-700">...</p>
+                    <div class="flex flex-col border-t border-l border-slate-200 pt-2 pl-3">
+                        <span class="text-[7px] font-black text-green-400 uppercase">Guru Wali</span>
+                        <span id="display-guru-wali" class="text-[9px] font-bold text-slate-700 truncate">...</span>
                     </div>
                 </div>
             </div>
 
-            <div class="space-y-4">
-                <h4 class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest">Riwayat Pembinaan</h4>
-                <div id="history-container" class="space-y-4">
-                    </div>
+            <div class="space-y-3">
+                <h4 class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest px-1">Riwayat Pembinaan</h4>
+                <div id="history-container" class="space-y-3"></div>
             </div>
 
-            <div class="bg-slate-950 p-6 rounded-[2.5rem] mb-4 shadow-xl">
-                <h4 class="text-[9px] font-extrabold text-white/50 uppercase tracking-widest mb-4">Tambah Catatan</h4>
-                <select id="select-peran" class="w-full bg-white/10 text-white p-3 rounded-xl text-[10px] font-bold mb-3 border-none outline-none focus:ring-1 focus:ring-red-500">
-                    <option value="Kesiswaan">KESISWAAN</option>
-                    <option value="Guru BK">GURU BK</option>
-                    <option value="Wali Kelas">WALI KELAS</option>
-                    <option value="Guru Wali">GURU WALI</option>
-                    <option value="Guru Mapel">GURU MAPEL</option>
-                </select>
-                <textarea id="new-note-text" placeholder="Ketik rincian pembinaan..." class="w-full bg-white/10 text-white p-4 rounded-2xl text-[10px] min-h-[100px] border-none outline-none mb-4 focus:ring-1 focus:ring-red-500 placeholder:text-white/20"></textarea>
-                <button onclick="window.addNewNote()" class="w-full bg-red-600 text-white p-4 rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-red-900/20 active:scale-95 transition-all">Simpan Catatan</button>
+            <div class="pb-4">
+                <button onclick="window.toggleNoteForm()" id="btn-toggle-note" class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-[9px] font-bold text-slate-400 uppercase tracking-widest active:bg-slate-50">
+                    <i class="fas fa-plus-circle mr-2"></i> Tambah Catatan Baru
+                </button>
+
+                <div id="wrapper-note-form" class="hidden bg-slate-950 p-5 rounded-[2rem] shadow-xl shadow-slate-900/20">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="text-[8px] font-extrabold text-white/40 uppercase tracking-widest">Input Pembinaan</h4>
+                        <button onclick="window.toggleNoteForm()" class="text-white/20"><i class="fas fa-times text-xs"></i></button>
+                    </div>
+                    <select id="select-peran" class="w-full bg-white/10 text-white p-3 rounded-xl text-[10px] font-bold mb-3 border-none outline-none">
+                        <option value="Kesiswaan">KESISWAAN</option>
+                        <option value="Guru BK">GURU BK</option>
+                        <option value="Wali Kelas">WALI KELAS</option>
+                        <option value="Guru Wali">GURU WALI</option>
+                        <option value="Guru Mapel">GURU MAPEL</option>
+                    </select>
+                    <textarea id="new-note-text" placeholder="Tulis detail di sini..." class="w-full bg-white/10 text-white p-4 rounded-2xl text-[10px] min-h-[80px] border-none outline-none mb-4 focus:ring-1 focus:ring-red-500"></textarea>
+                    <button onclick="window.addNewNote()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase shadow-lg shadow-red-900/20">Simpan Catatan</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 
 
             <!-- TAB BERANDA -->
@@ -1387,11 +1381,24 @@ window.renderProfilList = () => {
     `).join('');
 };
 
+// FUNGSI TOGGLE FORM
+window.toggleNoteForm = () => {
+    const form = document.getElementById('wrapper-note-form');
+    const btn = document.getElementById('btn-toggle-note');
+    if (form.classList.contains('hidden')) {
+        form.classList.remove('hidden');
+        btn.classList.add('hidden');
+    } else {
+        form.classList.add('hidden');
+        btn.classList.remove('hidden');
+    }
+};
+
 window.openEditor = async (id) => {
     const student = state.master.siswa.find(s => s.id === id);
     if (!student) return;
 
-    // 1. ISI DATA DASAR (MENGGUNAKAN VARIABEL ANDA)
+    // 1. DATA DASAR
     document.getElementById('edit-id').value = id;
     document.getElementById('edit-nama-display').innerText = student.nama;
     document.getElementById('display-nis').innerText = `NIS: ${student.id}`;
@@ -1401,25 +1408,23 @@ window.openEditor = async (id) => {
     document.getElementById('display-alamat').innerText = student.alamat || '-';
     document.getElementById('display-orangtua').innerText = student.orangtua || '-';
 
-    // Foto Inisial Otomatis
-    document.getElementById('display-foto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(student.nama)}&background=EF4444&color=FFFFFF&bold=true`;
-
-    // Tim Pembina
+    // 2. TIM PEMBINA
     document.getElementById('display-kesiswaan').innerText = student.kesiswaan || '-';
     document.getElementById('display-guru-bk').innerText = student.guruBK || '-';
     document.getElementById('display-wali-kelas').innerText = student.waliKelas || '-';
     document.getElementById('display-guru-wali').innerText = student.guruWali || '-';
 
-    // 2. PROSES NOMOR WA (SESUAIKAN hporangtua & nohp)
-    const processWA = (nohp, elementId, linkId, role) => {
+    // 3. FOTO & WA
+    document.getElementById('display-foto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(student.nama)}&background=EF4444&color=FFFFFF&bold=true`;
+
+    const processWA = (nohp, elementId, linkId, target) => {
         const el = document.getElementById(elementId);
         const link = document.getElementById(linkId);
         el.innerText = nohp || '-';
         if (nohp && nohp !== '-' && nohp.length > 5) {
             let clean = nohp.replace(/\D/g, '');
             if (clean.startsWith('0')) clean = '62' + clean.slice(1);
-            
-            const msg = `Halo ${role}, saya Guru Piket SMK PGRI 2 Kedondong ingin berkoordinasi terkait ananda ${student.nama}...`;
+            const msg = `Halo ${target}, saya Guru Piket SMK PGRI 2 Kedondong ingin berkoordinasi terkait ananda ${student.nama}...`;
             link.href = `https://wa.me/${clean}?text=${encodeURIComponent(msg)}`;
             link.style.opacity = '1';
             link.style.pointerEvents = 'auto';
@@ -1429,11 +1434,10 @@ window.openEditor = async (id) => {
             link.style.pointerEvents = 'none';
         }
     };
-
     processWA(student.nohp, 'display-nohp', 'display-nohp-link', 'Siswa');
     processWA(student.hporangtua, 'display-hp-orangtua', 'display-hp-ortu-link', 'Bapak/Ibu Orang Tua');
 
-    // 3. HITUNG REKAP ABSENSI
+    // 4. REKAP ABSENSI
     let rekap = { A: 0, B: 0, I: 0, S: 0, T: 0 };
     Object.values(state.records).forEach(day => {
         ['Pagi', 'Siang'].forEach(sess => {
@@ -1453,37 +1457,33 @@ window.openEditor = async (id) => {
     document.getElementById('rekap-s').innerText = rekap.S;
     document.getElementById('rekap-t').innerText = rekap.T;
 
-    // 4. LOAD RIWAYAT (FIREBASE RULES COMPLIANT)
+    // 5. LOAD RIWAYAT (FIREBASE)
     const container = document.getElementById('history-container');
-    container.innerHTML = '<div class="text-center py-4 text-[10px] text-slate-400 italic">Memuat riwayat...</div>';
+    container.innerHTML = '<div class="text-center py-4 text-[10px] text-slate-300 italic">Memuat riwayat...</div>';
     
     try {
         const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id));
         if (docSnap.exists() && docSnap.data().history) {
             const history = docSnap.data().history;
             container.innerHTML = history.slice().reverse().map(n => `
-                <div class="flex gap-3">
-                    <div class="flex flex-col items-center flex-shrink-0 mt-1">
-                        <div class="w-2 h-2 rounded-full border-2 border-white ring-1 ring-slate-100 ${getNoteColor(n.peran).replace('border-', 'bg-')}"></div>
-                        <div class="w-px flex-grow bg-slate-100 my-1"></div>
+                <div class="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm border-l-4 ${getNoteColor(n.peran)}">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[7px] font-black uppercase text-slate-400">${n.peran}</span>
+                        <span class="text-[7px] font-bold text-slate-300">${new Date(n.date).toLocaleString('id-ID')}</span>
                     </div>
-                    <div class="flex-grow p-4 bg-white border border-slate-100 shadow-sm rounded-2xl mb-1">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-[7px] font-black uppercase text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full border-l-2 ${getNoteColor(n.peran)}">${n.peran}</span>
-                            <span class="text-[7px] font-bold text-slate-300">${new Date(n.date).toLocaleString('id-ID')}</span>
-                        </div>
-                        <p class="text-[10px] font-bold text-slate-700 leading-relaxed">${n.text}</p>
-                    </div>
+                    <p class="text-[10px] font-bold text-slate-700">${n.text}</p>
                 </div>
             `).join('');
         } else {
-            container.innerHTML = '<div class="text-center py-6 text-[10px] text-slate-400 italic bg-slate-50 rounded-2xl border border-dashed">Belum ada catatan pembinaan.</div>';
+            container.innerHTML = '<div class="text-center py-4 text-[10px] text-slate-300 italic">Belum ada catatan.</div>';
         }
     } catch (e) { console.error(e); }
 
+    // Reset Form Toggle
+    document.getElementById('wrapper-note-form').classList.add('hidden');
+    document.getElementById('btn-toggle-note').classList.remove('hidden');
     document.getElementById('editor-modal').style.display = 'flex';
 };
-
 
 window.addNewNote = async () => {
     const id = document.getElementById('edit-id').value;
@@ -1496,19 +1496,15 @@ window.addNewNote = async () => {
         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id);
         const docSnap = await getDoc(docRef);
         let history = docSnap.exists() ? (docSnap.data().history || []) : [];
-        
         history.push({ peran, text, date: Date.now() });
         await setDoc(docRef, { history, lastUpdate: Date.now() }, { merge: true });
         
         showToast("✅ Tersimpan");
         document.getElementById('new-note-text').value = '';
-        window.openEditor(id); // Refresh
+        window.openEditor(id); // Refresh otomatis
     } catch (e) { showToast("❌ Gagal"); }
 };
 
-window.closeEditor = () => { document.getElementById('editor-modal').style.display = 'none'; };
-
-// HELPER WARNA
 function getNoteColor(peran) {
     const colors = {
         'Kesiswaan': 'border-red-500',
