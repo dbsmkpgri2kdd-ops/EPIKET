@@ -1329,6 +1329,25 @@ window.onload = () => {
 
 
 // --- BUKA EDITOR & LOAD SEMUA DATA ---
+// RENDER LIST DI TAB PROFIL
+window.renderProfilList = () => {
+    const container = document.getElementById('profil-list-container');
+    const search = document.getElementById('search-profil').value.toLowerCase();
+    const filtered = state.master.siswa.filter(s => s.nama.toLowerCase().includes(search) || s.id.includes(search));
+    
+    container.innerHTML = filtered.map(s => `
+        <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-4 active:scale-95 transition-all cursor-pointer">
+            <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 font-black text-xs">${s.nama.charAt(0)}</div>
+            <div class="flex-grow">
+                <h4 class="text-[11px] font-black text-slate-800 uppercase">${s.nama}</h4>
+                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">${s.kelas} • ${s.id}</p>
+            </div>
+            <i class="fas fa-chevron-right text-slate-200 text-xs"></i>
+        </div>
+    `).join('');
+};
+
+
 window.openEditor = async (id) => {
     const student = state.master.siswa.find(s => s.id === id);
     if (!student) return;
