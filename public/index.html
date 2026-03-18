@@ -99,6 +99,7 @@
 
 <div id="editor-modal" class="fixed inset-0 bg-black/50 z-[100] hidden items-end justify-center">
     <div class="bg-white w-full max-w-md h-[90vh] overflow-y-auto rounded-t-[3rem] p-6 no-scrollbar">
+        
         <div class="flex justify-between items-center mb-6">
             <button onclick="window.closeEditor()" class="w-10 h-10 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
                 <i class="fas fa-arrow-left"></i>
@@ -109,18 +110,38 @@
 
         <input type="hidden" id="edit-id">
 
-        <div class="bg-gradient-to-br from-red-600 to-red-700 p-6 rounded-[2.5rem] text-white shadow-xl mb-6">
+        <div class="bg-gradient-to-br from-red-600 to-red-700 p-6 rounded-[2.5rem] text-white shadow-xl shadow-red-100 mb-6">
             <h2 id="edit-nama-display" class="text-center font-black uppercase text-base mb-1 tracking-tight">...</h2>
             <p id="display-nis" class="text-center text-[9px] font-bold opacity-80 tracking-widest mb-4"></p>
+            
             <div class="grid grid-cols-2 gap-4 text-[9px] font-bold uppercase border-t border-white/20 pt-4">
                 <div><p class="opacity-60 mb-1">Kelas</p><p id="display-kelas" class="text-xs">...</p></div>
                 <div><p class="opacity-60 mb-1">Sesi</p><p id="display-sesi" class="text-xs">...</p></div>
                 <div><p class="opacity-60 mb-1">Tipe</p><p id="display-tipe" class="text-xs">...</p></div>
-                <div><p class="opacity-60 mb-1">No HP</p><p id="display-nohp" class="text-xs">...</p></div>
+                <div>
+                    <p class="opacity-60 mb-1">WA Siswa</p>
+                    <a id="display-nohp-link" href="#" target="_blank" class="text-[10px] font-black bg-white/20 px-2 py-1 rounded-lg flex items-center gap-2 w-fit">
+                        <i class="fab fa-whatsapp"></i><span id="display-nohp">...</span>
+                    </a>
+                </div>
             </div>
-            <div class="mt-4 pt-4 border-t border-white/20 text-[10px]">
-                <p class="opacity-60 text-[8px] mb-1">ALAMAT</p>
-                <p id="display-alamat">...</p>
+
+            <div class="mt-4 pt-4 border-t border-white/20">
+                <p class="opacity-60 text-[8px] font-bold uppercase mb-1">Alamat Lengkap</p>
+                <p id="display-alamat" class="text-[10px] leading-relaxed italic">...</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/20">
+                <div>
+                    <p class="opacity-60 text-[8px] font-bold uppercase mb-1">Orang Tua/Wali</p>
+                    <p id="display-orangtua" class="text-[10px] font-bold uppercase">...</p>
+                </div>
+                <div>
+                    <p class="opacity-60 text-[8px] font-bold uppercase mb-1">WA Orang Tua</p>
+                    <a id="display-hp-ortu-link" href="#" target="_blank" class="text-[10px] font-black bg-white/20 px-2 py-1 rounded-lg flex items-center gap-2 w-fit">
+                        <i class="fab fa-whatsapp"></i><span id="display-hp-orangtua">...</span>
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -132,21 +153,42 @@
             <div class="bg-slate-800 p-3 rounded-2xl text-center"><p class="text-[8px] font-black text-white/50">TOT</p><p id="rekap-t" class="text-sm font-black text-white">0</p></div>
         </div>
 
-        <div class="mb-10">
-            <h4 class="text-[9px] font-black text-slate-400 uppercase mb-4 tracking-widest px-2">Riwayat Pembinaan</h4>
-            <div id="history-container" class="space-y-3 italic text-[10px] text-slate-400 text-center">Belum ada riwayat.</div>
+        <div class="grid grid-cols-2 gap-3 mb-8">
+            <div class="p-4 bg-slate-50 rounded-[1.5rem] border border-slate-100">
+                <p class="text-[7px] font-black text-slate-400 uppercase mb-1">Kesiswaan</p>
+                <p id="display-kesiswaan" class="text-[9px] font-bold text-slate-700">...</p>
+            </div>
+            <div class="p-4 bg-slate-50 rounded-[1.5rem] border border-slate-100">
+                <p class="text-[7px] font-black text-slate-400 uppercase mb-1">Guru BK</p>
+                <p id="display-guru-bk" class="text-[9px] font-bold text-slate-700">...</p>
+            </div>
+            <div class="p-4 bg-slate-50 rounded-[1.5rem] border border-slate-100">
+                <p class="text-[7px] font-black text-slate-400 uppercase mb-1">Wali Kelas</p>
+                <p id="display-wali-kelas" class="text-[9px] font-bold text-slate-700">...</p>
+            </div>
+            <div class="p-4 bg-slate-50 rounded-[1.5rem] border border-slate-100">
+                <p class="text-[7px] font-black text-slate-400 uppercase mb-1">Guru Wali</p>
+                <p id="display-guru-wali" class="text-[9px] font-bold text-slate-700">...</p>
+            </div>
         </div>
 
-        <div class="bg-slate-900 p-6 rounded-[2.5rem] mb-8">
-            <h4 class="text-[9px] font-black text-white/50 uppercase mb-4 tracking-widest">Tambah Catatan</h4>
-            <select id="select-peran" class="w-full bg-white/10 text-white p-3 rounded-xl text-[10px] font-bold mb-3 border-none outline-none">
+        <div class="mb-10">
+            <h4 class="text-[9px] font-black text-slate-400 uppercase mb-4 tracking-widest px-2">Riwayat Pembinaan</h4>
+            <div id="history-container" class="space-y-3">
+                </div>
+        </div>
+
+        <div class="bg-slate-900 p-6 rounded-[2.5rem] mb-8 shadow-2xl shadow-slate-200">
+            <h4 class="text-[9px] font-black text-white/50 uppercase mb-4 tracking-widest">Tambah Catatan Baru</h4>
+            <select id="select-peran" class="w-full bg-white/10 text-white p-3 rounded-xl text-[10px] font-bold mb-3 border-none outline-none focus:ring-1 focus:ring-red-500">
                 <option value="Kesiswaan" class="text-slate-800">KESISWAAN</option>
                 <option value="Guru BK" class="text-slate-800">GURU BK</option>
                 <option value="Wali Kelas" class="text-slate-800">WALI KELAS</option>
                 <option value="Guru Wali" class="text-slate-800">GURU WALI</option>
+                <option value="Guru Mapel" class="text-slate-800">GURU MAPEL</option>
             </select>
-            <textarea id="new-note-text" placeholder="Tulis pembinaan..." class="w-full bg-white/10 text-white p-4 rounded-2xl text-[10px] min-h-[80px] border-none outline-none mb-4"></textarea>
-            <button onclick="window.addNewNote()" class="w-full bg-red-600 text-white p-4 rounded-2xl font-black text-[10px] active:scale-95 transition-all">SIMPAN CATATAN</button>
+            <textarea id="new-note-text" placeholder="Tulis rincian pembinaan atau catatan di sini..." class="w-full bg-white/10 text-white p-4 rounded-2xl text-[10px] min-h-[100px] border-none outline-none mb-4 focus:ring-1 focus:ring-red-500 font-medium"></textarea>
+            <button onclick="window.addNewNote()" class="w-full bg-red-600 text-white p-4 rounded-2xl font-black text-[10px] active:scale-95 transition-all shadow-lg shadow-red-900/20">SIMPAN CATATAN</button>
         </div>
     </div>
 </div>
@@ -1120,10 +1162,12 @@ const autoSyncData = async (url) => {
                 tipe: (c[4] || 'siswa').toLowerCase().trim(), // TIPE (Kolom E)
                 alamat: c[5] || '-',    // ALAMAT (Kolom F)
                 nohp: c[6] || '-',      // NO HP (Kolom G)
-                guruBK: c[7] || '-',    // GURU BK (Kolom H)
-                waliKelas: c[8] || '-', // WALI KELAS (Kolom I)
-                guruWali: c[9] || '-',  // GURU WALI (Kolom J)
-                kesiswaan: c[10] || '-' // KESISWAAN (Kolom K)
+                orangtua: c[7] || '-',      // ORANG TUA (Kolom H)
+                hporangtua: c[8] || '-',      // HP ORANG TUA (Kolom I)
+                guruBK: c[9] || '-',    // GURU BK (Kolom J)
+                waliKelas: c[10] || '-', // WALI KELAS (Kolom K)
+                guruWali: c[11] || '-',  // GURU WALI (Kolom L)
+                kesiswaan: c[12] || '-' // KESISWAAN (Kolom M)
             };
 
             if (item.tipe === 'guru') gtk.push(item); else siswa.push(item);
@@ -1289,17 +1333,45 @@ window.openEditor = async (id) => {
     const student = state.master.siswa.find(s => s.id === id);
     if (!student) return;
 
-    // 1. Set Profil
+    // 1. ISI DATA DASAR
     document.getElementById('edit-id').value = id;
     document.getElementById('edit-nama-display').innerText = student.nama;
     document.getElementById('display-nis').innerText = `NIS: ${student.id}`;
     document.getElementById('display-kelas').innerText = student.kelas;
     document.getElementById('display-sesi').innerText = student.sesi;
     document.getElementById('display-tipe').innerText = student.tipe.toUpperCase();
-    document.getElementById('display-nohp').innerText = student.nohp || '-';
     document.getElementById('display-alamat').innerText = student.alamat || '-';
+    document.getElementById('display-orangtua').innerText = student.orangtua || '-';
+    document.getElementById('display-hp-orangtua').innerText = student.hporangtua || '-';
 
-    // 2. Rekap Absen (State Records)
+    // 2. ISI INFO GURU PEMBINA
+    document.getElementById('display-kesiswaan').innerText = student.kesiswaan || '-';
+    document.getElementById('display-guru-bk').innerText = student.guruBK || '-';
+    document.getElementById('display-wali-kelas').innerText = student.waliKelas || '-';
+    document.getElementById('display-guru-wali').innerText = student.guruWali || '-';
+
+
+    // 3. PROSES NOMOR WA SISWA & ORANG TUA
+    const processWA = (nohp, elementId, linkId, defaultName) => {
+        const el = document.getElementById(elementId);
+        const link = document.getElementById(linkId);
+        el.innerText = nohp || '-';
+        if (nohp && nohp !== '-') {
+            let clean = nohp.replace(/\D/g, '');
+            if (clean.startsWith('0')) clean = '62' + clean.slice(1);
+            link.href = `https://wa.me/${clean}?text=${encodeURIComponent('Halo, saya Guru Piket SMK PGRI 2 Kedondong...')}`;
+            link.style.opacity = '1';
+        } else {
+            link.href = '#';
+            link.style.opacity = '0.3';
+        }
+    };
+
+    processWA(student.nohp, 'display-nohp', 'display-nohp-link');
+    processWA(student.hp_orangtua, 'display-hp-orangtua', 'display-hp-ortu-link');
+
+
+    // 4. HITUNG REKAP ABSEN (Sama seperti sebelumnya)
     let rekap = { A: 0, B: 0, I: 0, S: 0, T: 0 };
     Object.values(state.records).forEach(day => {
         ['Pagi', 'Siang'].forEach(sess => {
@@ -1318,6 +1390,7 @@ window.openEditor = async (id) => {
     document.getElementById('rekap-i').innerText = rekap.I;
     document.getElementById('rekap-s').innerText = rekap.S;
     document.getElementById('rekap-t').innerText = rekap.T;
+
 
     // 3. Load Riwayat
     const container = document.getElementById('history-container');
