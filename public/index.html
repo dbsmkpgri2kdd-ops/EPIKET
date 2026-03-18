@@ -39,6 +39,8 @@
     white-space: normal; /* Mengizinkan teks turun ke bawah */
     word-break: break-word; /* Memutus kata jika terlalu panjang */
 }
+
+
     </style>
 
 
@@ -1301,43 +1303,29 @@ window.onload = () => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// --- BUKA EDITOR & LOAD SEMUA DATA ---
-// RENDER LIST DI TAB PROFIL
+// --- RENDER LIST DI TAB PROFIL ---
 window.renderProfilList = () => {
     const container = document.getElementById('profil-list-container');
-    const search = document.getElementById('search-profil').value.toLowerCase();
-    const filtered = state.master.siswa.filter(s => s.nama.toLowerCase().includes(search) || s.id.includes(search));
+    const searchInput = document.getElementById('search-profil');
+    if (!container || !searchInput) return;
+
+    const search = searchInput.value.toLowerCase();
+    
+    // Pastikan data siswa ada
+    const students = (window.state && window.state.master) ? window.state.master.siswa : [];
+    
+    // Perbaikan: Tambahkan String() pada s.id agar tidak error jika ID berupa angka
+    const filtered = students.filter(s => 
+        (s.nama && s.nama.toLowerCase().includes(search)) || 
+        (s.id && String(s.id).includes(search))
+    );
     
     container.innerHTML = filtered.map(s => `
-        <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-4 active:scale-95 transition-all cursor-pointer">
-            <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 font-black text-xs">${s.nama.charAt(0)}</div>
+        <div onclick="window.openEditor('${s.id}')" 
+             class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-4 active:scale-95 transition-all cursor-pointer">
+            <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 font-black text-xs">
+                ${s.nama ? s.nama.charAt(0).toUpperCase() : '?'}
+            </div>
             <div class="flex-grow">
                 <h4 class="text-[11px] font-black text-slate-800 uppercase">${s.nama}</h4>
                 <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">${s.kelas} • ${s.id}</p>
@@ -1347,114 +1335,132 @@ window.renderProfilList = () => {
     `).join('');
 };
 
-
+// --- BUKA EDITOR MODAL ---
 window.openEditor = async (id) => {
-    const student = state.master.siswa.find(s => s.id === id);
+    const student = window.state.master.siswa.find(s => String(s.id) === String(id));
     if (!student) return;
 
-    // --- 1. SET DATA PROFIL LENGKAP ---
+    // 1. Isi Data Dasar
     document.getElementById('edit-id').value = id;
-    document.getElementById('edit-nama-display').innerText = student.nama;
+    document.getElementById('edit-nama').value = student.nama || '';
     document.getElementById('display-nis').innerText = `NIS: ${student.id}`;
-    document.getElementById('display-kelas').innerText = student.kelas;
-    document.getElementById('display-sesi').innerText = student.sesi;
-    document.getElementById('display-tipe').innerText = student.tipe.toUpperCase();
-    document.getElementById('display-alamat').innerText = student.alamat;
-    document.getElementById('display-kesiswaan').innerText = student.kesiswaan;
-    document.getElementById('display-guru-bk').innerText = student.guruBK;
-    document.getElementById('display-wali-kelas').innerText = student.waliKelas;
-    document.getElementById('display-guru-wali').innerText = student.guruWali;
+    document.getElementById('display-kelas').innerText = student.kelas || '-';
+    document.getElementById('display-sesi').innerText = student.sesi || '-';
+    document.getElementById('display-tipe').innerText = (student.tipe || '-').toUpperCase();
+    document.getElementById('display-alamat').innerText = student.alamat || '-';
+    document.getElementById('display-kesiswaan').innerText = student.kesiswaan || '-';
+    document.getElementById('display-guru-bk').innerText = student.guruBK || '-';
+    document.getElementById('display-wali-kelas').innerText = student.waliKelas || '-';
+    document.getElementById('display-guru-wali').innerText = student.guruWali || '-';
 
-    // --- 2. FITUR FOTO PROFIL (Avatar Inisial) ---
+    // 2. Foto Profil (Avatar)
     const photoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(student.nama)}&background=ef4444&color=fff&font-size=0.4&bold=true`;
     document.getElementById('edit-photo-display').src = photoUrl;
 
-    // --- 3. FITUR LINK WHATSAPP ---
-    const rawHp = student.nohp || '';
-    // Bersihkan nomor (hilangkan spasi, strip, dll)
+    // 3. Logika WhatsApp (Perbaikan: Deteksi angka 8 atau 0)
+    let rawHp = String(student.nohp || '');
     let cleanHp = rawHp.replace(/[^0-9]/g, '');
     
-    // Ubah 08... menjadi 628... agar bisa dihubungi WA
     if (cleanHp.startsWith('0')) {
         cleanHp = '62' + cleanHp.substring(1);
+    } else if (cleanHp.startsWith('8')) {
+        cleanHp = '62' + cleanHp;
     }
 
-    if (cleanHp) {
-        document.getElementById('display-nohp').innerText = rawHp; // Tampilkan nomor asli
-        document.getElementById('wa-link').href = `https://wa.me/${cleanHp}`;
-        document.getElementById('wa-link').classList.remove('opacity-40', 'pointer-events-none');
+    const waBtn = document.getElementById('wa-link');
+    if (cleanHp.length > 5) {
+        document.getElementById('display-nohp').innerText = rawHp;
+        waBtn.href = `https://wa.me/${cleanHp}`;
+        waBtn.classList.remove('opacity-40', 'pointer-events-none');
     } else {
         document.getElementById('display-nohp').innerText = 'Tidak Ada HP';
-        document.getElementById('wa-link').href = '#';
-        document.getElementById('wa-link').classList.add('opacity-40', 'pointer-events-none'); // Matikan tombol jika HP kosong
+        waBtn.href = '#';
+        waBtn.classList.add('opacity-40', 'pointer-events-none');
     }
 
-    // --- 4. HITUNG REKAP ABSENSI (4 BULAN) ---
-    // (Kode rekap absensi di bawah tetap biarkan sama)
+    // 4. Hitung Rekap Absensi (4 Bulan Terakhir)
     let rekap = { A: 0, B: 0, I: 0, S: 0, T: 0 };
-    Object.values(state.records).forEach(day => {
-        ['Pagi', 'Siang'].forEach(sess => {
-            const entry = day[`${id}_${sess}`];
-            if (entry) {
-                if (entry.status === 'Alpa') rekap.A++;
-                else if (entry.status === 'Bolos') rekap.B++;
-                else if (entry.status === 'Izin') rekap.I++;
-                else if (entry.status === 'Sakit') rekap.S++;
-                rekap.T++;
-            }
+    if (window.state.records) {
+        Object.values(window.state.records).forEach(day => {
+            ['Pagi', 'Siang'].forEach(sess => {
+                const entry = day[`${id}_${sess}`];
+                if (entry) {
+                    if (entry.status === 'Alpa') rekap.A++;
+                    else if (entry.status === 'Bolos') rekap.B++;
+                    else if (entry.status === 'Izin') rekap.I++;
+                    else if (entry.status === 'Sakit') rekap.S++;
+                    rekap.T++;
+                }
+            });
         });
-    });
+    }
     document.getElementById('rekap-a').innerText = rekap.A;
     document.getElementById('rekap-b').innerText = rekap.B;
     document.getElementById('rekap-i').innerText = rekap.I;
     document.getElementById('rekap-s').innerText = rekap.S;
     document.getElementById('rekap-t').innerText = rekap.T;
 
-    // --- 5. LOAD RIWAYAT CATATAN ---
+    // 5. Load Riwayat Catatan
     await window.refreshHistoryList(id);
 
-    document.getElementById('editor-modal').style.display = 'flex';
+    // Tampilkan Modal
+    const modal = document.getElementById('editor-modal');
+    modal.style.display = 'flex';
+    modal.classList.remove('hidden');
 };
 
-// --- RENDER UI RIWAYAT DENGAN KONSEP TABEL TERLIHAT ---
+// --- REFRESH DAFTAR CATATAN ---
+window.refreshHistoryList = async (id) => {
+    try {
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', String(id));
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+            window.renderHistoryUI(snap.data().history || []);
+        } else {
+            window.renderHistoryUI([]);
+        }
+    } catch (e) {
+        console.error("Gagal refresh riwayat:", e);
+        window.renderHistoryUI([]);
+    }
+};
+
+// --- RENDER UI TABEL CATATAN ---
 window.renderHistoryUI = (historyArray) => {
     const container = document.getElementById('history-container');
-    
-    if (historyArray.length === 0) {
+    if (!historyArray || historyArray.length === 0) {
         container.innerHTML = `<p class="text-[10px] text-slate-400 text-center py-6 font-bold uppercase tracking-widest opacity-50">Belum ada catatan</p>`;
         return;
     }
     
-    // Urutkan: Catatan terbaru tampil di paling atas
     const sorted = [...historyArray].sort((a, b) => b.tanggal - a.tanggal);
     
-    // Bangun Struktur Tabel
     let tableHtml = `
-        <table class="w-full text-left text-[9px] border-collapse min-w-[300px]">
-            <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider">
-                <tr>
-                    <th class="px-3 py-2 border-b border-slate-100">Tanggal</th>
-                    <th class="px-3 py-2 border-b border-slate-100">Sebagai</th>
-                    <th class="px-3 py-2 border-b border-slate-100 cell-catatan">Catatan</th>
-                    <th class="px-3 py-2 border-b border-slate-100 text-center">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-[9px] border-collapse min-w-[350px]">
+                <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider">
+                    <tr>
+                        <th class="px-3 py-2 border-b border-slate-100">Tanggal</th>
+                        <th class="px-3 py-2 border-b border-slate-100">Sebagai</th>
+                        <th class="px-3 py-2 border-b border-slate-100">Catatan</th>
+                        <th class="px-3 py-2 border-b border-slate-100 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
     `;
 
-    // Isi Baris Tabel
     sorted.forEach(h => {
         const tglStr = new Date(h.tanggal).toLocaleDateString('id-ID');
-        
         tableHtml += `
-            <tr class="border-b border-slate-100 hover:bg-slate-50">
+            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                 <td class="px-3 py-3 text-slate-500 font-medium whitespace-nowrap">${tglStr}</td>
                 <td class="px-3 py-3">
                     <span class="text-[8px] font-black px-2 py-0.5 bg-red-100 text-red-600 rounded-full uppercase">${h.peran}</span>
                 </td>
-                <td class="px-3 py-3 text-slate-800 font-medium cell-catatan">${h.isi}</td>
+                <td class="px-3 py-3 text-slate-800 font-medium leading-relaxed">${h.isi}</td>
                 <td class="px-3 py-3 text-center">
-                    <button onclick="window.deleteNote('${h.id}')" class="w-6 h-6 bg-slate-100 text-slate-400 rounded-full hover:bg-red-500 hover:text-white transition-all flex items-center justify-center mx-auto shadow-sm">
+                    <button onclick="window.deleteNote('${h.id}')" 
+                            class="w-6 h-6 bg-slate-100 text-slate-400 rounded-full hover:bg-red-500 hover:text-white transition-all flex items-center justify-center mx-auto">
                         <i class="fas fa-trash-alt text-[9px]"></i>
                     </button>
                 </td>
@@ -1462,13 +1468,17 @@ window.renderHistoryUI = (historyArray) => {
         `;
     });
 
-    tableHtml += `
-            </tbody>
-        </table>
-    `;
-
+    tableHtml += `</tbody></table></div>`;
     container.innerHTML = tableHtml;
 };
+
+// --- TUTUP EDITOR ---
+window.closeEditor = () => {
+    const modal = document.getElementById('editor-modal');
+    modal.style.display = 'none';
+    modal.classList.add('hidden');
+};
+
 
 // --- TAMBAH CATATAN (CREATE) ---
 window.addNewNote = async () => {
@@ -1506,7 +1516,7 @@ window.deleteNote = async (noteId) => {
     } catch (e) { showToast("❌ Gagal"); }
 };
 
-window.closeEditor = () => document.getElementById('editor-modal').style.display = 'none';
+
 
 
 
