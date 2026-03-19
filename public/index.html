@@ -137,7 +137,7 @@
     </div>
 </div>
 
-<div id="editor-modal" class="modal-full-screen fixed inset-0 z-50 flex flex-col bg-white overflow-hidden">
+<div id="editor-modal" class="modal-full-screen">
     <div class="flex justify-between items-center p-5 border-b border-slate-100 flex-shrink-0 bg-white">
         <button onclick="window.closeEditor()" class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 active:scale-90 transition-all">
             <i class="fas fa-times text-lg"></i>
@@ -1243,6 +1243,7 @@ const autoSyncData = async (url) => {
                 waliKelas: c[10] || '-', // WALI KELAS (Kolom K)
                 guruWali: c[11] || '-',  // GURU WALI (Kolom L)
                 kesiswaan: c[12] || '-' // KESISWAAN (Kolom M)
+                email: c[13] || '-',      // NO HP (Kolom N)
             };
 
             if (item.tipe === 'guru') gtk.push(item); else siswa.push(item);
@@ -1431,6 +1432,8 @@ window.openEditor = async (id) => {
     document.getElementById('display-tipe').innerText = student.tipe.toUpperCase();
     document.getElementById('display-alamat').innerText = student.alamat || '-';
     document.getElementById('display-orangtua').innerText = student.orangtua || '-';
+    document.getElementById('display-email').innerText = student.email || '-';
+
 
     // 2. TIM PEMBINA
     document.getElementById('display-kesiswaan').innerText = student.kesiswaan || '-';
