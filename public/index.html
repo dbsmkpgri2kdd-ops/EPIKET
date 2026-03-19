@@ -209,7 +209,7 @@
                             <p id="display-hp-orangtua" class="text-xs font-bold">...</p>
                         </div>
                     </div>
-                    <a id="display-hp-ortu-link" href="#" target="_blank" class="bg-white text-slate-900 text-[9px] font-black px-4 py-2 rounded-xl active:scale-95 transition-all">WA ORTU</a>
+                    <a id="display-hp-ortu-link" href="#" target="_blank" class="bg-white text-slate-900 text-[9px] font-black px-4 py-2 rounded-xl active:scale-95 transition-all">HUBUNGI</a>
                 </div>
 
                 <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
@@ -219,7 +219,7 @@
 
                 <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
                     <i class="fas fa-envelope text-lg text-slate-400"></i>
-                    <p id="display-email" class="text-[11px] font-bold">...</p>
+                    <p id="display-emailsiswa" class="text-[11px] font-bold">...</p>
                 </div>
             </div>
 
@@ -1243,7 +1243,6 @@ const autoSyncData = async (url) => {
                 waliKelas: c[10] || '-', // WALI KELAS (Kolom K)
                 guruWali: c[11] || '-',  // GURU WALI (Kolom L)
                 kesiswaan: c[12] || '-' // KESISWAAN (Kolom M)
-                email: c[13] || '-',      // EMAIL (Kolom N)
             };
 
             if (item.tipe === 'guru') gtk.push(item); else siswa.push(item);
@@ -1432,7 +1431,6 @@ window.openEditor = async (id) => {
     document.getElementById('display-tipe').innerText = student.tipe.toUpperCase();
     document.getElementById('display-alamat').innerText = student.alamat || '-';
     document.getElementById('display-orangtua').innerText = student.orangtua || '-';
-    document.getElementById('display-email').innerText = student.email || '-';
 
 
     // 2. TIM PEMBINA
