@@ -1,6 +1,6 @@
 {
   "name": "BioScan GPS Prida",
-  "short_name": "BioScan",
+  "short_name": "BioScanSTM",
   "description": "Sistem Presensi Biometrik Wajah dengan Verifikasi GPS",
   "start_url": "./index.html",
   "display": "standalone",
