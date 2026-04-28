@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BioScan GPS v1.4.2</title>
+    <meta name="theme-color" content="#1d4ed8">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BioScan">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3064/3064197.png">
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script> tailwind.config = {darkMode: 'class', } </script>    
+    <style>
+        body { transition: background-color 0.4s, color 0.4s; -webkit-tap-highlight-color: transparent; }
+        .video-container { position: relative; width: 100%; max-width: 640px; margin: auto; }
+        canvas { position: absolute; top: 0; left: 0; width: 100% !important; height: auto !important; pointer-events: none; }
+        .tab-content { display: none; } 
+        .tab-content.active { display: block; }
+        #log-content::-webkit-scrollbar { width: 4px; }
+        #log-content::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Registration Failed', err));
+            });
+        }
+    </script>
+</head>
+
+
+
+<body class="bg-gray-50 dark:bg-slate-950 min-h-screen font-sans text-slate-900 dark:text-slate-100">
+    <nav class="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 p-4 sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center px-2 md:px-4">
+            <div class="flex items-center space-x-2">
+                <svg class="w-7 h-7 text-blue-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15a2.25 2.25 0 002.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"></path></svg>
+                <h1 class="text-lg font-black text-blue-900 dark:text-white uppercase tracking-tighter">BIOSCANGPS <span class="text-orange-500">PRIDA</span></h1>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="install-pwa" onclick="installApp()" class="bg-orange-500 text-white px-3 py-2 rounded-lg text-[10px] font-bold animate-bounce hidden">INSTALL APP</button>
+                <button id="theme-toggle" onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-gray-100 dark:bg-slate-800 hover:ring-2 ring-blue-400 transition-all">
+                    <span id="theme-icon-sun" class="hidden dark:block text-xl">☀️</span>
+                    <span id="theme-icon-moon" class="block dark:hidden text-xl">🌙</span>
+                </button>
+                <button onclick="toggleMenu()" class="text-gray-600 dark:text-gray-300 text-2xl p-2 focus:outline-none"><span id="menu-icon">☰</span></button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden absolute left-0 right-0 top-full bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 shadow-xl p-4 flex flex-col gap-2">
+            <button onclick="switchTab('absensi');toggleMenu()" class="text-left px-4 py-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30 text-gray-700 dark:text-gray-200 font-bold text-sm">Absensi</button>
+            <button onclick="switchTab('pengaturan');toggleMenu()" class="text-left px-4 py-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30 text-gray-700 dark:text-gray-200 font-bold text-sm">Pengaturan</button>
+            <hr class="border-gray-100 dark:border-slate-800 my-1">
+            <button onclick="window.location.href='piket.html'" class="bg-blue-700 text-white px-6 py-3 rounded-xl font-bold text-sm transition active:scale-95 text-center">Login Piket</button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 pb-20">
+        <div id="absensi" class="tab-content active">
+            <header class="mb-8">
+                <div class="bg-gradient-to-br from-blue-700 to-blue-900 rounded-[2rem] md:rounded-[3rem] p-8 md:p-14 text-white shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-20 -mt-20"></div>
+                    <div class="relative z-10 max-w-2xl">
+                        <span class="bg-orange-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Sistem Presensi v1.4.2</span>
+                        <h2 class="text-3xl md:text-5xl font-extrabold mt-4 leading-tight">Membangun Kedisiplinan Dengan Teknologi.</h2>
+                        <p class="text-blue-100 mt-4 text-sm md:text-base opacity-90">Pastikan wajah terlihat jelas dan berada di dalam jangkauan GPS sekolah.</p>
+                    </div>
+                </div>
+            </header>
+            <div class="max-w-2xl mx-auto bg-white dark:bg-slate-900 rounded-3xl shadow-lg p-5 md:p-8 border border-gray-100 dark:border-slate-800">
+                <div class="flex justify-center space-x-3 mb-6">
+                    <label class="flex-1 flex items-center justify-center space-x-2 cursor-pointer p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-100 dark:border-blue-800">
+                        <input type="radio" name="absensi-type" value="Masuk" checked class="w-4 h-4 text-blue-600">
+                        <span class="text-xs font-black text-blue-700 dark:text-blue-400 uppercase">Masuk</span>
+                    </label>
+                    <label class="flex-1 flex items-center justify-center space-x-2 cursor-pointer p-4 bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-100 dark:border-red-800">
+                        <input type="radio" name="absensi-type" value="Pulang" class="w-4 h-4 text-red-600">
+                        <span class="text-xs font-black text-red-700 dark:text-red-400 uppercase">Pulang</span>
+                    </label>
+                </div>
+                <div id="gps-status" class="mb-4 p-3 rounded-xl text-center font-bold bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 text-[10px] uppercase">Menunggu GPS...</div>
+                <div class="video-container bg-black rounded-2xl overflow-hidden border-4 border-gray-100 dark:border-slate-800 aspect-video shadow-inner">
+                    <video id="video" class="w-full h-full object-cover" autoplay muted playsinline></video>
+                </div>
+                <div class="mt-6 p-4 bg-gray-950 rounded-2xl border border-slate-800">
+                    <h3 class="text-blue-500 font-mono text-[10px] uppercase mb-2 tracking-widest flex justify-between">Log Aktivitas <span>System Live</span></h3>
+                    <div id="log-content" class="text-[11px] font-mono text-gray-400 h-28 overflow-y-auto space-y-1"><div>> Sistem diinisialisasi...</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="pengaturan" class="tab-content">
+            <div class="max-w-5xl mx-auto space-y-6">
+                <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800">
+                    <h2 class="text-xl font-bold mb-6 text-orange-600 flex items-center"><span class="mr-2">👤</span> Pendaftaran Wajah Siswa</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Pilih Kelas</label>
+                                <select id="reg-kelas" onchange="updateRegNama()" class="w-full p-3 border dark:border-slate-700 rounded-xl outline-none text-sm bg-gray-50 dark:bg-slate-800 dark:text-white"><option value="">-- Pilih Kelas --</option></select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Pilih Nama Siswa</label>
+                                <select id="reg-siswa" class="w-full p-3 border dark:border-slate-700 rounded-xl outline-none text-sm bg-gray-50 dark:bg-slate-800 dark:text-white"><option value="">-- Pilih Nama --</option></select>
+                            </div>
+                        </div>
+                        <div class="bg-orange-50 dark:bg-orange-900/10 border-2 border-dashed border-orange-200 dark:border-orange-800 p-6 text-center rounded-2xl">
+                            <button onclick="registerFace()" class="w-full bg-orange-500 text-white px-6 py-4 rounded-xl font-black shadow-lg hover:bg-orange-600 transition transform active:scale-95 text-xs uppercase">Ambil Data Wajah</button>
+                            <div id="reg-status" class="mt-4 font-bold text-sm min-h-[1.5rem]"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800">
+                    <h2 class="text-xl font-bold mb-6 text-blue-700 flex items-center"><span class="mr-2">⚙️</span> Konfigurasi Sistem</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase">Link CSV G-Sheets</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="csv-url" class="flex-1 p-3 border dark:border-slate-700 rounded-xl outline-none text-sm dark:bg-slate-800 dark:text-white" placeholder="https://...">
+                                    <button onclick="fetchSiswa()" class="bg-green-600 text-white px-4 rounded-xl text-[10px] font-bold hover:bg-green-700 transition">SINKRON</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-blue-500 uppercase">URL Apps Script Backend</label>
+                                <input type="text" id="endpoint-url" class="w-full p-3 border border-blue-200 dark:border-blue-900/50 rounded-xl outline-none text-sm dark:bg-slate-800 dark:text-white" placeholder="https://script.google.com/...">
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="block text-[10px] font-bold text-gray-400 uppercase">Latitude</label><input type="number" id="target-lat" class="w-full p-3 border dark:border-slate-700 rounded-xl text-sm dark:bg-slate-800 dark:text-white" step="any"></div>
+                                <div><label class="block text-[10px] font-bold text-gray-400 uppercase">Longitude</label><input type="number" id="target-lng" class="w-full p-3 border dark:border-slate-700 rounded-xl text-sm dark:bg-slate-800 dark:text-white" step="any"></div>
+                            </div>
+                            <div class="flex gap-3">
+                                <div class="flex-1"><label class="block text-[10px] font-bold text-gray-400 uppercase">Radius (Meter)</label><input type="number" id="target-radius" class="w-full p-3 border dark:border-slate-700 rounded-xl text-sm dark:bg-slate-800 dark:text-white" value="50"></div>
+                                <button onclick="setCurrentLocation()" class="mt-5 bg-gray-100 dark:bg-slate-800 text-blue-600 px-4 rounded-xl text-[10px] font-bold uppercase">Set GPS</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="saveSettings()" class="w-full bg-slate-900 dark:bg-blue-700 text-white py-4 rounded-2xl font-bold hover:bg-black dark:hover:bg-blue-800 shadow-md mt-8 transition uppercase tracking-widest text-sm">Simpan Semua Pengaturan</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+
+
+
+
+
+
+    <script>
+// ================== CONFIG & INIT ==================
+const config = {
+    apiKey: "AIzaSyC8KQzupwLouy6zSxiz5V5-kB6jPvigCII",
+    authDomain: "e-absensi-9be8b.firebaseapp.com",
+    projectId: "e-absensi-9be8b",
+    databaseURL: "https://e-absensi-9be8b-default-rtdb.firebaseio.com",
+    storageBucket: "e-absensi-9be8b.firebasestorage.app",
+    messagingSenderId: "828041116350", 
+    appId: "1:828041116350:web:8cf5617195e140ec58fcef"
+};
+
+firebase.initializeApp(config);
+const db = firebase.database();
+const BIOMETRIC_PATH = `artifacts/${config.appId}/biometrics_module`;
+
+let siswaData = [], settings = {}, isLocationValid = false;
+let faceMatcher = null, lastAttendance = {};
+
+const video = document.getElementById('video');
+const logContent = document.getElementById('log-content');
+const gpsStatus = document.getElementById('gps-status');
+
+window.onload = async () => {
+    initTheme();
+    listenToCloudSettings();
+    await loadModels();
+    startVideo();
+    startGpsTracking();
+    initFaceDetection();
+};
+
+// ================== CORE FUNCTIONS ==================
+
+async function loadModels() {
+    addLog("⏳ Memuat AI...");
+    const URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+    await Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri(URL),
+        faceapi.nets.faceLandmark68Net.loadFromUri(URL),
+        faceapi.nets.faceRecognitionNet.loadFromUri(URL)
+    ]);
+    addLog("✅ AI Siap.");
+}
+
+function startVideo() {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(s => video.srcObject = s)
+        .catch(() => addLog("❌ Kamera Gagal."));
+}
+
+async function syncFaceDatabase() {
+    if (!settings.endpointUrl) return;
+    try {
+        const res = await fetch(`${settings.endpointUrl}?action=getBiometrics`);
+        const data = await res.json();
+        if (data?.length) {
+            faceMatcher = new faceapi.FaceMatcher(data.map(d => 
+                new faceapi.LabeledFaceDescriptors(d.nama, [new Float32Array(JSON.parse(d.descriptor))])
+            ), 0.45);
+            addLog(`✅ ${data.length} wajah tersinkron.`);
+        }
+    } catch (e) { addLog("⚠️ DB Wajah Kosong."); }
+}
+
+async function recordAttendance(nama) {
+    const now = Date.now();
+    // Jeda 5 menit agar tidak dobel absen
+    if (lastAttendance[nama] && (now - lastAttendance[nama] < 300000)) return;
+    
+    const type = document.querySelector('input[name="absensi-type"]:checked').value;
+    const info = siswaData.find(s => s.nama === nama);
+    
+    lastAttendance[nama] = now;
+    
+    try {
+        addLog(`⏳ Mengirim: ${nama}...`);
+        await fetch(settings.endpointUrl, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'attendance_biometric',
+                nama: nama,
+                nis: info?.nis || "-",
+                type: type,
+                location: gpsStatus.innerText
+            })
+        });
+        addLog(`✅ BERHASIL: ${nama}`);
+        speak(`${nama}, ${type} sukses`);
+    } catch (e) { addLog("❌ Gagal Kirim."); }
+}
+
+function initFaceDetection() {
+    video.onplay = () => {
+        if (document.querySelector('canvas')) return;
+        const canvas = faceapi.createCanvasFromMedia(video);
+        document.querySelector('.video-container').append(canvas);
+        const size = { width: video.clientWidth, height: video.clientHeight };
+        faceapi.matchDimensions(canvas, size);
+
+        setInterval(async () => {
+            if (!isLocationValid) {
+                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                return;
+            }
+            const dets = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+                                     .withFaceLandmarks().withFaceDescriptors();
+            const resized = faceapi.resizeResults(dets, size);
+            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (faceMatcher && resized.length) {
+                resized.forEach(d => {
+                    const res = faceMatcher.findBestMatch(d.descriptor);
+                    new faceapi.draw.DrawBox(d.detection.box, { label: res.label }).draw(canvas);
+                    if (res.label !== 'unknown' && res.distance < 0.45) recordAttendance(res.label);
+                });
+            }
+        }, 600);
+    };
+}
+
+// ================== GPS & SETTINGS ==================
+
+function startGpsTracking() {
+    navigator.geolocation.watchPosition(p => {
+        if (!settings.lat) return gpsStatus.innerText = "MENUNGGU CONFIG...";
+        
+        const accuracy = p.coords.accuracy; // dalam meter
+        const dist = calculateDistance(p.coords.latitude, p.coords.longitude, settings.lat, settings.lng);
+        
+        // Anggap lokasi valid jika dalam radius DAN akurasi GPS di bawah 100 meter
+        const isWithinRadius = dist <= settings.radius;
+        const isAccurate = accuracy < 100; 
+        
+        isLocationValid = isWithinRadius && isAccurate;
+
+        if (!isAccurate) {
+            gpsStatus.innerText = `SINYAL LEMAH (Akurasi: ${Math.round(accuracy)}m)`;
+            gpsStatus.className = "mb-4 p-2 rounded-lg text-center font-bold text-[10px] bg-orange-100 text-orange-700";
+        } else {
+            gpsStatus.innerText = isWithinRadius ? `LOKASI SESUAI (${Math.round(dist)}m)` : `DILUAR RADIUS (${Math.round(dist)}m)`;
+            gpsStatus.className = `mb-4 p-2 rounded-lg text-center font-bold text-[10px] ${isWithinRadius ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
+        }
+        
+    }, e => addLog("GPS Error: " + e.message), { 
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0 
+    });
+}
+
+function calculateDistance(la1, lo1, la2, lo2) {
+    const R = 6371e3;
+    const dLat = (la2 - la1) * Math.PI / 180;
+    const dLon = (lo2 - lo1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(la1 * Math.PI / 180) * Math.cos(la2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+}
+
+async function fetchSiswa() {
+    const url = document.getElementById('csv-url').value;
+    if (!url) return alert("URL Kosong!");
+    addLog("⏳ Sinkron Siswa...");
+    
+    try {
+        const res = await fetch(url);
+        const data = await res.text();
+        
+        // Memisahkan baris dan membersihkan spasi kosong
+        const rows = data.split(/\r?\n/).filter(r => r.trim() !== "");
+        
+        // Lewati header (baris pertama)
+        const contentRows = rows.slice(1);
+        
+        siswaData = contentRows.map(r => {
+            // Regex ini memisahkan koma tetapi mengabaikan koma di dalam tanda kutip
+            const c = r.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+            const clean = c.map(v => v.replace(/"/g, '').trim());
+            
+            return { 
+                nama: clean || "", 
+                nis: clean || "", 
+                kelas: clean || "" 
+            };
+        }).filter(s => s.nama);
+
+        // Update Dropdown Kelas
+        const kelasSet = [...new Set(siswaData.map(s => s.kelas))].filter(k => k).sort();
+        document.getElementById('reg-kelas').innerHTML = '<option value="">-- Pilih Kelas --</option>' + 
+            kelasSet.map(k => `<option value="${k}">${k}</option>`).join('');
+            
+        addLog(`✅ ${siswaData.length} Siswa Terload.`);
+    } catch (e) { 
+        addLog("❌ Gagal Load CSV: " + e.message); 
+    }
+}
+
+// ================== UI HELPERS ==================
+
+function addLog(m) {
+    const d = document.createElement('div');
+    d.textContent = `> ${m}`;
+    logContent.prepend(d);
+}
+
+function speak(t) {
+    const m = new SpeechSynthesisUtterance(t);
+    m.lang = 'id-ID';
+    window.speechSynthesis.speak(m);
+}
+
+function saveSettings() {
+    settings = {
+        csvUrl: document.getElementById('csv-url').value,
+        endpointUrl: document.getElementById('endpoint-url').value,
+        lat: parseFloat(document.getElementById('target-lat').value),
+        lng: parseFloat(document.getElementById('target-lng').value),
+        radius: parseInt(document.getElementById('target-radius').value)
+    };
+    db.ref(`${BIOMETRIC_PATH}/settings`).set(settings).then(() => {
+        alert("Tersimpan ke Cloud!");
+        syncFaceDatabase();
+    });
+}
+
+function listenToCloudSettings() {
+    db.ref(`${BIOMETRIC_PATH}/settings`).on('value', snap => {
+        const d = snap.val();
+        if (!d) return;
+        settings = d;
+        const fields = { 'csv-url': d.csvUrl, 'endpoint-url': d.endpointUrl, 'target-lat': d.lat, 'target-lng': d.lng, 'target-radius': d.radius };
+        Object.entries(fields).forEach(([id, val]) => { if(document.getElementById(id)) document.getElementById(id).value = val || ""; });
+        addLog("⚙️ Config Cloud Aktif.");
+        syncFaceDatabase();
+    });
+}
+
+function updateRegNama() {
+    const k = document.getElementById('reg-kelas').value;
+    const filtered = siswaData.filter(s => s.kelas === k);
+    document.getElementById('reg-siswa').innerHTML = '<option value="">-- Pilih Nama --</option>' + 
+        filtered.map(s => `<option value="${s.nama}">${s.nama}</option>`).join('');
+}
+
+function initTheme() {
+    const isDark = localStorage.getItem('theme') === 'dark';
+    document.documentElement.classList.toggle('dark', isDark);
+    document.getElementById('theme-icon-sun').classList.toggle('hidden', !isDark);
+    document.getElementById('theme-icon-moon').classList.toggle('hidden', isDark);
+}
+
+function toggleDarkMode() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    document.getElementById('theme-icon-sun').classList.toggle('hidden', !isDark);
+    document.getElementById('theme-icon-moon').classList.toggle('hidden', isDark);
+}
+
+function switchTab(id) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+function toggleMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
+function setCurrentLocation() {
+    navigator.geolocation.getCurrentPosition(p => {
+        document.getElementById('target-lat').value = p.coords.latitude;
+        document.getElementById('target-lng').value = p.coords.longitude;
+    });
+}
+
+    </script>
+</body>
+</html>
