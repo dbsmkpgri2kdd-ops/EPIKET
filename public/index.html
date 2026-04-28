@@ -332,17 +332,17 @@ async function fetchSiswa() {
         // Lewati header (baris pertama)
         const contentRows = rows.slice(1);
         
-        siswaData = contentRows.map(r => {
-            // Regex ini memisahkan koma tetapi mengabaikan koma di dalam tanda kutip
-            const c = r.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
-            const clean = c.map(v => v.replace(/"/g, '').trim());
-            
-            return { 
-                nama: clean || "", 
-                nis: clean || "", 
-                kelas: clean || "" 
-            };
-        }).filter(s => s.nama);
+siswaData = contentRows.map(r => {
+    // Memisahkan kolom berdasarkan koma, menangani tanda kutip (misal: "Nama, Gelar")
+    const clean = r.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+    const val = clean.map(v => v.replace(/"/g, '').trim());
+    
+    return { 
+        nama: val || "",  // Mengambil kolom ke-2 (Nama)
+        nis: val || "",   // Mengambil kolom ke-1 (NIS)
+        kelas: val || ""  // Mengambil kolom ke-3 (Kelas)
+    };
+}).filter(s => s.nama);
 
         // Update Dropdown Kelas
         const kelasSet = [...new Set(siswaData.map(s => s.kelas))].filter(k => k).sort();
