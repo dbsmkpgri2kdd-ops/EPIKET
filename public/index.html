@@ -173,7 +173,6 @@
 
 
  <script>
-
 // ================== CONFIG & INIT ==================
 const firebaseConfig = {
     apiKey: "AIzaSyC8KQzupwLouy6zSxiz5V5-kB6jPvigCII",
@@ -187,16 +186,14 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-
 const APP_PATH = "stm-pgri2-kdd-v3";
+
 // Gunakan variabel ini secara konsisten di semua fungsi
 const BIOMETRIC_PATH = `artifacts/${APP_PATH}/biometrics`; 
 const SETTINGS_PATH = `artifacts/${APP_PATH}/config/settings`;
-
 let siswaData = [], settings = {}, isLocationValid = false;
 let faceMatcher = null, lastAttendance = {};
 let currentFacingMode = "user", currentStream = null;
-
 const video = document.getElementById('video');
 const logContent = document.getElementById('log-content');
 const gpsStatus = document.getElementById('gps-status');
@@ -251,7 +248,6 @@ async function syncFaceDatabase() {
         const snap = await db.ref(`${BIOMETRIC_PATH}/face_data`).once('value');
         const data = snap.val(); 
         if (!data) return addLog("⚠️ Database Cloud Kosong."); 
-
         const labeled = Object.entries(data).map(([id, user]) => { 
             const desc = new Float32Array(JSON.parse(user.descriptor)); 
             return new faceapi.LabeledFaceDescriptors(user.nama, [desc]); 
@@ -307,10 +303,7 @@ async function recordAttendance(nama) {
     const tglHariIni = now.toISOString().split('T')[0];
     const typeSelected = document.querySelector('input[name="absensi-type"]:checked').value;
     const siswa = siswaData.find(s => s.nama === nama);
-    
-    // Cooldown & Validasi
     if (!siswa || (lastAttendance[nama] && Date.now() - lastAttendance[nama] < 30000)) return;
-    
     if (!isValidSession(siswa.sesi)) {
         addLog(`⛔ ${nama}: Bukan sesi ${siswa.sesi}`);
         return;
@@ -321,14 +314,11 @@ async function recordAttendance(nama) {
         const ref = db.ref(`absensi/${tglHariIni}/${studentKey}`);
         const snap = await ref.once('value');
         const currentData = snap.val() || { nama, nis: siswa.nis, kelas: siswa.kelas, sesi: siswa.sesi };
-
         // Cegah Dobel Absen
         if (typeSelected === "Masuk" && currentData.masuk) return;
         if (typeSelected === "Pulang" && currentData.pulang) return;
-
         currentData[typeSelected.toLowerCase()] = now.toISOString();
         await ref.set(currentData);
-
         // Kirim ke Google Apps Script (Jika ada URL)
         if (settings.endpointUrl) {
             fetch(settings.endpointUrl, {
@@ -345,7 +335,6 @@ async function recordAttendance(nama) {
                 })
             });
         }
-
         lastAttendance[nama] = Date.now();
         addLog(`✅ ${nama} ${typeSelected} Berhasil`);
         speak(`${nama} ${typeSelected} berhasil`);
@@ -429,7 +418,6 @@ function startGpsTracking() {
         
         const dist = calculateDistance(p.coords.latitude, p.coords.longitude, settings.lat, settings.lng);
         isLocationValid = dist <= settings.radius;
-        
         if (isLocationValid) {
             gpsStatus.innerText = `📍 Lokasi Sesuai (${Math.round(dist)}m)`;
             gpsStatus.className = "mb-4 p-3 rounded-xl text-center font-bold bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 text-[10px] uppercase";
@@ -486,9 +474,6 @@ function toggleFullscreenCamera() {
 }
 
 
-
-
-
 async function fetchSiswa() {
     const url = document.getElementById('csv-url').value;
     if (!url) return alert("URL Kosong!");
@@ -499,15 +484,15 @@ async function fetchSiswa() {
         const rows = text.split(/\r?\n/).filter(r => r.trim() !== "");
         const content = rows.slice(1);
 	siswaData = content.map(row => {
-	    // Regex yang lebih aman untuk menangani koma di dalam tanda kutip
+	    // Regex untuk menangani koma di dalam tanda kutip (nama yang mengandung koma)
 	    const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
 	    return {
         nis: cols?.replace(/"/g, '').trim(),
         nama: cols?.replace(/"/g, '').trim(),
         kelas: cols?.replace(/"/g, '').trim(),
         sesi: cols?.replace(/"/g, '').trim()
-	    };
-	});
+    };
+});
 
         const kelasUnik = [...new Set(siswaData.map(s => s.kelas))].sort();
         document.getElementById('reg-kelas').innerHTML =
@@ -517,7 +502,6 @@ async function fetchSiswa() {
         addLog("❌ Gagal load CSV: " + e.message);
     }
 }
-
 
 
 function loadLaporan() {
@@ -548,8 +532,7 @@ function saveSettings() {
         lng: parseFloat(document.getElementById('target-lng').value) || 0, 
         radius: parseInt(document.getElementById('target-radius').value) || 50 
     }; 
-    
-    // PERBAIKAN: Path yang benar
+
     db.ref(SETTINGS_PATH).set(newSettings)
       .then(() => { 
           alert("Tersimpan ke Cloud!"); 
