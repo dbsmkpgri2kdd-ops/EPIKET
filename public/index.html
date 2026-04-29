@@ -184,9 +184,14 @@ const firebaseConfig = {
     messagingSenderId: "828041116350", 
     appId: "1:828041116350:web:8cf5617195e140ec58fcef"
 };
+
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-const BIOMETRIC_PATH = `artifacts/${firebaseConfig.appId.replace(/:/g, '_')}/biometrics_module`;
+
+const APP_PATH = "stm-pgri2-kdd-v3";
+// Gunakan variabel ini secara konsisten di semua fungsi
+const BIOMETRIC_PATH = `artifacts/${APP_PATH}/biometrics`; 
+const SETTINGS_PATH = `artifacts/${APP_PATH}/config/settings`;
 
 let siswaData = [], settings = {}, isLocationValid = false;
 let faceMatcher = null, lastAttendance = {};
@@ -195,7 +200,6 @@ let currentFacingMode = "user", currentStream = null;
 const video = document.getElementById('video');
 const logContent = document.getElementById('log-content');
 const gpsStatus = document.getElementById('gps-status');
-
 
 // ================== INITIALIZATION ==================
 window.onload = async () => {
@@ -243,17 +247,21 @@ function switchCamera() {
 async function syncFaceDatabase() { 
     addLog("🔄 Sinkronisasi wajah..."); 
     try {
-        const snap = await db.ref(`${BIOMETRIC_PATH}/face_data`).once('value'); 
+        // Gunakan .ref() untuk Realtime Database (Anda pakai compat SDK)
+        const snap = await db.ref(`${BIOMETRIC_PATH}/face_data`).once('value');
         const data = snap.val(); 
         if (!data) return addLog("⚠️ Database Cloud Kosong."); 
 
-        const labeled = Object.values(data).map(user => { 
+        const labeled = Object.entries(data).map(([id, user]) => { 
             const desc = new Float32Array(JSON.parse(user.descriptor)); 
             return new faceapi.LabeledFaceDescriptors(user.nama, [desc]); 
         }); 
         faceMatcher = new faceapi.FaceMatcher(labeled, 0.45);
         addLog("✅ Database Wajah Sinkron."); 
-    } catch (e) { addLog("❌ Gagal sinkron wajah."); }
+    } catch (e) { 
+        console.error(e);
+        addLog("❌ Gagal sinkron: " + e.message); 
+    }
 }
 
 let faceDetectionInterval;
@@ -296,7 +304,7 @@ async function initFaceDetection() {
 // ================== ATTENDANCE LOGIC ==================
 async function recordAttendance(nama) {
     const now = new Date();
-    const tglHariIni = now.toISOString().split('T');
+    const tglHariIni = now.toISOString().split('T')[0];
     const typeSelected = document.querySelector('input[name="absensi-type"]:checked').value;
     const siswa = siswaData.find(s => s.nama === nama);
     
@@ -358,6 +366,7 @@ async function registerFace() {
     statusDiv.innerText = "⏳ Memindai...";
     statusDiv.className = "mt-4 font-bold text-sm text-blue-500";
     
+    // Pastikan video aktif saat scan
     const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
         .withFaceLandmarks().withFaceDescriptor(); 
     
@@ -365,6 +374,7 @@ async function registerFace() {
         const descriptorArray = Array.from(detection.descriptor); 
         const studentId = namaSiswa.replace(/\s+/g, '_').toLowerCase(); 
         
+        // PERBAIKAN: Menggunakan BIOMETRIC_PATH yang benar
         db.ref(`${BIOMETRIC_PATH}/face_data/${studentId}`).set({ 
             nama: namaSiswa, 
             kelas: kelasSiswa, 
@@ -376,7 +386,6 @@ async function registerFace() {
             syncFaceDatabase(); 
         }).catch(err => {
             statusDiv.innerText = "❌ Gagal Simpan: " + err.message;
-            statusDiv.className = "mt-4 font-bold text-sm text-red-500";
         }); 
     } else { 
         statusDiv.innerText = "❌ Wajah Tidak Terdeteksi!"; 
@@ -413,7 +422,7 @@ function isValidSession(sesi) {
 function startGpsTracking() {
     if (!navigator.geolocation) return addLog("GPS Tidak Didukung");
     navigator.geolocation.watchPosition(p => {
-        if (!settings.lat) {
+        if (settings.lat == null || settings.lng == null) {
             gpsStatus.innerText = "Konfigurasi GPS Belum Diset";
             return;
         }
@@ -442,9 +451,16 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 function listenToCloudSettings() {
-    db.ref(`${BIOMETRIC_PATH}/settings`).on('value', snap => {
+    db.ref(SETTINGS_PATH).on('value', snap => {
         settings = snap.val() || {};
-        if (settings.csvUrl) addLog("⚙️ Config Sync.");
+        if (settings.csvUrl) {
+            document.getElementById('csv-url').value = settings.csvUrl;
+            document.getElementById('endpoint-url').value = settings.endpointUrl || "";
+            document.getElementById('target-lat').value = settings.lat || "";
+            document.getElementById('target-lng').value = settings.lng || "";
+            document.getElementById('target-radius').value = settings.radius || 50;
+            addLog("⚙️ Konfigurasi Dimuat.");
+        }
         syncFaceDatabase();
     });
 }
@@ -482,15 +498,16 @@ async function fetchSiswa() {
         const text = await res.text();
         const rows = text.split(/\r?\n/).filter(r => r.trim() !== "");
         const content = rows.slice(1);
-        siswaData = content.map(row => {
-            const cols = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(c => c.replace(/"/g, '').trim());
-            return {
-                nis: cols[0],
-                nama: cols[1],
-                kelas: cols[2],
-                sesi: cols[3] // penting!
-            };
-        });
+	siswaData = content.map(row => {
+	    // Regex yang lebih aman untuk menangani koma di dalam tanda kutip
+	    const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
+	    return {
+        nis: cols?.replace(/"/g, '').trim(),
+        nama: cols?.replace(/"/g, '').trim(),
+        kelas: cols?.replace(/"/g, '').trim(),
+        sesi: cols?.replace(/"/g, '').trim()
+	    };
+	});
 
         const kelasUnik = [...new Set(siswaData.map(s => s.kelas))].sort();
         document.getElementById('reg-kelas').innerHTML =
@@ -524,18 +541,21 @@ function loadLaporan() {
 }
 
 function saveSettings() { 
-    settings = { 
+    const newSettings = { 
         csvUrl: document.getElementById('csv-url').value, 
         endpointUrl: document.getElementById('endpoint-url').value, 
-        lat: parseFloat(document.getElementById('target-lat').value), 
-        lng: parseFloat(document.getElementById('target-lng').value), 
-        radius: parseInt(document.getElementById('target-radius').value) 
+        lat: parseFloat(document.getElementById('target-lat').value) || 0, 
+        lng: parseFloat(document.getElementById('target-lng').value) || 0, 
+        radius: parseInt(document.getElementById('target-radius').value) || 50 
     }; 
-    db.ref(`${BIOMETRIC_PATH}/settings`).set(settings)
+    
+    // PERBAIKAN: Path yang benar
+    db.ref(SETTINGS_PATH).set(newSettings)
       .then(() => { 
           alert("Tersimpan ke Cloud!"); 
+          settings = newSettings; // Update local settings
           syncFaceDatabase(); 
-      }); 
+      }).catch(err => alert("Gagal simpan: " + err.message)); 
 }
 
 function updateRegNama() { 
@@ -550,7 +570,7 @@ function speakSuccess(nama) { speak(`${nama} berhasil`); }
 function speakError() { speak("Gagal, ulangi"); }
 function initTheme() { const isDark = localStorage.getItem('theme') === 'dark'; document.documentElement.classList.toggle('dark', isDark); document.getElementById('theme-icon-sun').classList.toggle('hidden', !isDark); document.getElementById('theme-icon-moon').classList.toggle('hidden', isDark); }
 function toggleDarkMode() { const isDark = document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', isDark ? 'dark' : 'light'); document.getElementById('theme-icon-sun').classList.toggle('hidden', !isDark); document.getElementById('theme-icon-moon').classList.toggle('hidden', isDark); }
-function switchTab(id) { if (id === 'pengaturan') { const token = prompt("Masukkan Token Keamanan:"); const tokenBenar = "12345"; if (token !== tokenBenar) { alert("Token Salah! Akses Ditolak."); return; } } document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0, 0); }
+function switchTab(id) { if (id === 'pengaturan') { const token = prompt("Masukkan Token Keamanan:"); const tokenBenar = "pengaturan123"; if (token !== tokenBenar) { alert("Token Salah! Akses Ditolak."); return; } } document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0, 0); }
 function toggleMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
 function setCurrentLocation() { navigator.geolocation.getCurrentPosition(p => { document.getElementById('target-lat').value = p.coords.latitude; document.getElementById('target-lng').value = p.coords.longitude; }); }
 let deferredPrompt; window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; document.getElementById('install-pwa').classList.remove('hidden'); });
