@@ -26,16 +26,13 @@
         .tab-content.active { display: block; }
         #log-content::-webkit-scrollbar { width: 4px; }
         #log-content::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+	#face-silhouette svg { animation: pulse 2s infinite; }
+	@keyframes pulse {0% { opacity: 0.3; transform: scale(0.95); } 50% { opacity: 0.6; transform: scale(1); } 100% { opacity: 0.3; transform: scale(0.95); } }
     </style>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW Registered'))
-                    .catch(err => console.log('SW Registration Failed', err));
-            });
-        }
+        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW Registered')) .catch(err => console.log('SW Registration Failed', err)); }); }
     </script>
 
 </head>
@@ -65,44 +62,48 @@
     </nav>
 
     <main class="container mx-auto p-4 pb-20">
-        <div id="absensi" class="tab-content active">
-            <header class="mb-8">
-                <div class="bg-gradient-to-br from-blue-700 to-blue-900 rounded-[2rem] md:rounded-[3rem] p-8 md:p-14 text-white shadow-2xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-20 -mt-20"></div>
-                    <div class="relative z-10 max-w-2xl">
-                        <span class="bg-orange-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Sistem Presensi v1.4.2</span>
-                        <h2 class="text-3xl md:text-5xl font-extrabold mt-4 leading-tight">Membangun Kedisiplinan Dengan Teknologi.</h2>
-                        <p class="text-blue-100 mt-4 text-sm md:text-base opacity-90">Pastikan wajah terlihat jelas dan berada di dalam jangkauan GPS sekolah.</p>
-                    </div>
-                </div>
-            </header>
-            <div class="max-w-2xl mx-auto bg-white dark:bg-slate-900 rounded-3xl shadow-lg p-5 md:p-8 border border-gray-100 dark:border-slate-800">
-                <div class="flex justify-center space-x-3 mb-6">
-                    <label class="flex-1 flex items-center justify-center space-x-2 cursor-pointer p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-100 dark:border-blue-800">
-                        <input type="radio" name="absensi-type" value="Masuk" checked class="w-4 h-4 text-blue-600">
-                        <span class="text-xs font-black text-blue-700 dark:text-blue-400 uppercase">Masuk</span>
-                    </label>
-                    <label class="flex-1 flex items-center justify-center space-x-2 cursor-pointer p-4 bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-100 dark:border-red-800">
-                        <input type="radio" name="absensi-type" value="Pulang" class="w-4 h-4 text-red-600">
-                        <span class="text-xs font-black text-red-700 dark:text-red-400 uppercase">Pulang</span>
-                    </label>
-                </div>
-                <div id="gps-status" class="mb-4 p-3 rounded-xl text-center font-bold bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 text-[10px] uppercase">Menunggu GPS...</div>
-                <div class="video-container bg-black rounded-2xl overflow-hidden border-4 border-gray-100 dark:border-slate-800 aspect-video shadow-inner">
-                    <video id="video" class="w-full h-full object-cover" autoplay muted playsinline></video>
-		</div>
-		<div class="flex justify-center gap-3 mt-4">
-		    <button onclick="switchCamera()" class="bg-orange-500 text-white px-4 py-3 rounded-xl text-xs font-bold shadow">🔄 GANTI KAMERA</button>
-		    <button onclick="toggleFullscreenCamera()" class="bg-blue-600 text-white px-4 py-3 rounded-xl text-xs font-bold shadow">⛶ FULLSCREEN</button>
-                </div>
+	<div id="absensi" class="tab-content active">
+	    <header class="mb-8">
+	        <div class="bg-gradient-to-br from-blue-700 to-blue-900 rounded-[2rem] md:rounded-[3rem] p-8 md:p-14 text-white shadow-2xl relative overflow-hidden">
+	            <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-20 -mt-20"></div>
+	            <div class="relative z-10 max-w-2xl">
+	                <span class="bg-orange-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Sistem Presensi v1.4.2</span>
+	                <h2 class="text-3xl md:text-5xl font-extrabold mt-4 leading-tight">BioScan GPS <span class="text-orange-400">PRIDA</span></h2>
+	                <p class="text-blue-100 mt-4 text-sm md:text-base opacity-90">Posisikan wajah Anda di dalam siluet panduan agar terdeteksi otomatis.</p>
+	            </div>
+	        </div>
+	    </header>
 
-                <div class="mt-6 p-4 bg-gray-950 rounded-2xl border border-slate-800">
-                    <h3 class="text-blue-500 font-mono text-[10px] uppercase mb-2 tracking-widest flex justify-between">Log Aktivitas <span>System Live</span></h3>
-                    <div id="log-content" class="text-[11px] font-mono text-gray-400 h-28 overflow-y-auto space-y-1"><div>> Sistem diinisialisasi...</div></div>
-                </div>
-            </div>
-        </div>
+	    <div class="max-w-2xl mx-auto bg-white dark:bg-slate-900 rounded-3xl shadow-lg p-5 md:p-8 border border-gray-100 dark:border-slate-800">
+	        <div class="flex justify-center space-x-3 mb-6">
+	            <label class="flex-1 flex items-center justify-center space-x-2 cursor-pointer p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-100 dark:border-blue-800">
+	                <input type="radio" name="absensi-type" value="Masuk" checked class="w-4 h-4 text-blue-600"><span class="text-xs font-black text-blue-700 dark:text-blue-400 uppercase">Masuk</span></label>
+	            <label class="flex-1 flex items-center justify-center space-x-2 cursor-pointer p-4 bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-100 dark:border-red-800">
+                <input type="radio" name="absensi-type" value="Pulang" class="w-4 h-4 text-red-600"><span class="text-xs font-black text-red-700 dark:text-red-400 uppercase">Pulang</span></label>
+	        </div>
 
+	        <div id="gps-status" class="mb-4 p-3 rounded-xl text-center font-bold bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 text-[10px] uppercase">Menunggu GPS...</div>
+	        <div class="video-container bg-black rounded-2xl overflow-hidden border-4 border-gray-100 dark:border-slate-800 aspect-video shadow-inner relative">
+	            <video id="video" class="w-full h-full object-cover" autoplay muted playsinline></video>
+	            <div id="face-silhouette" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+	                <svg id="face-silhouette-svg" class="w-64 h-64 text-white/30 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.5">
+	                    <!-- Garis Kepala --><path d="M12 21C16.4183 21 20 17.4183 20 13C20 8.58172 16.4183 5 12 5C7.58172 5 4 8.58172 4 13C4 17.4183 7.58172 21 12 21Z" />
+	                    <!-- Area Mata & Hidung --><path d="M12 18C14.2091 18 16 16.2091 16 14C16 11.7909 14.2091 10 12 10C9.79086 10 8 11.7909 8 14C8 16.2091 9.79086 18 12 18Z" />
+	                    <!-- Garis Senyum --><path d="M9 13C9 13 10 12 12 12C14 12 15 13 15 13" /></svg>
+	            </div>
+	        </div>
+
+    	    <div class="flex justify-center gap-3 mt-4">
+	            <button onclick="switchCamera()" class="bg-orange-500 text-white px-4 py-3 rounded-xl text-xs font-bold shadow-lg transition active:scale-95">🔄 GANTI KAMERA</button>
+	            <button onclick="toggleFullscreenCamera()" class="bg-blue-600 text-white px-4 py-3 rounded-xl text-xs font-bold shadow-lg transition active:scale-95">⛶ FULLSCREEN</button>
+	        </div>
+
+	        <div class="mt-6 p-4 bg-gray-950 rounded-2xl border border-slate-800">
+	            <h3 class="text-blue-500 font-mono text-[10px] uppercase mb-2 tracking-widest flex justify-between">Log Aktivitas <span>System Live</span></h3>
+	            <div id="log-content" class="text-[11px] font-mono text-gray-400 h-28 overflow-y-auto space-y-1"><div>> Sistem diinisialisasi...</div></div>
+	        </div>
+	    </div>
+	</div>
 
 	<div id="laporan" class="tab-content">
 	    <div class="max-w-4xl mx-auto bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800">
@@ -140,19 +141,16 @@
                 <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800">
                     <h2 class="text-xl font-bold mb-6 text-blue-700 flex items-center"><span class="mr-2">⚙️</span> Konfigurasi Sistem</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-400 uppercase">Link CSV G-Sheets</label>
-                                <div class="flex gap-2">
-                                    <input type="text" id="csv-url" class="flex-1 p-3 border dark:border-slate-700 rounded-xl outline-none text-sm dark:bg-slate-800 dark:text-white" placeholder="https://...">
-                                    <button onclick="fetchSiswa()" class="bg-green-600 text-white px-4 rounded-xl text-[10px] font-bold hover:bg-green-700 transition">SINKRON</button>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-blue-500 uppercase">URL Apps Script Backend</label>
-                                <input type="text" id="endpoint-url" class="w-full p-3 border border-blue-200 dark:border-blue-900/50 rounded-xl outline-none text-sm dark:bg-slate-800 dark:text-white" placeholder="https://script.google.com/...">
-                            </div>
-                        </div>
+			<div class="space-y-4">
+			    <div>
+		   	     <label class="block text-[10px] font-bold text-gray-400 uppercase">Link CSV G-Sheets</label>
+		     	   <input type="text" id="csv-url" class="w-full p-3 border dark:border-slate-700 rounded-xl outline-none text-sm dark:bg-slate-800 dark:text-white" placeholder="https://...">
+			    </div>
+			    <div>
+			        <label class="block text-[10px] font-bold text-blue-500 uppercase">URL Apps Script Backend</label>
+			        <input type="text" id="endpoint-url" class="w-full p-3 border border-blue-200 dark:border-blue-900/50 rounded-xl outline-none text-sm dark:bg-slate-800 dark:text-white" placeholder="https://script.google.com/...">
+			    </div>
+			</div>
                         <div class="space-y-4">
                             <div class="grid grid-cols-2 gap-3">
                                 <div><label class="block text-[10px] font-bold text-gray-400 uppercase">Latitude</label><input type="number" id="target-lat" class="w-full p-3 border dark:border-slate-700 rounded-xl text-sm dark:bg-slate-800 dark:text-white" step="any"></div>
@@ -170,7 +168,7 @@
 		    </h3>
 		    <button onclick="exportLaporan()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold text-xs transition uppercase tracking-wider shadow-md">
 	   	     Unduh Laporan Hari Ini (.CSV)</button></div>
-                    </div><button onclick="saveSettings()" class="w-full bg-slate-900 dark:bg-blue-700 text-white py-4 rounded-2xl font-bold hover:bg-black dark:hover:bg-blue-800 shadow-md mt-8 transition uppercase tracking-widest text-sm">Simpan Semua Pengaturan</button></div>
+                    </div><button onclick="saveSettings()" class="w-full bg-slate-900 dark:bg-blue-700 text-white py-4 rounded-2xl font-bold hover:bg-black dark:hover:bg-blue-800 shadow-md mt-8 transition uppercase tracking-widest text-sm">Simpan dan Sikron Pengaturan</button></div>
             </div>
 
     </main>
@@ -260,106 +258,112 @@ async function syncFaceDatabase() {
         addLog("✅ Database Wajah Sinkron.");
     } catch (e) { addLog("❌ Gagal: " + e.message); }
 }
-
 let faceDetectionInterval;
-    async function initFaceDetection() {
-        video.onplay = () => {
-            const canvas = faceapi.createCanvasFromMedia(video);
-            document.querySelector('.video-container').append(canvas);
-            const displaySize = { width: video.offsetWidth, height: video.offsetHeight };
-            faceapi.matchDimensions(canvas, displaySize);
+// Perbaikan pada interval deteksi agar tidak lag
+async function initFaceDetection() {
+    video.onplay = () => {
+        const canvas = faceapi.createCanvasFromMedia(video);
+        const displaySize = { width: video.offsetWidth, height: video.offsetHeight };
+        faceapi.matchDimensions(canvas, displaySize);
+        document.querySelector('.video-container').append(canvas);
 
-            if (faceDetectionInterval) clearInterval(faceDetectionInterval);
-            faceDetectionInterval = setInterval(async () => {
-                if (!isLocationValid || !faceMatcher || document.hidden) return;
+        if (faceDetectionInterval) clearInterval(faceDetectionInterval);
+        
+        faceDetectionInterval = setInterval(async () => {
+            // Tambahkan pengecekan visibilitas tab untuk hemat baterai
+            if (!isLocationValid || !faceMatcher || document.hidden) return;
+
+            const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+                .withFaceLandmarks()
+                .withFaceDescriptors();
+
+            const resized = faceapi.resizeResults(detections, displaySize);
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            resized.forEach(det => {
+                const match = faceMatcher.findBestMatch(det.descriptor);
+                // Threshold 0.45 sudah bagus, tapi 0.40 lebih aman dari false positive
+                if (match.label !== 'unknown' && match.distance < 0.42) {
+                    recordAttendance(match.label);
+                }
                 
-                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-                    .withFaceLandmarks().withFaceDescriptors();
-                
-                const resized = faceapi.resizeResults(detections, displaySize);
-                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                // Gambar hanya jika perlu debugging
+                new faceapi.draw.DrawBox(det.detection.box, { 
+                    label: match.toString(),
+                    boxColor: match.label !== 'unknown' ? '#10b981' : '#ef4444'
+                }).draw(canvas);
+            });
+        }, 800); // Interval 800ms adalah sweet spot antara akurasi dan performa
+    };
+}
 
-                resized.forEach(det => {
-                    const match = faceMatcher.findBestMatch(det.descriptor);
-                    new faceapi.draw.DrawBox(det.detection.box, { 
-                        label: match.toString(),
-                        boxColor: match.label !== 'unknown' ? '#10b981' : '#ef4444'
-                    }).draw(canvas);
 
-                    if (match.label !== 'unknown' && match.distance < 0.45) {
-                        recordAttendance(match.label);
-                    }
-                });
-            }, 1000);
-        };
-    }
-
-// ================== ATTENDANCE LOGIC ==================
+// ================== LOGIKA ABSENSI TERINTEGRASI ==================
 async function recordAttendance(nis) {
     const now = new Date();
     const siswa = siswaData.find(s => s.nis === nis);
+    
+    // Validasi data dan batasi absensi berulang (jedanya 1 menit)
     if (!siswa || (lastAttendance[nis] && Date.now() - lastAttendance[nis] < 60000)) return;
-    const type = document.querySelector('input[name="absensi-type"]:checked').value.toLowerCase();
+    
+    const type = document.querySelector('input[name="absensi-type"]:checked').value;
     const tgl = now.toISOString().split('T')[0];
+    const waktu = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    // Payload data untuk dikirim
     const data = {
         nama: siswa.nama, 
         nis: siswa.nis, 
         kelas: siswa.kelas,
-        [type]: now.toISOString(),
+        type: type, // "Masuk" atau "Pulang"
+        waktu: waktu,
+        tanggal: tgl,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     };
 
+    // Feedback Visual: Ubah warna siluet menjadi hijau saat wajah dikenali
+    const silhouette = document.getElementById('face-silhouette-svg');
+    if (silhouette) silhouette.classList.add('text-green-500', 'scale-110');
+
     try {
-        // Coba kirim ke Firestore
+        // A. SIMPAN KE FIRESTORE (Untuk Laporan di Aplikasi)
+        const updateData = { ...data };
+        if (type.toLowerCase() === 'masuk') updateData.masuk = now.toISOString();
+        else updateData.pulang = now.toISOString();
+
         await db.collection("artifacts").doc(APP_PATH)
                 .collection("public").doc("records")
-                .collection(tgl).doc(nis).set(data, { merge: true });
+                .collection(tgl).doc(nis).set(updateData, { merge: true });
         
-        addLog(`✅ Online: ${siswa.nama} - ${type}`);
+        addLog(`✅ Firestore: ${siswa.nama} (${type})`);
+
+        // B. KIRIM KE GOOGLE SHEETS (Via URL Backend yang tersimpan)
+        if (settings.endpointUrl) {
+            fetch(settings.endpointUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            addLog(`🚀 Spreadsheet: Data terkirim.`);
+        }
+
     } catch (e) {
-        // Jika gagal (offline), simpan ke Local Storage
+        // C. BACKUP OFFLINE (Jika koneksi internet terputus)
         let offlineData = JSON.parse(localStorage.getItem('offline_logs') || "[]");
-        offlineData.push({...data, isSync: false, type: type});
+        offlineData.push({...data, isSync: false});
         localStorage.setItem('offline_logs', JSON.stringify(offlineData));
-        
-        addLog(`⚠️ Offline: ${siswa.nama} tersimpan lokal`);
+        addLog(`⚠️ Offline: ${siswa.nama} tersimpan lokal.`);
+    } finally {
+        // Kembalikan efek visual siluet setelah 1.5 detik
+        setTimeout(() => {
+            if (silhouette) silhouette.classList.remove('text-green-500', 'scale-110');
+        }, 1500);
     }
     
     lastAttendance[nis] = Date.now();
     speak(`${siswa.nama} ${type}`);
-}
-
-// ================== REGISTRATION ==================
-async function registerFace() {
-    const namaSiswa = document.getElementById('reg-siswa').value;
-    const statusDiv = document.getElementById('reg-status');
-    if (!namaSiswa) return alert("Pilih siswa!");
-    const siswa = siswaData.find(s => s.nama === namaSiswa);
-    if (!siswa) return alert("Data siswa tidak ditemukan!");
-    statusDiv.innerText = "⏳ Memindai...";
-    statusDiv.className = "mt-4 font-bold text-sm text-blue-500";
-    const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks().withFaceDescriptor();
-    if (detection) {
-        const descriptorArray = Array.from(detection.descriptor);
-        db.collection("artifacts").doc(APP_PATH)
-          .collection("public").doc("biometrics")
-          .collection("face_data").doc(siswa.nis).set({
-            nis: siswa.nis, 
-            nama: siswa.nama, 
-            kelas: siswa.kelas,
-            descriptor: JSON.stringify(descriptorArray),
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp() // Gunakan Firestore Timestamp
-        }).then(() => {
-            statusDiv.innerText = "✅ Berhasil Terdaftar!";
-            statusDiv.className = "mt-4 font-bold text-sm text-green-500";
-            syncFaceDatabase();
-        }).catch(err => { statusDiv.innerText = "❌ Gagal Simpan: " + err.message; });
-
-    } else {
-        statusDiv.innerText = "❌ Wajah Tidak Terdeteksi!";
-        statusDiv.className = "mt-4 font-bold text-sm text-red-500";
-    }
 }
 
 // ================== HELPERS ==================
@@ -440,17 +444,21 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
 // ================== CLOUD SETTINGS ==================
 function listenToCloudSettings() {
-    // Gunakan path lengkap sesuai Rules
+    // Mendengarkan perubahan di Firestore secara real-time
     db.collection("artifacts").doc(APP_PATH)
       .collection("public").doc("config")
       .collection("settings").doc("global").onSnapshot(doc => {
         if (doc.exists) {
             settings = doc.data();
             document.getElementById('csv-url').value = settings.csvUrl || "";
+            document.getElementById('endpoint-url').value = settings.endpointUrl || ""; 
             document.getElementById('target-lat').value = settings.lat || "";
             document.getElementById('target-lng').value = settings.lng || "";
             document.getElementById('target-radius').value = settings.radius || 50;
-            addLog("⚙️ Konfigurasi Firestore Dimuat.");
+            if (settings.csvUrl) {
+                fetchSiswa();
+            }
+            addLog("⚙️ Konfigurasi & Data Siswa Sinkron.");
             syncFaceDatabase();
         }
     });
@@ -574,10 +582,68 @@ function exportLaporan() {
     }).catch(err => alert("Gagal ekspor: " + err.message));
 }
 
+// ================== PENDAFTARAN WAJAH (REGISTRATION) ==================
+async function registerFace() {
+    const regStatus = document.getElementById('reg-status');
+    const nama = document.getElementById('reg-siswa').value;
+    const kelas = document.getElementById('reg-kelas').value;
+    const nisSiswa = siswaData.find(s => s.nama === nama)?.nis;
+
+    if (!nama || !kelas || !nisSiswa) {
+        regStatus.innerText = "❌ Pilih Kelas & Nama dulu!";
+        regStatus.className = "mt-4 font-bold text-sm text-red-500";
+        return;
+    }
+
+    regStatus.innerText = "⏳ Memproses wajah... Jangan bergerak";
+    regStatus.className = "mt-4 font-bold text-sm text-blue-500";
+
+    try {
+        // 1. Deteksi wajah dari video saat ini
+        const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceDescriptor();
+
+        if (!detection) {
+            regStatus.innerText = "❌ Wajah tidak terdeteksi!";
+            regStatus.className = "mt-4 font-bold text-sm text-red-500";
+            return;
+        }
+
+        // 2. Konversi descriptor ke format String agar bisa disimpan di Firestore
+        const descriptorArray = Array.from(detection.descriptor);
+        const descriptorString = JSON.stringify(descriptorArray);
+
+        // 3. Simpan ke Firestore
+        await db.collection("artifacts").doc(APP_PATH)
+            .collection("public").doc("biometrics")
+            .collection("face_data").doc(nisSiswa).set({
+                nis: nisSiswa,
+                nama: nama,
+                kelas: kelas,
+                descriptor: descriptorString,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+        regStatus.innerText = `✅ Wajah ${nama} Berhasil Terdaftar!`;
+        regStatus.className = "mt-4 font-bold text-sm text-green-500";
+        
+        // 4. Update database wajah lokal agar bisa langsung absen tanpa refresh
+        addLog(`👤 Wajah baru terdaftar: ${nama}`);
+        await syncFaceDatabase(); 
+
+    } catch (e) {
+        console.error(e);
+        regStatus.innerText = "❌ Gagal menyimpan ke cloud";
+        regStatus.className = "mt-4 font-bold text-sm text-red-500";
+    }
+}
+
 // ================== SETTINGS ==================
 function saveSettings() {
     const newSettings = {
         csvUrl: document.getElementById('csv-url').value,
+        endpointUrl: document.getElementById('endpoint-url').value, // URL Backend kini ikut tersimpan
         lat: parseFloat(document.getElementById('target-lat').value) || 0,
         lng: parseFloat(document.getElementById('target-lng').value) || 0,
         radius: parseInt(document.getElementById('target-radius').value) || 50
@@ -585,9 +651,34 @@ function saveSettings() {
     db.collection("artifacts").doc(APP_PATH)
       .collection("public").doc("config")
       .collection("settings").doc("global").set(newSettings)
-        .then(() => alert("Tersimpan ke Firestore!"))
-        .catch(err => alert("Gagal: " + err.message));
+        .then(() => {
+            alert("Berhasil! Pengaturan tersimpan dan sinkron ke semua perangkat.");
+            addLog("✅ Pengaturan global diperbarui.");
+        })
+        .catch(err => {
+            alert("Gagal menyimpan: " + err.message);
+        });
 }
+
+function saveOffline(d){
+let o=JSON.parse(localStorage.getItem('offline_logs')||"[]");
+o.push({...d,isSync:false});
+localStorage.setItem('offline_logs',JSON.stringify(o));
+}
+
+async function syncOfflineData(){
+let o=JSON.parse(localStorage.getItem('offline_logs')||"[]"); if(!o.length) return;
+let s=[]; addLog("🔄 sync");
+for(let i of o){
+try{
+await fetch(settings.endpointUrl,{method:'POST',headers:{'Content-Type':'application/json'},
+body:JSON.stringify({...i,token:"PRIDA_SECRET_123"})});
+}catch{s.push(i);}
+}
+localStorage.setItem('offline_logs',JSON.stringify(s));
+addLog("✅ selesai");
+}
+window.addEventListener("online",syncOfflineData);
 
 function updateRegNama() {
     const k = document.getElementById('reg-kelas').value;
@@ -596,6 +687,8 @@ function updateRegNama() {
         '<option value="">-- Pilih Nama --</option>' +
         filtered.map(s => `<option value="${s.nama}">${s.nama}</option>`).join('');
 }
+
+
 
 // ================== UI HELPERS ==================
 function speakSuccess(nama) { speak(`${nama} berhasil`); }
