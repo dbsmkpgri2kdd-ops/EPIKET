@@ -18,17 +18,22 @@
     <script> tailwind.config = {darkMode: 'class', } </script>    
     <style>
         body { transition: background-color 0.4s, color 0.4s; -webkit-tap-highlight-color: transparent; }
-        .video-container { position: relative; width: 100%; max-width: 640px; margin: auto; display: flex; justify-content: center; align-items: center; }
+        .video-container { position: relative; width: 100%; max-width: 640px; margin: auto; display: flex; justify-content: center; align-items: center; border-radius: 24px; overflow: hidden; background: linear-gradient(to bottom right, #020617, #000000); box-shadow: 0 20px 60px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.08); transition: all 0.3s ease; }
 	.video-fullscreen { position: fixed !important; top: 0; left: 0; width: 100vw !important; height: 100vh !important; z-index: 9999; background: black; border-radius: 0 !important; }
+	video { width: 100%; height: 100%; object-fit: cover; }
         canvas { position: absolute; top: 0; left: 0; width: 100% !important; height: auto !important; pointer-events: none; }
 	.video-fullscreen canvas { width: 100% !important; height: 100% !important; }
-        .tab-content { display: none; } 
-        .tab-content.active { display: block; }
-        #log-content::-webkit-scrollbar { width: 4px; }
-        #log-content::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-	#face-silhouette svg { animation: pulse 2s infinite; }
-	.face-mask-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.6); /* Area luar wajah lebih gelap */ -webkit-mask-image: radial-gradient(ellipse 45% 60% at 50% 50%, transparent 100%, black 100%); mask-image: radial-gradient(ellipse 45% 60% at 50% 50%, transparent 100%, black 100%); pointer-events: none; }
-	@keyframes pulse {0% { opacity: 0.3; transform: scale(0.95); } 50% { opacity: 0.6; transform: scale(1); } 100% { opacity: 0.3; transform: scale(0.95); } }
+        .tab-content { display: none; } .tab-content.active { display: block; }
+        #log-content::-webkit-scrollbar { width: 4px; } #log-content::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+	#face-oval { width: 220px; height: 260px; border-radius: 50% / 60%; border: 2px solid rgba(255,255,255,0.4); transition: all 0.25s ease; }
+	#face-oval.valid { border-color: #22c55e; box-shadow: 0 0 30px rgba(34,197,94,0.8); } #face-oval.invalid { border-color: #ef4444; } #face-oval.warning { border-color: #f59e0b; }
+	.face-mask-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.65); -webkit-mask-image: radial-gradient(ellipse 30% 45% at 50% 50%, transparent 98%, black 100%); mask-image: radial-gradient(ellipse 30% 45% at 50% 50%, transparent 98%, black 100%); }
+	.scan-line { position: absolute; width: 100%; height: 2px; background: linear-gradient(to right, transparent, #22c55e, transparent); animation: scan 2s linear infinite; pointer-events: none; }
+	@keyframes scan { 0% { top: 0; opacity: 0; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+	.video-container:active { transform: scale(0.98); }
+	@media (max-width: 480px) { #face-oval { width: 180px; height: 250px; } }
+	@keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(34,197,94,0.4); } 50% { box-shadow: 0 0 25px rgba(34,197,94,0.8); } 100% { box-shadow: 0 0 10px rgba(34,197,94,0.4); } }
+	#face-oval.valid { animation: pulseGlow 1.5s infinite; }
     </style>
 
     <script>
@@ -83,16 +88,24 @@
                 <input type="radio" name="absensi-type" value="Pulang" class="w-4 h-4 text-red-600"><span class="text-xs font-black text-red-700 dark:text-red-400 uppercase">Pulang</span></label>
 	        </div>
 
-	        <div id="gps-status" class="mb-4 p-3 rounded-xl text-center font-bold bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 text-[10px] uppercase">Menunggu GPS...</div>
-	        <div class="video-container bg-black rounded-2xl overflow-hidden border-4 border-gray-100 dark:border-slate-800 aspect-video shadow-inner relative">
-	            <video id="video" class="w-full h-full object-cover" autoplay muted playsinline></video>
-	            <div id="face-silhouette" class="absolute inset-0 flex items-center justify-center pointer-events-none">
-	                <svg id="face-silhouette-svg" class="w-64 h-64 text-white/30 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.5">
-	                    <!-- Garis Kepala --><path d="M12 21C16.4183 21 20 17.4183 20 13C20 8.58172 16.4183 5 12 5C7.58172 5 4 8.58172 4 13C4 17.4183 7.58172 21 12 21Z" />
-	                    <!-- Area Mata & Hidung --><path d="M12 18C14.2091 18 16 16.2091 16 14C16 11.7909 14.2091 10 12 10C9.79086 10 8 11.7909 8 14C8 16.2091 9.79086 18 12 18Z" />
-	                    <!-- Garis Senyum --><path d="M9 13C9 13 10 12 12 12C14 12 15 13 15 13" /></svg>
-	            </div>
-	        </div>
+	<div id="gps-status" class="mb-4 p-3 rounded-xl text-center font-bold bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 text-[10px] uppercase"> Menunggu GPS...</div>
+<div class="video-container relative rounded-3xl overflow-hidden bg-black border border-white/10 shadow-2xl aspect-video">
+    <!-- VIDEO -->
+    <video id="video" autoplay muted playsinline></video>
+    <!-- MASK GELAP LUAR -->
+    <div class="face-mask-overlay"></div>
+    <!-- FRAME OVAL -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div id="face-oval"></div>
+    </div>
+    <!-- TITIK TENGAH -->
+    <div class="absolute w-2 h-2 bg-white/70 rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+    <!-- SCAN LINE -->
+    <div class="scan-line"></div>
+    <!-- TEXT -->
+    <div id="face-instruction"
+        class="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs font-bold px-4 py-2 rounded-xl bg-black/70 text-white backdrop-blur"> Arahkan wajah ke tengah</div>
+</div>
 
     	    <div class="flex justify-center gap-3 mt-4">
 	            <button onclick="switchCamera()" class="bg-orange-500 text-white px-4 py-3 rounded-xl text-xs font-bold shadow-lg transition active:scale-95">🔄 GANTI KAMERA</button>
@@ -262,43 +275,111 @@ async function syncFaceDatabase() {
         addLog("✅ Database Wajah Sinkron.");
     } catch (e) { addLog("❌ Gagal: " + e.message); }
 }
-let faceDetectionInterval;
-// Perbaikan pada interval deteksi agar tidak lag
+
+let runningDetection = false;
+let lastDetectTime = 0;
 async function initFaceDetection() {
     video.onplay = () => {
+        const existingCanvas = document.querySelector('canvas');
+        if (existingCanvas) existingCanvas.remove();
         const canvas = faceapi.createCanvasFromMedia(video);
-        const displaySize = { width: video.offsetWidth, height: video.offsetHeight };
-        faceapi.matchDimensions(canvas, displaySize);
         document.querySelector('.video-container').append(canvas);
+        const displaySize = {
+            width: video.offsetWidth,
+            height: video.offsetHeight
+        };
 
-        if (faceDetectionInterval) clearInterval(faceDetectionInterval);
-        
-        faceDetectionInterval = setInterval(async () => {
-            // Tambahkan pengecekan visibilitas tab untuk hemat baterai
-            if (!isLocationValid || !faceMatcher || document.hidden) return;
+        faceapi.matchDimensions(canvas, displaySize);
+        const ctx = canvas.getContext('2d');
+        async function detectLoop() {
+            if (!faceMatcher || document.hidden) {
+                runningDetection = false;
+                return;
+            }
 
-            const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+            const now = performance.now();
+            // adaptive throttle (hemat baterai)
+            const delay = 300;
+            if (now - lastDetectTime < delay) {
+                requestAnimationFrame(detectLoop);
+                return;
+            }
+
+            lastDetectTime = now;
+            const detections = await faceapi
+                .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({
+                    inputSize: 224,
+                    scoreThreshold: 0.5
+                }))
                 .withFaceLandmarks()
-                .withFaceDescriptors();
-
-            const resized = faceapi.resizeResults(detections, displaySize);
-            const ctx = canvas.getContext('2d');
+                .withFaceDescriptor();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            resized.forEach(det => {
-                const match = faceMatcher.findBestMatch(det.descriptor);
-                // Threshold 0.45 sudah bagus, tapi 0.40 lebih aman dari false positive
-                if (match.label !== 'unknown' && match.distance < 0.42) {
-                    recordAttendance(match.label);
+            const oval = document.getElementById('face-oval');
+            const text = document.getElementById('face-instruction');
+            if (!detections) {
+                oval.className = "";
+                text.innerText = "Wajah tidak terdeteksi";
+                stableStart = null;
+                requestAnimationFrame(detectLoop);
+                return;
+            }
+
+            const box = detections.detection.box;
+            const centerX = box.x + box.width / 2;
+            const centerY = box.y + box.height / 2;
+            const frameCenterX = displaySize.width / 2;
+            const frameCenterY = displaySize.height / 2;
+            const toleranceX = displaySize.width * 0.15;
+            const toleranceY = displaySize.height * 0.15;
+            const isCentered =
+                Math.abs(centerX - frameCenterX) < toleranceX &&
+                Math.abs(centerY - frameCenterY) < toleranceY;
+            const faceRatio = box.width / displaySize.width;
+            const isProperSize = faceRatio > 0.22 && faceRatio < 0.45;
+            const landmarks = detections.landmarks;
+            const leftEye = landmarks.getLeftEye();
+            const rightEye = landmarks.getRightEye();
+            const eyeDiff = Math.abs(leftEye[0].y - rightEye[0].y);
+            const isStraight = eyeDiff < 15;
+            if (!isCentered) {
+                oval.className = "warning";
+                text.innerText = centerX < frameCenterX ? "Geser ke Kanan ➡️" : "Geser ke Kiri ⬅️";
+                stableStart = null;
+            } 
+            else if (!isProperSize) {
+                oval.className = "invalid";
+                text.innerText = faceRatio < 0.22 ? "Mendekat ke Kamera" : "Terlalu Dekat";
+                stableStart = null;
+            } 
+            else if (!isStraight) {
+                oval.className = "warning";
+                text.innerText = "Luruskan Posisi Kepala";
+                stableStart = null;
+            } 
+            else {
+                const match = faceMatcher.findBestMatch(detections.descriptor);
+                if (match.label === 'unknown' || match.distance > 0.45) {
+                    oval.className = "invalid";
+                    text.innerText = "Wajah Tidak Dikenali";
+                    stableStart = null;
+                } else {
+                    oval.className = "valid";
+                    text.innerText = "Tahan Posisi...";
+                    if (!stableStart) stableStart = Date.now();
+                    if (Date.now() - stableStart > 1500) {
+                        recordAttendance(match.label);
+                        text.innerText = "Berhasil ✔️";
+                        navigator.vibrate?.([100, 50, 100]);
+                        stableStart = null;
+                    }
                 }
-                
-                // Gambar hanya jika perlu debugging
-                new faceapi.draw.DrawBox(det.detection.box, { 
-                    label: match.toString(),
-                    boxColor: match.label !== 'unknown' ? '#10b981' : '#ef4444'
-                }).draw(canvas);
-            });
-        }, 800); // Interval 800ms adalah sweet spot antara akurasi dan performa
+            }
+
+            requestAnimationFrame(detectLoop);
+        }
+
+        detectLoop();
     };
 }
 
@@ -377,9 +458,9 @@ function autoSelectType() { const jam = new Date().getHours(); document.querySel
 function isValidSession(sesi) { const jam = new Date().getHours(); if (sesi === "Pagi") return jam >= 6 && jam <= 14; if (sesi === "Siang") return jam >= 11 && jam <= 18; return true; }
 
 // ================== GPS ==================
-let watchId = null; // Variabel global untuk menyimpan ID tracker
+let watchId = null;
 let locationBuffer = [];
-
+let gpsReady = false;
 function startGpsTracking() {
     // Pastikan tidak ada tracker ganda yang berjalan
     if (watchId !== null) {
@@ -402,7 +483,10 @@ function startGpsTracking() {
         const dist = calculateDistance(userLat, userLng, targetLat, targetLng);
         locationBuffer.push(dist);
         if (locationBuffer.length > 3) locationBuffer.shift();
-        const avgDist = locationBuffer.reduce((a, b) => a + b) / locationBuffer.length;
+        let avgDist = 0;
+	if (locationBuffer.length > 0) {
+	    avgDist = locationBuffer.reduce((a, b) => a + b, 0) / locationBuffer.length;
+	} else {avgDist = Infinity; // aman kalau belum ada data }
         isLocationValid = avgDist <= radius;
         if (isLocationValid) {
             gpsStatus.innerText = `📍 AREA SEKOLAH (${Math.round(avgDist)}m)`;
@@ -712,27 +796,17 @@ function toggleDarkMode() {
     document.getElementById('theme-icon-moon').classList.toggle('hidden', isDark);
 }
 
-async function switchTab(id) {
+function switchTab(id) {
     if (id === 'pengaturan') {
         const token = prompt("Masukkan Token Keamanan:");
-        if (token !== "pengaturan123") { 
-            alert("Akses Ditolak!"); 
-            return; 
+        if (token !== "pengaturan123") {
+            alert("Akses Ditolak!");
+            return;
         }
-        // Pindahkan video ke tab pengaturan
-        const placeholder = document.getElementById('camera-placeholder-reg');
-        const videoElement = document.getElementById('video');
-        placeholder.appendChild(videoElement);
-        placeholder.classList.remove('hidden');
-    } else if (id === 'absensi') {
-        // Kembalikan video ke tab absensi
-        const absensiContainer = document.querySelector('#absensi .video-container');
-        const videoElement = document.getElementById('video');
-        absensiContainer.insertBefore(videoElement, absensiContainer.firstChild);
-        document.getElementById('camera-placeholder-reg').classList.add('hidden');
     }
 
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content')
+        .forEach(t => t.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     window.scrollTo(0, 0);
 }
