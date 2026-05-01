@@ -27,6 +27,7 @@
         #log-content::-webkit-scrollbar { width: 4px; }
         #log-content::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
 	#face-silhouette svg { animation: pulse 2s infinite; }
+	.face-mask-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.6); /* Area luar wajah lebih gelap */ -webkit-mask-image: radial-gradient(ellipse 45% 60% at 50% 50%, transparent 100%, black 100%); mask-image: radial-gradient(ellipse 45% 60% at 50% 50%, transparent 100%, black 100%); pointer-events: none; }
 	@keyframes pulse {0% { opacity: 0.3; transform: scale(0.95); } 50% { opacity: 0.6; transform: scale(1); } 100% { opacity: 0.3; transform: scale(0.95); } }
     </style>
 
@@ -133,11 +134,13 @@
                             </div>
                         </div>
                         <div class="bg-orange-50 dark:bg-orange-900/10 border-2 border-dashed border-orange-200 dark:border-orange-800 p-6 text-center rounded-2xl">
+        	            <div id="camera-placeholder-reg" class="mb-4 rounded-xl overflow-hidden bg-black aspect-video hidden border-2 border-orange-200"></div>
                             <button onclick="registerFace()" class="w-full bg-orange-500 text-white px-6 py-4 rounded-xl font-black shadow-lg hover:bg-orange-600 transition transform active:scale-95 text-xs uppercase">Ambil Data Wajah</button>
                             <div id="reg-status" class="mt-4 font-bold text-sm min-h-[1.5rem]"></div>
                         </div>
                     </div>
                 </div>
+
                 <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800">
                     <h2 class="text-xl font-bold mb-6 text-blue-700 flex items-center"><span class="mr-2">⚙️</span> Konfigurasi Sistem</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -172,6 +175,7 @@
             </div>
 
     </main>
+
 
 
 
@@ -710,13 +714,24 @@ function toggleDarkMode() {
 
 async function switchTab(id) {
     if (id === 'pengaturan') {
-        const savedToken = localStorage.getItem('admin_token');
         const token = prompt("Masukkan Token Keamanan:");
         if (token !== "pengaturan123") { 
             alert("Akses Ditolak!"); 
             return; 
         }
+        // Pindahkan video ke tab pengaturan
+        const placeholder = document.getElementById('camera-placeholder-reg');
+        const videoElement = document.getElementById('video');
+        placeholder.appendChild(videoElement);
+        placeholder.classList.remove('hidden');
+    } else if (id === 'absensi') {
+        // Kembalikan video ke tab absensi
+        const absensiContainer = document.querySelector('#absensi .video-container');
+        const videoElement = document.getElementById('video');
+        absensiContainer.insertBefore(videoElement, absensiContainer.firstChild);
+        document.getElementById('camera-placeholder-reg').classList.add('hidden');
     }
+
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     window.scrollTo(0, 0);
