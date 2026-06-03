@@ -926,33 +926,84 @@ function getMonthYearGTK() {
 
 
 window.exportMonthlySiswa = () => {
-    // Sesuaikan ID dengan yang ada di HTML Anda
+    // 1. Ambil Parameter dari UI
     const month = document.getElementById('download-month').value;
     const year = document.getElementById('download-year').value;
-    const kelas = document.getElementById('download-class-siswa').value; 
-    const session = downloadSessionSiswa; 
-    if(!kelas) { showToast("⚠️ Pilih kelas terlebih dahulu"); return; }
-    const wb = XLSX.utils.book_new(); // Tambahkan baris ini agar file bisa dibuat
-    const data = formatMatrixData('siswa', session, kelas, month, year);
+    const selectedClass = document.getElementById('download-class-siswa').value; 
+    const session = downloadSessionSiswa; // Variabel global sesi (Pagi/Siang)
 
+    // 2. Validasi awal
+    if (!selectedClass) { 
+        showToast("⚠️ Pilih kelas terlebih dahulu"); 
+        return; 
+    }
+
+    const wb = XLSX.utils.book_new(); // Inisialisasi Workbook Excel baru
+
+    // 3. Definisi Header Kolom
     const header = [
         "ID", "Nama", "Kelas",
         ...Array.from({ length: 31 }, (_, i) => String(i + 1)),
         "TOTAL A", "TOTAL B", "TOTAL I", "TOTAL S"
     ];
 
-    const aoa = [header];
-    data.forEach(row => {
-        const line = header.map(h => row[h] || "");
-        aoa.push(line);
-    });
+    // 4. Helper Function: Mengubah array data menjadi Worksheet
+    const createSheetFromData = (dataRows) => {
+        const aoa = [header]; // Baris pertama adalah header
+        dataRows.forEach(row => {
+            const line = header.map(h => (row[h] !== undefined && row[h] !== null) ? row[h] : "");
+            aoa.push(line);
+        });
+        return XLSX.utils.aoa_to_sheet(aoa);
+    };
 
-    const ws = XLSX.utils.aoa_to_sheet(aoa);
-    XLSX.utils.book_append_sheet(wb, ws, "REKAP SISWA");
+    // 5. Logika Pemisahan Sheet
+    if (selectedClass === "SEMUA") {
+        // A. Jika Pilih SEMUA KELAS:
+        // Ambil daftar kelas unik hanya yang ada di sesi tersebut (Pagi/Siang)
+        const filteredSiswaBySession = state.master.siswa.filter(s => 
+            (s.sesi || 'Pagi').toLowerCase() === session.toLowerCase()
+        );
+        const listKelasUnik = [...new Set(filteredSiswaBySession.map(s => s.kelas))].sort();
 
-    const filename = safeFilename(`REKAP_SISWA_${kelas}_${session}_${month}_${year}.xlsx`);
+        if (listKelasUnik.length === 0) {
+            showToast("❌ Tidak ada data siswa di sesi ini");
+            return;
+        }
+
+        // Looping untuk setiap kelas dan buat sheet tersendiri
+        listKelasUnik.forEach(namaKelas => {
+            const dataMatriks = formatMatrixData('siswa', session, namaKelas, month, year);
+            if (dataMatriks.length > 0) {
+                const ws = createSheetFromData(dataMatriks);
+                
+                // Excel limit: Nama sheet maks 31 karakter & tidak boleh ada karakter khusus
+                const safeName = namaKelas.substring(0, 31).replace(/[:\\\/\?\*\[\]]/g, "_");
+                XLSX.utils.book_append_sheet(wb, ws, safeName);
+            }
+        });
+
+        showToast(`✅ Berhasil menyusun ${listKelasUnik.length} kelas`);
+
+    } else {
+        // B. Jika Pilih SATU KELAS tertentu:
+        const dataMatriks = formatMatrixData('siswa', session, selectedClass, month, year);
+        
+        if (dataMatriks.length === 0) {
+            showToast("❌ Data kelas ini kosong");
+            return;
+        }
+
+        const ws = createSheetFromData(dataMatriks);
+        const safeName = selectedClass.substring(0, 31).replace(/[:\\\/\?\*\[\]]/g, "_");
+        XLSX.utils.book_append_sheet(wb, ws, safeName);
+        
+        showToast(`✅ Rekap Kelas ${selectedClass} Berhasil`);
+    }
+
+    // 6. Proses Unduh File
+    const filename = safeFilename(`REKAP_SISWA_${selectedClass}_${session}_${month}_${year}.xlsx`);
     downloadXLSX(wb, filename);
-    showToast(`✅ Rekap Siswa Sesi ${session} Berhasil`);
 };
 
 window.exportMonthlyGTK = (sess) => {
@@ -1556,6 +1607,21 @@ function getNoteColor(peran) {
     return colors[peran] || 'border-slate-300';
 }
 
+window.onerror = function (msg, url, lineNo, columnNo, error) {
+    console.error('Error: ' + msg + '\nScript: ' + url + '\nLine: ' + lineNo);
+    showToast("⚠️ Terjadi kesalahan sistem");
+    return false;
+};
+
+// Penanganan jika internet mati
+window.addEventListener('offline', () => {
+    showToast("🌐 Anda sedang offline. Beberapa fitur mungkin tidak berfungsi.");
+});
+
+window.addEventListener('online', () => {
+    showToast("✨ Anda kembali online. Menyinkronkan...");
+    location.reload(); // Refresh untuk mengambil data terbaru
+});
 
     </script>
 </body>
