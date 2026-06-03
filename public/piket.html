@@ -930,8 +930,7 @@ window.exportMonthlySiswa = () => {
     const month = document.getElementById('download-month').value;
     const year = document.getElementById('download-year').value;
     const selectedClass = document.getElementById('download-class-siswa').value; 
-    const session = downloadSessionSiswa; // Variabel global sesi (Pagi/Siang)
-
+    
     // 2. Validasi awal
     if (!selectedClass) { 
         showToast("⚠️ Pilih kelas terlebih dahulu"); 
@@ -940,69 +939,110 @@ window.exportMonthlySiswa = () => {
 
     const wb = XLSX.utils.book_new(); // Inisialisasi Workbook Excel baru
 
-    // 3. Definisi Header Kolom
+    // 3. Definisi Header Kolom (Ditambahkan kolom 'Sesi' untuk kejelasan)
     const header = [
-        "ID", "Nama", "Kelas",
+        "ID", "Nama", "Kelas", "Sesi",
         ...Array.from({ length: 31 }, (_, i) => String(i + 1)),
         "TOTAL A", "TOTAL B", "TOTAL I", "TOTAL S"
     ];
 
-    // 4. Helper Function: Mengubah array data menjadi Worksheet
-    const createSheetFromData = (dataRows) => {
-        const aoa = [header]; // Baris pertama adalah header
-        dataRows.forEach(row => {
-            const line = header.map(h => (row[h] !== undefined && row[h] !== null) ? row[h] : "");
+    // 4. Helper Function: Membuat baris data siswa berdasarkan absensi di state.records
+    const getStudentDataRows = (students) => {
+        return students.map(p => {
+            const row = { 
+                ID: p.id, 
+                Nama: p.nama, 
+                Kelas: p.kelas, 
+                Sesi: p.sesi || 'Pagi' 
+            };
+            
+            let total = { A: 0, B: 0, I: 0, S: 0 };
+
+            // Cek absensi untuk tanggal 1 sampai 31
+            for (let d = 1; d <= 31; d++) {
+                const dateKey = `${year}-${month}-${String(d).padStart(2, '0')}`;
+                
+                // Ambil sesi asli siswa dari master data (PENTING: agar data record tepat sasaran)
+                const studentSession = p.sesi || 'Pagi';
+                const record = state.records?.[dateKey]?.[`${p.id}_${studentSession}`];
+
+                if (record) {
+                    const statusChar = record.status[0].toUpperCase(); // Mengambil inisial status (A/B/I/S)
+                    row[String(d)] = statusChar;
+                    if (total[statusChar] !== undefined) total[statusChar]++;
+                } else {
+                    row[String(d)] = ""; 
+                }
+            }
+
+            row["TOTAL A"] = total.A;
+            row["TOTAL B"] = total.B;
+            row["TOTAL I"] = total.I;
+            row["TOTAL S"] = total.S;
+            return row;
+        });
+    };
+
+    // 5. Helper Function: Mengonversi data array menjadi Worksheet
+    const createSheetFromRows = (rows) => {
+        const aoa = [header];
+        rows.forEach(r => {
+            const line = header.map(h => (r[h] !== undefined && r[h] !== null) ? r[h] : "");
             aoa.push(line);
         });
         return XLSX.utils.aoa_to_sheet(aoa);
     };
 
-    // 5. Logika Pemisahan Sheet
+    // 6. Logika Ekspor Berdasarkan Pilihan
     if (selectedClass === "SEMUA") {
-        // A. Jika Pilih SEMUA KELAS:
-        // Ambil daftar kelas unik hanya yang ada di sesi tersebut (Pagi/Siang)
-        const filteredSiswaBySession = state.master.siswa.filter(s => 
-            (s.sesi || 'Pagi').toLowerCase() === session.toLowerCase()
-        );
-        const listKelasUnik = [...new Set(filteredSiswaBySession.map(s => s.kelas))].sort();
+        showToast("⏳ Memproses Seluruh Kelas (Pagi & Siang)...");
+
+        // Ambil DAFTAR KELAS UNIK dari seluruh database siswa (mengabaikan filter sesi UI)
+        const listKelasUnik = [...new Set(state.master.siswa.map(s => s.kelas))].sort();
 
         if (listKelasUnik.length === 0) {
-            showToast("❌ Tidak ada data siswa di sesi ini");
+            showToast("❌ Database siswa kosong");
             return;
         }
 
-        // Looping untuk setiap kelas dan buat sheet tersendiri
+        // Buat satu sheet untuk setiap kelas yang ditemukan
         listKelasUnik.forEach(namaKelas => {
-            const dataMatriks = formatMatrixData('siswa', session, namaKelas, month, year);
-            if (dataMatriks.length > 0) {
-                const ws = createSheetFromData(dataMatriks);
+            // Ambil semua siswa di kelas tersebut (mencakup siswa Pagi & Siang jika ada)
+            const siswaDiKelasIni = state.master.siswa.filter(s => s.kelas === namaKelas);
+            
+            if (siswaDiKelasIni.length > 0) {
+                const rows = getStudentDataRows(siswaDiKelasIni);
+                const ws = createSheetFromRows(rows);
                 
-                // Excel limit: Nama sheet maks 31 karakter & tidak boleh ada karakter khusus
-                const safeName = namaKelas.substring(0, 31).replace(/[:\\\/\?\*\[\]]/g, "_");
-                XLSX.utils.book_append_sheet(wb, ws, safeName);
+                // Aturan Excel: Nama sheet maks 31 karakter & tanpa karakter terlarang
+                const safeSheetName = namaKelas.substring(0, 31).replace(/[:\\\/\?\*\[\]]/g, "_");
+                XLSX.utils.book_append_sheet(wb, ws, safeSheetName);
             }
         });
 
-        showToast(`✅ Berhasil menyusun ${listKelasUnik.length} kelas`);
+        showToast(`✅ Berhasil menyusun ${listKelasUnik.length} Sheet Kelas`);
 
     } else {
-        // B. Jika Pilih SATU KELAS tertentu:
-        const dataMatriks = formatMatrixData('siswa', session, selectedClass, month, year);
+        // Logika untuk SATU KELAS tertentu (mengambil semua siswa di kelas tersebut lintas sesi)
+        const siswaKelasSpesifik = state.master.siswa.filter(s => s.kelas === selectedClass);
         
-        if (dataMatriks.length === 0) {
-            showToast("❌ Data kelas ini kosong");
+        if (siswaKelasSpesifik.length === 0) {
+            showToast("❌ Data kelas tidak ditemukan");
             return;
         }
 
-        const ws = createSheetFromData(dataMatriks);
-        const safeName = selectedClass.substring(0, 31).replace(/[:\\\/\?\*\[\]]/g, "_");
-        XLSX.utils.book_append_sheet(wb, ws, safeName);
+        const rows = getStudentDataRows(siswaKelasSpesifik);
+        const ws = createSheetFromRows(rows);
+        const safeSheetName = selectedClass.substring(0, 31).replace(/[:\\\/\?\*\[\]]/g, "_");
         
+        XLSX.utils.book_append_sheet(wb, ws, safeSheetName);
         showToast(`✅ Rekap Kelas ${selectedClass} Berhasil`);
     }
 
-    // 6. Proses Unduh File
-    const filename = safeFilename(`REKAP_SISWA_${selectedClass}_${session}_${month}_${year}.xlsx`);
+    // 7. Proses Unduh
+    const fileSessionLabel = selectedClass === "SEMUA" ? "SEMUA_SESI" : downloadSessionSiswa.toUpperCase();
+    const filename = safeFilename(`REKAP_SISWA_${selectedClass}_${fileSessionLabel}_${month}_${year}.xlsx`);
+    
     downloadXLSX(wb, filename);
 };
 
