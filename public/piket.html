@@ -74,7 +74,7 @@
             <div class="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md">
                 <i class="fas fa-user-shield text-4xl"></i>
             </div>
-            <h1 class="text-2xl font-black tracking-tight">E-PIKETTT</h1>
+            <h1 class="text-2xl font-black tracking-tight">E-PIKET</h1>
             <p class="text-[10px] font-bold opacity-80 uppercase tracking-widest mt-1">SMK PGRI 2 KEDONDONG</p>
         </div>
         <div class="w-full max-w-xs bg-white rounded-3xl p-6 shadow-2xl">
@@ -628,23 +628,25 @@
 
 
         // --- LOGIKA NAVIGASI ---
-        window.switchTab = (tab) => {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active', 'text-red-600'));
-            
-            document.getElementById(`tab-${tab}`).classList.add('active');
-            document.getElementById(`nav-${tab}`).classList.add('active', 'text-red-600');
+window.switchTab = (tab) => {
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active', 'text-red-600'));
+    
+    document.getElementById(`tab-${tab}`).classList.add('active');
+    document.getElementById(`nav-${tab}`).classList.add('active', 'text-red-600');
 
-            if (tab !== 'config') {
-                document.getElementById('kesiswaan-lock').classList.remove('hidden');
-                document.getElementById('kesiswaan-content').classList.add('hidden');
-                document.getElementById('kesiswaan-pass').value = '';
-            }
+    if (tab !== 'config') {
+        document.getElementById('kesiswaan-lock').classList.remove('hidden');
+        document.getElementById('kesiswaan-content').classList.add('hidden');
+        document.getElementById('kesiswaan-pass').value = '';
+    }
 
-            if(tab === 'download') updateClassListDropdown();
-            if(tab === 'profil') window.renderProfilList();
-            refreshUI();
-        };
+    // PERBAIKAN DI SINI
+    if(tab === 'download') { if(typeof updateDownloadClassList === 'function') {updateDownloadClassList(state.activeSession); }}
+    
+    if(tab === 'profil') { if(typeof window.renderProfilList === 'function') {window.renderProfilList();} }
+    refreshUI();
+};
 
         
 
