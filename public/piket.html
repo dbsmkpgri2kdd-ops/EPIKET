@@ -99,10 +99,11 @@
         </div>
     </div>
 
+
     <!-- App Content -->
     <div id="app-content">
-        <header class="bg-red-600 text-white p-4 sticky top-0 z-50 shadow-lg rounded-b-[2rem]">
-            <div class="max-w-md mx-auto flex justify-between items-center">
+        <header class="sticky top-0 z-50">
+            <div class="max-w-md mx-auto bg-red-600 text-white p-4 shadow-lg rounded-b-[2.5rem] flex justify-between items-center px-6">
                 <div class="flex flex-col text-left">
                     <span class="text-[9px] font-black opacity-70 tracking-widest leading-none">E-PIKET</span>
                     <h1 class="text-xs font-black uppercase">SMK PGRI 2 KEDONDONG</h1>
@@ -538,14 +539,29 @@
                         <button onclick="unlockDb()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-[10px] uppercase active:scale-95 transition">BUKA AKSES</button>
                     </div>
 
-                    <div id="kesiswaan-content" class="hidden text-left">
-                        <div class="flex items-center justify-between mb-4 pb-2 border-b">
-                            <h3 class="text-xs font-black text-red-600 uppercase">Database Master</h3>
-                        </div>
-                        <textarea id="sheet-url" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[10px] h-28 mb-4 outline-none font-mono focus:ring-2 focus:ring-red-500" placeholder="CSV Google Sheets URL"></textarea>
-                        <button onclick="saveAndSync()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black text-xs uppercase shadow-lg shadow-red-200 active:scale-95 transition flex items-center justify-center gap-2"><i class="fas fa-cloud-upload-alt"></i> SIMPAN & UPDATE</button>
-                    </div>
-                </div>
+		<div id="kesiswaan-content" class="hidden text-left">
+		    <div class="flex items-center justify-between mb-4 pb-2 border-b">
+		        <h3 class="text-xs font-black text-red-600 uppercase">Database Master</h3>
+		    </div>
+		   <!-- Tombol Langsung ke Google Sheets -->
+		    <a href="https://docs.google.com/spreadsheets/d/16P8Xa3WFx7y6JKG8vZfL2Tp31Ppchs9b/edit?usp=sharing&ouid=106742461028090272241&rtpof=true&sd=true" target="_blank" 
+		       class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-[10px] uppercase mb-4 active:scale-95 transition flex items-center justify-center gap-3 shadow-xl">
+		        <i class="fas fa-table text-green-400"></i> BUKA SPREADSHEET MASTER
+		    </a>
+
+		    <p class="text-[9px] font-bold text-slate-400 uppercase mb-2 ml-1">Link CSV Google Sheets</p>
+
+		    <textarea id="sheet-url" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[10px] h-28 mb-4 outline-none font-mono focus:ring-2 focus:ring-red-500" placeholder="CSV Google Sheets URL"></textarea>
+		    <button onclick="saveAndSync()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black text-xs uppercase shadow-lg shadow-red-200 active:scale-95 transition flex items-center justify-center gap-2"><i class="fas fa-cloud-upload-alt"></i> SIMPAN & UPDATE</button>
+
+		    <div class="mt-8 pt-6 border-t border-dashed border-slate-200">
+		        <p class="text-[9px] font-bold text-slate-400 uppercase mb-3 text-center">WARNING!</p>
+		        <button onclick="resetAllFirebaseData()" class="w-full bg-white text-red-600 border-2 border-red-600 py-4 rounded-2xl font-black text-xs uppercase active:bg-red-50 transition flex items-center justify-center gap-2">
+		            <i class="fas fa-eraser"></i> Kosongkan Semua Riwayat
+		        </button>
+		        <p class="text-[8px] text-slate-400 mt-2 text-center leading-relaxed italic">Catatan: Gunakan tombol ini hanya saat memulai tahun ajaran baru untuk menghapus seluruh riwayat absen & pembinaan.</p>
+		    </div>
+		</div>
             </div>
         </main>
 
@@ -588,8 +604,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+	import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc, getDocs, query, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         // --- KONFIGURASI FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyC8KQzupwLouy6zSxiz5V5-kB6jPvigCII",
@@ -718,72 +733,58 @@ window.switchTab = (tab) => {
         };
 
 
-        window.renderPopularData = () => {
-            const body = document.getElementById('popular-data-body');
-            const agg = {};
+// Tambahkan di global state
+window.state.cachedPopularHTML = "";
 
-            // 🔥 BATAS 6 BULAN TERAKHIR
-            const today = new Date();
-            const sixMonthsAgo = new Date();
-            sixMonthsAgo.setMonth(today.getMonth() - 6);
+window.calculatePopularData = () => {
+    const agg = {};
+    const today = new Date();
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(today.getMonth() - 6);
 
-            Object.keys(state.records).forEach(dateStr => {
-                  const recordDate = new Date(dateStr + 'T00:00:00');
+    Object.keys(state.records).forEach(dateStr => {
+        const recordDate = new Date(dateStr + 'T00:00:00');
+        if (recordDate < sixMonthsAgo) return;
 
-                  if (recordDate < sixMonthsAgo) return;
-
-                  Object.values(state.records[dateStr] || {}).forEach(rec => {
-                      const person = state.master.siswa.find(s => s.id === rec.personId);
-                      if (!person) return;
-
-                      if (!agg[rec.personId]) {
-                          agg[rec.personId] = { B: 0, A: 0, I: 0, S: 0, T: 0 };
-                      }
-
-                      if (rec.status === 'Bolos') { agg[rec.personId].B++; agg[rec.personId].T++; }
-                      else if (rec.status === 'Alpa') { agg[rec.personId].A++; agg[rec.personId].T++; }
-                      else if (rec.status === 'Izin') { agg[rec.personId].I++; agg[rec.personId].T++; }
-                      else if (rec.status === 'Sakit') { agg[rec.personId].S++; agg[rec.personId].T++; }
-                  });
-              });
-
-
-            const sorted = Object.entries(agg)
-                .map(([id, data]) => ({ id, ...data }))
-                .sort((a, b) => b.T - a.T)
-                .slice(0, 100); // ✅ TOP 100 SAJA
-
-            if (sorted.length === 0) {
-                body.innerHTML = `
-                  <tr>
-                    <td colspan="6" class="text-center py-8 text-[8px] font-bold text-slate-300 italic uppercase">
-                      Belum ada data 6 bulan terakhir
-                    </td>
-                  </tr>`;
-                return;
+        Object.values(state.records[dateStr] || {}).forEach(rec => {
+            if (!agg[rec.personId]) {
+                agg[rec.personId] = { B: 0, A: 0, I: 0, S: 0, T: 0 };
             }
+            if (rec.status === 'Bolos') { agg[rec.personId].B++; agg[rec.personId].T++; }
+            else if (rec.status === 'Alpa') { agg[rec.personId].A++; agg[rec.personId].T++; }
+            else if (rec.status === 'Izin') { agg[rec.personId].I++; agg[rec.personId].T++; }
+            else if (rec.status === 'Sakit') { agg[rec.personId].S++; agg[rec.personId].T++; }
+        });
+    });
 
-            body.innerHTML = sorted.map(item => {
-                const s = state.master.siswa.find(x => x.id === item.id);
-                if (!s) return '';
+    const sorted = Object.entries(agg)
+        .map(([id, data]) => ({ id, ...data }))
+        .sort((a, b) => b.T - a.T)
+        .slice(0, 50); // Batasi top 50 untuk performa
 
-                return `
-                <tr class="border-b border-slate-50">
-                    <td class="px-4 py-3">
-                        <p class="text-[9px] font-black uppercase text-slate-800">${s.nama}</p>
-                        <p class="text-[7px] font-bold text-slate-400 uppercase">${s.kelas}</p>
-                    </td>
-                    <td class="text-center text-[9px] font-bold w-8 text-orange-600">${item.B}</td>
-                    <td class="text-center text-[9px] font-bold w-8 text-red-600">${item.A}</td>
-                    <td class="text-center text-[9px] font-bold w-8 text-blue-600">${item.I}</td>
-                    <td class="text-center text-[9px] font-bold w-8 text-green-600">${item.S}</td>
-                    <td class="text-center w-10">
-                        <span class="text-[10px] font-black text-red-600">${item.T}</span>
-                    </td>
-                </tr>`;
-            }).join('');
-        };
+    window.state.cachedPopularHTML = sorted.map(item => {
+        const s = state.master.siswa.find(x => x.id === item.id);
+        if (!s) return '';
+        return `
+        <tr class="border-b border-slate-50">
+            <td class="px-4 py-3">
+                <p class="text-[9px] font-black uppercase text-slate-800">${s.nama}</p>
+                <p class="text-[7px] font-bold text-slate-400 uppercase">${s.kelas}</p>
+            </td>
+            <td class="text-center text-[9px] font-bold w-8 text-orange-600">${item.B}</td>
+            <td class="text-center text-[9px] font-bold w-8 text-red-600">${item.A}</td>
+            <td class="text-center text-[9px] font-bold w-8 text-blue-600">${item.I}</td>
+            <td class="text-center text-[9px] font-bold w-8 text-green-600">${item.S}</td>
+            <td class="text-center w-10"><span class="text-[10px] font-black text-red-600">${item.T}</span></td>
+        </tr>`;
+    }).join('');
+};
 
+// Fungsi render tinggal memanggil cache
+window.renderPopularData = () => {
+    const body = document.getElementById('popular-data-body');
+    body.innerHTML = window.state.cachedPopularHTML || `<tr><td colspan="6" class="text-center py-8 text-[8px] font-bold text-slate-300 italic uppercase">Belum ada data</td></tr>`;
+};
 
         window.renderRecentLogs = () => {
             const container = document.getElementById('recent-logs');
@@ -851,15 +852,9 @@ const formatMatrixData = (type, sessionFilter, classFilter, month, year) => {
     const rows = [];
 
     list.forEach(p => {
-        const row = {
-            ID: p.id,
-            Nama: p.nama,
-        };
-
+        const row = {ID: p.id, Nama: p.nama, };
         if (type === 'siswa') row.Kelas = p.kelas;
-
         const total = { A: 0, B: 0, I: 0, S: 0, TK: 0, DL: 0 };
-
         for (let d = 1; d <= 31; d++) {
             const date = `${year}-${month}-${String(d).padStart(2, '0')}`;
             
@@ -1415,23 +1410,18 @@ const autoSyncData = async (url) => {
         };
 
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                onSnapshot(
-  collection(db, 'artifacts', appId, 'public', 'data', 'attendance_records'),
+            if (user) {onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'attendance_records'),
   (snap) => {
-      const recs = {};
-      snap.forEach(d => {
-          const data = d.data();
-          if(!recs[data.date]) recs[data.date] = {};
-          recs[data.date][`${data.personId}_${data.session}`] = data;
-      });
-
-      console.log("🔥 FIRESTORE RECORDS:", recs); // 👈 TAMBAHKAN INI
-
-      state.records = recs; 
-      refreshUI();
-  }
-);
+    const recs = {};
+    snap.forEach(d => {
+        const data = d.data();
+        if(!recs[data.date]) recs[data.date] = {};
+        recs[data.date][`${data.personId}_${data.session}`] = data;
+    });
+    state.records = recs; 
+    window.calculatePopularData(); 
+    refreshUI();
+});
 
 
                 // AUTO-SYNC MASTER DATA DARI FIREBASE SETIAP KALI PIKET LOGIN
@@ -1444,6 +1434,54 @@ const autoSyncData = async (url) => {
                 });
             }
         });
+
+window.resetAllFirebaseData = async () => {
+    // 1. Konfirmasi ganda untuk keamanan
+    const confirm1 = confirm("⚠️ PERINGATAN! Anda akan menghapus SELURUH data absensi dan catatan pembinaan siswa.");
+    if (!confirm1) return;
+
+    const confirm2 = prompt("Ketik 'HAPUS' untuk mengonfirmasi pembersihan data ajaran baru:");
+    if (confirm2 !== 'HAPUS') {
+        alert("Konfirmasi gagal. Data tidak dihapus.");
+        return;
+    }
+
+    showToast("⏳ Memulai pembersihan data...");
+
+    try {
+        const batch = writeBatch(db);
+        
+        // A. Hapus Koleksi attendance_records
+        const attendanceRef = collection(db, 'artifacts', appId, 'public', 'data', 'attendance_records');
+        const attendanceSnap = await getDocs(attendanceRef);
+        attendanceSnap.forEach((d) => {
+            batch.delete(d.ref);
+        });
+
+        // B. Hapus Koleksi student_notes (Catatan Pembinaan)
+        const notesRef = collection(db, 'artifacts', appId, 'public', 'data', 'student_notes');
+        const notesSnap = await getDocs(notesRef);
+        notesSnap.forEach((d) => {
+            batch.delete(d.ref);
+        });
+
+        // Eksekusi Batch Delete
+        await batch.commit();
+
+        showToast("✅ Firebase Berhasil Dibersihkan!");
+        setTimeout(() => {
+            location.reload(); // Refresh aplikasi agar tampilan bersih
+        }, 1500);
+
+    } catch (e) {
+        console.error("Error Reset:", e);
+        showToast("❌ Gagal menghapus data: " + e.message);
+    }
+};
+
+
+
+
 
 window.onload = () => { 
     setupAuth(); 
@@ -1610,11 +1648,13 @@ window.openEditor = async (id) => {
     document.getElementById('wrapper-note-form').classList.add('hidden');
     document.getElementById('btn-toggle-note').classList.remove('hidden');
     document.getElementById('editor-modal').style.display = 'flex';
+    document.body.style.height = '100vh';
     document.body.style.overflow = 'hidden'; // Lock background scroll
 };
 
 window.closeEditor = () => {
     document.getElementById('editor-modal').style.display = 'none';
+    document.body.style.height = 'auto';
     document.body.style.overflow = 'auto'; // Unlock background scroll
 };
 
