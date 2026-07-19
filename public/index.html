@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="BioScanSTM">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
-    <link rel="manifest" href="manifest.json">
+    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -18,17 +18,16 @@
     <script> tailwind.config = {darkMode: 'class', } </script>    
     <style>
         body { transition: background-color 0.4s, color 0.4s; -webkit-tap-highlight-color: transparent; }
-        .video-container { position: relative; width: 100%; max-width: 640px; margin: auto; display: flex; justify-content: center; align-items: center; }
-	.video-fullscreen { position: fixed !important; top: 0; left: 0; width: 100vw !important; height: 100vh !important; z-index: 9999; background: black; border-radius: 0 !important; }
-        canvas { position: absolute; top: 0; left: 0; width: 100% !important; height: auto !important; pointer-events: none; }
-	.video-fullscreen canvas { width: 100% !important; height: 100% !important; }
+        .video-container { position: relative; width: 100%; max-width: 640px; margin: auto; display: flex; justify-content: center; align-items: center; overflow: hidden; border-radius: 1rem; }
+	    .video-fullscreen { position: fixed !important; top: 0; left: 0; width: 100vw !important; height: 100vh !important; z-index: 9999; background: black; border-radius: 0 !important; }
+        canvas { position: absolute; top: 0; left: 0; width: 100% !important; height: 100% !important; pointer-events: none; z-index: 10; }
         .tab-content { display: none; } 
         .tab-content.active { display: block; }
         #log-content::-webkit-scrollbar { width: 4px; }
         #log-content::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-	#face-silhouette svg { animation: pulse 2s infinite; }
-	.face-mask-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.6); /* Area luar wajah lebih gelap */ -webkit-mask-image: radial-gradient(ellipse 45% 60% at 50% 50%, transparent 100%, black 100%); mask-image: radial-gradient(ellipse 45% 60% at 50% 50%, transparent 100%, black 100%); pointer-events: none; }
-	@keyframes pulse {0% { opacity: 0.3; transform: scale(0.95); } 50% { opacity: 0.6; transform: scale(1); } 100% { opacity: 0.3; transform: scale(0.95); } }
+	    #face-silhouette svg { animation: pulse 2s infinite; }
+	    .face-mask-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); -webkit-mask-image: radial-gradient(ellipse 45% 60% at 50% 50%, transparent 100%, black 100%); mask-image: radial-gradient(ellipse 45% 60% at 50% 50%, transparent 100%, black 100%); pointer-events: none; z-index: 5; }
+	    @keyframes pulse {0% { opacity: 0.3; transform: scale(0.95); } 50% { opacity: 0.6; transform: scale(1); } 100% { opacity: 0.3; transform: scale(0.95); } }
     </style>
 
     <script>
@@ -84,9 +83,11 @@
 	        </div>
 
 	        <div id="gps-status" class="mb-4 p-3 rounded-xl text-center font-bold bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800 text-[10px] uppercase">Menunggu GPS...</div>
-	        <div class="video-container bg-black rounded-2xl overflow-hidden border-4 border-gray-100 dark:border-slate-800 aspect-video shadow-inner relative">
-	            <video id="video" class="w-full h-full object-cover" autoplay muted playsinline></video>
-	            <div id="face-silhouette" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+	            <div class="video-container bg-black rounded-2xl overflow-hidden border-4 border-gray-100 dark:border-slate-800 aspect-video shadow-inner relative" id="camera-wrapper">>
+			<video id="video" class="w-full h-full object-cover" autoplay muted playsinline></video>
+			<!-- Overlay Pemindai Baru -->
+    			<div class="face-mask-overlay"></div> 
+			<div id="face-silhouette" class="absolute inset-0 flex items-center justify-center pointer-events-none">
 	                <svg id="face-silhouette-svg" class="w-64 h-64 text-white/30 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.5">
 	                    <!-- Garis Kepala --><path d="M12 21C16.4183 21 20 17.4183 20 13C20 8.58172 16.4183 5 12 5C7.58172 5 4 8.58172 4 13C4 17.4183 7.58172 21 12 21Z" />
 	                    <!-- Area Mata & Hidung --><path d="M12 18C14.2091 18 16 16.2091 16 14C16 11.7909 14.2091 10 12 10C9.79086 10 8 11.7909 8 14C8 16.2091 9.79086 18 12 18Z" />
@@ -203,6 +204,11 @@ const ABSENSI_PATH = `artifacts/${APP_PATH}/public/records`;
 let siswaData = [], settings = {}, isLocationValid = false;
 let faceMatcher = null, lastAttendance = {};
 let currentFacingMode = "user", currentStream = null;
+let watchId = null, isProcessing = false;
+let lastX = 0, lastY = 0; 
+let currentTab = 'absensi'; // Tracker tab aktif
+
+const faceOptions = new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.5 });
 const video = document.getElementById('video');
 const logContent = document.getElementById('log-content');
 const gpsStatus = document.getElementById('gps-status');
@@ -214,15 +220,21 @@ window.onload = async () => {
 };
 
 async function loadModels() {
-        addLog("⏳ Memuat AI...");
-        const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
-        try {
-            await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-            await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-            await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-            addLog("✅ AI Siap.");
-        } catch (e) { addLog("❌ Gagal AI: " + e.message); }
+    addLog("⏳ Memuat AI...");
+    const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/';
+    try {
+        // Muat semua model secara bersamaan (Parallel)
+        await Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+            faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+            faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+        ]);
+        addLog("✅ AI Siap digunakan.");
+    } catch (e) { 
+        addLog("❌ Gagal memuat AI: " + e.message);
+        showToast("Gagal memuat AI. Cek koneksi internet!", "error");
     }
+}
 
 // ================== CAMERA & FACE CORE ==================
 async function startVideo() {
@@ -241,74 +253,237 @@ function switchCamera() {
 }
 
 
+const localDB = new Dexie("BioScanDB");
+localDB.version(1).stores({
+    faces: "nis, nama, kelas, descriptor"
+});
+
+// Update fungsi syncFaceDatabase
 async function syncFaceDatabase() {
-    addLog("🔄 Sinkronisasi wajah (Firestore)...");
+    addLog("🔄 Mengecek Database Wajah...");
     try {
-        // Mengakses koleksi biometrics di dalam path public
+        // 1. Cek jumlah data lokal
+        const localCount = await localDB.faces.count();
+        
+        // 2. Ambil data terbaru dari Firestore
         const snapshot = await db.collection("artifacts").doc(APP_PATH)
                                   .collection("public").doc("biometrics")
                                   .collection("face_data").get();
-        if (snapshot.empty) return addLog("⚠️ Database Wajah Kosong.");
-        const labeled = [];
-        snapshot.forEach(doc => {
-            const user = doc.data();
-            if (user.descriptor) {
-                const desc = new Float32Array(JSON.parse(user.descriptor));
-                labeled.push(new faceapi.LabeledFaceDescriptors(user.nis, [desc]));
-            }
-        });
-        faceMatcher = new faceapi.FaceMatcher(labeled, 0.45);
-        addLog("✅ Database Wajah Sinkron.");
-    } catch (e) { addLog("❌ Gagal: " + e.message); }
+        
+        if (snapshot.size !== localCount) {
+            addLog("📥 Mengunduh Data Wajah Baru...");
+            const faceDataArray = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                faceDataArray.push({
+                    nis: data.nis,
+                    nama: data.nama,
+                    kelas: data.kelas,
+                    descriptor: JSON.parse(data.descriptor)
+                });
+            });
+
+            await localDB.faces.clear();
+            await localDB.faces.bulkPut(faceDataArray);
+            addLog(`✅ ${faceDataArray.length} Wajah Tersimpan Lokal.`);
+        }
+
+        // 3. Load ke FaceMatcher
+        const allFaces = await localDB.faces.toArray();
+        const labeled = allFaces.map(f => 
+            new faceapi.LabeledFaceDescriptors(f.nis, [new Float32Array(f.descriptor)])
+        );
+
+        if (labeled.length > 0) {
+            faceMatcher = new faceapi.FaceMatcher(labeled, 0.45);
+            addLog("Ready: AI siap mengenali wajah.");
+        } else {
+            addLog("⚠️ Database Wajah Kosong.");
+        }
+    } catch (e) {
+        addLog("❌ Sync Gagal: " + e.message);
+    }
 }
-let faceDetectionInterval;
-// Perbaikan pada interval deteksi agar tidak lag
+
+// 1. TAMBAHKAN FUNGSI TOAST (WAJIB ADA)
+function showToast(msg, type = "info") {
+    const toast = document.createElement("div");
+    toast.className = `fixed bottom-24 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl text-white text-xs font-bold shadow-2xl transition-all duration-500 z-[10000] ${
+        type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600'
+    }`;
+    toast.innerText = msg.toUpperCase();
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translate(-50%, 20px)";
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
+
+// 2. PERBAIKAN GPS TRACKING (DENGAN CEK AKURASI)
+function startGpsTracking() {
+    if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+    addLog("📡 Memulai GPS akurasi tinggi...");
+    
+    watchId = navigator.geolocation.watchPosition(p => {
+        const { latitude, longitude, accuracy } = p.coords;
+
+        if (!settings.lat || !settings.lng) {
+            gpsStatus.innerText = "⚠️ KOORDINAT TARGET BELUM DISET";
+            return;
+        }
+
+        const dist = calculateDistance(latitude, longitude, settings.lat, settings.lng);
+        
+        // VALIDASI AKURASI: Jika akurasi > 50 meter, anggap sinyal tidak sah
+        if (accuracy > 50) {
+            gpsStatus.innerText = `📡 SINYAL LEMAH (${Math.round(accuracy)}m). CARI TEMPAT TERBUKA!`;
+            gpsStatus.className = "bg-orange-500 text-white p-2 rounded-lg text-[10px] font-bold";
+            isLocationValid = false;
+        } else {
+            isLocationValid = dist <= (settings.radius || 30);
+            if (isLocationValid) {
+                gpsStatus.innerText = `📍 AREA SEKOLAH (Jarak: ${Math.round(dist)}m | Akurasi: ${Math.round(accuracy)}m)`;
+                gpsStatus.className = "bg-green-600 text-white p-2 rounded-lg text-[10px] font-bold";
+            } else {
+                gpsStatus.innerText = `🚫 DI LUAR AREA (Jarak: ${Math.round(dist)}m)`;
+                gpsStatus.className = "bg-red-600 text-white p-2 rounded-lg text-[10px] font-bold";
+            }
+        }
+    }, (err) => {
+        let msg = "GPS MATI";
+        if (err.code === 1) msg = "IZINKAN LOKASI DI BROWSER!";
+        gpsStatus.innerText = "🚫 " + msg;
+        gpsStatus.className = "bg-red-700 text-white p-2 rounded-lg text-[10px] font-bold";
+    }, { 
+        enableHighAccuracy: true, // WAJIB TRUE untuk geofencing
+        timeout: 10000, 
+        maximumAge: 0 
+    });
+}
+
+// 3. SATU FUNGSI DETEKSI WAJAH YANG SOLID
 async function initFaceDetection() {
     video.onplay = () => {
         const canvas = faceapi.createCanvasFromMedia(video);
+        const container = document.querySelector('.video-container');
+        container.append(canvas);
         const displaySize = { width: video.offsetWidth, height: video.offsetHeight };
         faceapi.matchDimensions(canvas, displaySize);
-        document.querySelector('.video-container').append(canvas);
 
-        if (faceDetectionInterval) clearInterval(faceDetectionInterval);
-        
-        faceDetectionInterval = setInterval(async () => {
-            // Tambahkan pengecekan visibilitas tab untuk hemat baterai
-            if (!isLocationValid || !faceMatcher || document.hidden) return;
+        let lastProcessTime = 0; // Untuk throttling
 
-            const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-                .withFaceLandmarks()
-                .withFaceDescriptors();
+        const runDetection = async (now) => {
+            // Berhenti jika tab tidak aktif atau video mati
+            if (document.hidden || currentTab !== 'absensi' || video.paused || video.ended) {
+                requestAnimationFrame(runDetection);
+                return;
+            }
 
-            const resized = faceapi.resizeResults(detections, displaySize);
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // HANYA JALANKAN SETIAP 500ms (0.5 detik)
+            if (now - lastProcessTime > 500) {
+                lastProcessTime = now;
 
-            resized.forEach(det => {
-                const match = faceMatcher.findBestMatch(det.descriptor);
-                // Threshold 0.45 sudah bagus, tapi 0.40 lebih aman dari false positive
-                if (match.label !== 'unknown' && match.distance < 0.42) {
-                    recordAttendance(match.label);
+                const detection = await faceapi.detectSingleFace(video, faceOptions)
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (detection && isLocationValid && faceMatcher) {
+                    const resized = faceapi.resizeResults(detection, displaySize);
+                    
+                    // Liveness Check: Gerakan wajah minimal
+                    const nose = detection.landmarks.getNose()[3]; 
+                    const movement = Math.abs(nose.x - lastX) + Math.abs(nose.y - lastY);
+                    const isAlive = movement > 0.3 && movement < 15; 
+                    lastX = nose.x; lastY = nose.y;
+
+                    const match = faceMatcher.findBestMatch(detection.descriptor);
+                    
+                    if (match.label !== 'unknown' && match.distance < 0.45 && isAlive) {
+                        if (!isProcessing) {
+                            isProcessing = true;
+                            await recordAttendance(match.label);
+                            // Jeda 5 detik sebelum bisa absen orang berikutnya
+                            setTimeout(() => { isProcessing = false; }, 5000); 
+                        }
+                        ctx.strokeStyle = '#10b981'; // Hijau jika dikenal
+                    } else {
+                        ctx.strokeStyle = '#3b82f6'; // Biru jika mencari
+                    }
+                    // Gambar kotak tipis saja agar tidak mengganggu pandangan
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(resized.detection.box.x, resized.detection.box.y, resized.detection.box.width, resized.detection.box.height);
                 }
-                
-                // Gambar hanya jika perlu debugging
-                new faceapi.draw.DrawBox(det.detection.box, { 
-                    label: match.toString(),
-                    boxColor: match.label !== 'unknown' ? '#10b981' : '#ef4444'
-                }).draw(canvas);
-            });
-        }, 800); // Interval 800ms adalah sweet spot antara akurasi dan performa
+            }
+            requestAnimationFrame(runDetection);
+        };
+        requestAnimationFrame(runDetection);
     };
 }
 
+// 4. PERBAIKAN FUNGSI REGISTER (UPDATE DEXIE SECARA INSTAN)
+async function registerFace() {
+    const nama = document.getElementById('reg-siswa').value;
+    const kelas = document.getElementById('reg-kelas').value;
+    
+    if (!nama) {
+        showToast("Pilih nama siswa dulu!", "error");
+        return;
+    }
 
-// ================== LOGIKA ABSENSI TERINTEGRASI ==================
+    if (!confirm(`Daftarkan wajah ${nama}? Data lama (jika ada) akan ditimpa.`)) return;
+
+    const regStatus = document.getElementById('reg-status');
+    regStatus.innerText = "⏳ MEMINDAI... JANGAN BERGERAK";
+
+    try {
+        // Gunakan detektor yang lebih akurat khusus pendaftaran
+        const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 320 }))
+            .withFaceLandmarks()
+            .withFaceDescriptor();
+
+        if (!detection) throw new Error("Wajah tidak jelas, coba lagi.");
+
+        const nisSiswa = siswaData.find(s => s.nama === nama)?.nis;
+        const descriptorArray = Array.from(detection.descriptor);
+        
+        await db.collection("artifacts").doc(APP_PATH)
+            .collection("public").doc("biometrics")
+            .collection("face_data").doc(nisSiswa).set({
+                nis: nisSiswa, nama, kelas,
+                descriptor: JSON.stringify(descriptorArray),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+        // Update database lokal saat itu juga
+        await localDB.faces.put({ nis: nisSiswa, nama, kelas, descriptor: descriptorArray });
+
+        showToast("REGISTRASI BERHASIL", "success");
+        regStatus.innerText = "✅ SELESAI";
+        
+        // Refresh matcher agar siswa bisa langsung absen
+        await syncFaceDatabase(); 
+
+    } catch (e) {
+        showToast(e.message, "error");
+        regStatus.innerText = "❌ GAGAL";
+    }
+}
+
+// ================== LOGIKA ABSENSI TERINTEGRASI (VERSI TEROPTIMASI) ==================
 async function recordAttendance(nis) {
     const now = new Date();
     const siswa = siswaData.find(s => s.nis === nis);
     
-    // Validasi data dan batasi absensi berulang (jedanya 1 menit)
-    if (!siswa || (lastAttendance[nis] && Date.now() - lastAttendance[nis] < 60000)) return;
+    // 1. Validasi & Cooldown (Cegah absensi ganda dalam 1 menit)
+    if (!siswa) return;
+    if (lastAttendance[nis] && (Date.now() - lastAttendance[nis] < 60000)) {
+        console.log(`Menunggu cooldown untuk: ${siswa.nama}`);
+        return;
+    }
     
     const type = document.querySelector('input[name="absensi-type"]:checked').value;
     const tgl = now.toISOString().split('T')[0];
@@ -319,52 +494,73 @@ async function recordAttendance(nis) {
         nama: siswa.nama, 
         nis: siswa.nis, 
         kelas: siswa.kelas,
-        type: type, // "Masuk" atau "Pulang"
+        type: type, 
         waktu: waktu,
         tanggal: tgl,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        timestamp: firebase.firestore.FieldValue.serverTimestamp() // Waktu Server Anti-Cheat
     };
 
-    // Feedback Visual: Ubah warna siluet menjadi hijau saat wajah dikenali
+    // Feedback Visual: Ubah warna siluet & animasi
     const silhouette = document.getElementById('face-silhouette-svg');
-    if (silhouette) silhouette.classList.add('text-green-500', 'scale-110');
+    if (silhouette) {
+        silhouette.classList.remove('text-white/30');
+        silhouette.classList.add('text-green-500', 'scale-110');
+    }
 
     try {
-        // A. SIMPAN KE FIRESTORE (Untuk Laporan di Aplikasi)
-        const updateData = { ...data };
-        if (type.toLowerCase() === 'masuk') updateData.masuk = now.toISOString();
-        else updateData.pulang = now.toISOString();
+        // A. SIMPAN KE FIRESTORE
+        const docRef = db.collection("artifacts").doc(APP_PATH)
+                         .collection("public").doc("records")
+                         .collection(tgl).doc(nis);
 
-        await db.collection("artifacts").doc(APP_PATH)
-                .collection("public").doc("records")
-                .collection(tgl).doc(nis).set(updateData, { merge: true });
-        
+        const updateData = { ...data };
+        // Mencatat waktu spesifik masuk/pulang dalam format ISO
+        if (type === "Masuk") {
+            updateData.masuk = now.toISOString();
+        } else {
+            updateData.pulang = now.toISOString();
+        }
+
+        await docRef.set(updateData, { merge: true });
         addLog(`✅ Firestore: ${siswa.nama} (${type})`);
 
-        // B. KIRIM KE GOOGLE SHEETS (Via URL Backend yang tersimpan)
+        // B. KIRIM KE GOOGLE SHEETS (Via Backend Apps Script)
         if (settings.endpointUrl) {
+            // Mode 'no-cors' penting agar fetch tidak di-block oleh browser
             fetch(settings.endpointUrl, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
+            }).then(() => {
+                addLog(`🚀 Spreadsheet: Data terkirim.`);
+            }).catch(err => {
+                addLog(`⚠️ Spreadsheet Gagal: ${err.message}`);
             });
-            addLog(`🚀 Spreadsheet: Data terkirim.`);
+        }
+        
+        // Munculkan notifikasi sukses
+        if (typeof showToast === "function") {
+            showToast(`${type} Berhasil: ${siswa.nama}`, "success");
         }
 
     } catch (e) {
-        // C. BACKUP OFFLINE (Jika koneksi internet terputus)
+        // C. BACKUP OFFLINE (Jika internet terputus)
+        addLog(`⚠️ Offline: Tersimpan lokal.`);
         let offlineData = JSON.parse(localStorage.getItem('offline_logs') || "[]");
-        offlineData.push({...data, isSync: false});
+        offlineData.push({...data, isSync: false, error: e.message});
         localStorage.setItem('offline_logs', JSON.stringify(offlineData));
-        addLog(`⚠️ Offline: ${siswa.nama} tersimpan lokal.`);
     } finally {
-        // Kembalikan efek visual siluet setelah 1.5 detik
+        // Kembalikan efek visual siluet setelah 2 detik
         setTimeout(() => {
-            if (silhouette) silhouette.classList.remove('text-green-500', 'scale-110');
-        }, 1500);
+            if (silhouette) {
+                silhouette.classList.remove('text-green-500', 'scale-110');
+                silhouette.classList.add('text-white/30');
+            }
+        }, 2000);
     }
     
+    // Update cooldown & Suara
     lastAttendance[nis] = Date.now();
     speak(`${siswa.nama} ${type}`);
 }
@@ -376,51 +572,6 @@ function autoSelectType() { const jam = new Date().getHours(); document.querySel
 function isValidSession(sesi) { const jam = new Date().getHours(); if (sesi === "Pagi") return jam >= 6 && jam <= 14; if (sesi === "Siang") return jam >= 11 && jam <= 18; return true; }
 
 // ================== GPS ==================
-let watchId = null; // Variabel global untuk menyimpan ID tracker
-let locationBuffer = [];
-
-function startGpsTracking() {
-    // Pastikan tidak ada tracker ganda yang berjalan
-    if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
-    }
-    addLog("📡 Memulai pelacakan lokasi...");
-    watchId = navigator.geolocation.watchPosition(p => {
-        const userLat = p.coords.latitude;
-        const userLng = p.coords.longitude;
-        // Ambil koordinat target dari settings yang dimuat dari Firestore
-        const targetLat = settings.lat;
-        const targetLng = settings.lng;
-        const radius = settings.radius || 50;
-        if (!targetLat || !targetLng) {
-            gpsStatus.innerText = "⚠️ KOORDINAT BELUM DISET";
-            gpsStatus.className = "bg-yellow-600 text-white p-2 rounded-lg text-[10px]";
-            return;
-        }
-
-        const dist = calculateDistance(userLat, userLng, targetLat, targetLng);
-        locationBuffer.push(dist);
-        if (locationBuffer.length > 3) locationBuffer.shift();
-        const avgDist = locationBuffer.reduce((a, b) => a + b) / locationBuffer.length;
-        isLocationValid = avgDist <= radius;
-        if (isLocationValid) {
-            gpsStatus.innerText = `📍 AREA SEKOLAH (${Math.round(avgDist)}m)`;
-            gpsStatus.className = "bg-green-600 text-white p-2 rounded-lg text-[10px] font-bold";
-        } else {
-            gpsStatus.innerText = `🚫 DI LUAR AREA (${Math.round(avgDist)}m)`;
-            gpsStatus.className = "bg-red-600 text-white p-2 rounded-lg text-[10px] font-bold";
-        }
-    }, (err) => {
-        addLog("❌ GPS Error: " + err.message);
-        gpsStatus.innerText = "🚫 GPS MATI / ERROR";
-        gpsStatus.className = "bg-black text-white p-2 rounded-lg text-[10px]";
-    }, { 
-        enableHighAccuracy: true, 
-        timeout: 10000, 
-        maximumAge: 0 
-    });
-}
-
 // Logika cerdas: Matikan GPS jika aplikasi di-minimize (hemat baterai)
 document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
@@ -585,62 +736,6 @@ function exportLaporan() {
     }).catch(err => alert("Gagal ekspor: " + err.message));
 }
 
-// ================== PENDAFTARAN WAJAH (REGISTRATION) ==================
-async function registerFace() {
-    const regStatus = document.getElementById('reg-status');
-    const nama = document.getElementById('reg-siswa').value;
-    const kelas = document.getElementById('reg-kelas').value;
-    const nisSiswa = siswaData.find(s => s.nama === nama)?.nis;
-
-    if (!nama || !kelas || !nisSiswa) {
-        regStatus.innerText = "❌ Pilih Kelas & Nama dulu!";
-        regStatus.className = "mt-4 font-bold text-sm text-red-500";
-        return;
-    }
-
-    regStatus.innerText = "⏳ Memproses wajah... Jangan bergerak";
-    regStatus.className = "mt-4 font-bold text-sm text-blue-500";
-
-    try {
-        // 1. Deteksi wajah dari video saat ini
-        const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
-            .withFaceLandmarks()
-            .withFaceDescriptor();
-
-        if (!detection) {
-            regStatus.innerText = "❌ Wajah tidak terdeteksi!";
-            regStatus.className = "mt-4 font-bold text-sm text-red-500";
-            return;
-        }
-
-        // 2. Konversi descriptor ke format String agar bisa disimpan di Firestore
-        const descriptorArray = Array.from(detection.descriptor);
-        const descriptorString = JSON.stringify(descriptorArray);
-
-        // 3. Simpan ke Firestore
-        await db.collection("artifacts").doc(APP_PATH)
-            .collection("public").doc("biometrics")
-            .collection("face_data").doc(nisSiswa).set({
-                nis: nisSiswa,
-                nama: nama,
-                kelas: kelas,
-                descriptor: descriptorString,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-
-        regStatus.innerText = `✅ Wajah ${nama} Berhasil Terdaftar!`;
-        regStatus.className = "mt-4 font-bold text-sm text-green-500";
-        
-        // 4. Update database wajah lokal agar bisa langsung absen tanpa refresh
-        addLog(`👤 Wajah baru terdaftar: ${nama}`);
-        await syncFaceDatabase(); 
-
-    } catch (e) {
-        console.error(e);
-        regStatus.innerText = "❌ Gagal menyimpan ke cloud";
-        regStatus.className = "mt-4 font-bold text-sm text-red-500";
-    }
-}
 
 // ================== SETTINGS ==================
 function saveSettings() {
@@ -649,7 +744,7 @@ function saveSettings() {
         endpointUrl: document.getElementById('endpoint-url').value, // URL Backend kini ikut tersimpan
         lat: parseFloat(document.getElementById('target-lat').value) || 0,
         lng: parseFloat(document.getElementById('target-lng').value) || 0,
-        radius: parseInt(document.getElementById('target-radius').value) || 50
+        radius: parseInt(document.getElementById('target-radius').value) || 30
     };
     db.collection("artifacts").doc(APP_PATH)
       .collection("public").doc("config")
@@ -713,26 +808,20 @@ function toggleDarkMode() {
 
 async function switchTab(id) {
     if (id === 'pengaturan') {
-        const token = prompt("Masukkan Token Keamanan:");
-        if (token !== "pengaturan123") { 
-            alert("Akses Ditolak!"); 
-            return; 
-        }
-        // Pindahkan video ke tab pengaturan
-        const placeholder = document.getElementById('camera-placeholder-reg');
-        const videoElement = document.getElementById('video');
-        placeholder.appendChild(videoElement);
-        placeholder.classList.remove('hidden');
-    } else if (id === 'absensi') {
-        // Kembalikan video ke tab absensi
-        const absensiContainer = document.querySelector('#absensi .video-container');
-        const videoElement = document.getElementById('video');
-        absensiContainer.insertBefore(videoElement, absensiContainer.firstChild);
-        document.getElementById('camera-placeholder-reg').classList.add('hidden');
+        const pass = prompt("Password Admin:");
+        if (pass !== "pengaturan123") return showToast("Akses Ditolak!", "error");
     }
-
+    
+    currentTab = id; // Update status tab
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+    
+    // Jika pindah dari absensi, stop video untuk hemat daya (opsional)
+    if (id !== 'absensi') {
+        // video.pause(); // Bisa diaktifkan untuk extreme battery saving
+    } else {
+        video.play();
+    }
     window.scrollTo(0, 0);
 }
 
