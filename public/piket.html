@@ -121,29 +121,51 @@
         <main class="pb-32 p-4 max-w-md mx-auto">
 
 
-            <!-- TAB PROFIL -->
+<!-- TAB PROFIL -->
 <div id="tab-profil" class="tab-content">
     <div class="px-6 py-4 pb-24">
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-xl font-black text-slate-800 tracking-tighter uppercase">Profil Siswa</h2>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Detail & Catatan Pembinaan</p>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pencarian & Filter Data</p>
             </div>
             <div class="w-10 h-10 bg-red-50 rounded-2xl flex items-center justify-center text-red-600">
-                <i class="fas fa-address-card text-lg"></i>
+                <i class="fas fa-filter text-lg"></i>
             </div>
         </div>
         
-        <div class="relative mb-6">
-            <input type="text" id="search-profil" onkeyup="window.renderProfilList()" 
-                   placeholder="Cari Nama atau NIS..." 
-                   class="w-full bg-white border border-slate-200 rounded-2xl py-3.5 px-6 text-[11px] font-bold focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm">
-            <i class="fas fa-search absolute right-6 top-4 text-slate-300"></i>
+        <div class="space-y-3 mb-6">
+            <!-- Search Bar -->
+            <div class="relative">
+                <input type="text" id="search-profil" onkeyup="window.renderProfilList()" 
+                       placeholder="Cari Nama Siswa..." 
+                       class="w-full bg-white border border-slate-200 rounded-2xl py-3.5 px-6 text-[11px] font-bold focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm">
+                <i class="fas fa-search absolute right-6 top-4 text-slate-300"></i>
+            </div>
+
+            <!-- Filter Kelas & Guru Wali -->
+            <div class="grid grid-cols-2 gap-2">
+                <div class="relative">
+                    <select id="filter-profil-kelas" onchange="window.renderProfilList()" 
+                        class="w-full bg-slate-900 text-white p-3 rounded-xl text-[9px] font-black uppercase appearance-none outline-none border-none shadow-lg">
+                        <option value="SEMUA">SEMUA KELAS</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-white/50 text-[8px] pointer-events-none"></i>
+                </div>
+                <div class="relative">
+                    <select id="filter-profil-guru" onchange="window.renderProfilList()" 
+                        class="w-full bg-slate-900 text-white p-3 rounded-xl text-[9px] font-black uppercase appearance-none outline-none border-none shadow-lg">
+                        <option value="SEMUA">SEMUA GURU WALI</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-white/50 text-[8px] pointer-events-none"></i>
+                </div>
+            </div>
         </div>
 
         <div id="profil-list-container" class="space-y-3"></div>
     </div>
 </div>
+
 
 <div id="editor-modal" class="modal-full-screen">
     <div class="flex justify-between items-center p-5 border-b border-slate-100 flex-shrink-0 bg-white">
@@ -632,6 +654,7 @@
             records: {}, 
             currentMode: 'siswa',
             activeSession: 'Pagi', 
+	    profilSortMode: 'kelas',
             today: new Date().toISOString().split('T')[0]
         };
 
@@ -659,11 +682,9 @@ window.switchTab = (tab) => {
     // PERBAIKAN DI SINI
     if(tab === 'download') { if(typeof updateDownloadClassList === 'function') {updateDownloadClassList(state.activeSession); }}
     
-    if(tab === 'profil') { if(typeof window.renderProfilList === 'function') {window.renderProfilList();} }
+    if(tab === 'profil') { if(typeof window.renderProfilList === 'function') {window.populateProfilFilters(); window.renderProfilList();} }
     refreshUI();
 };
-
-        
 
         window.updateSessionUI = (s) => {
             state.activeSession = s;
@@ -1527,17 +1548,61 @@ window.onload = () => {
 
 
 // --- RENDER LIST SISWA DI TAB PROFIL ---
+// Fungsi untuk mengisi pilihan di Dropdown Filter
+window.populateProfilFilters = () => {
+    const kelasSelect = document.getElementById('filter-profil-kelas');
+    const guruSelect = document.getElementById('filter-profil-guru');
+    
+    if(!kelasSelect || !guruSelect) return;
+
+    // Ambil daftar unik dan urutkan
+    const daftarKelas = [...new Set(state.master.siswa.map(s => s.kelas))].filter(Boolean).sort();
+    const daftarGuru = [...new Set(state.master.siswa.map(s => s.guruWali))].filter(g => g && g !== '-').sort();
+
+    // Isi Dropdown Kelas
+    let htmlKelas = '<option value="SEMUA">SEMUA KELAS</option>';
+    daftarKelas.forEach(k => htmlKelas += `<option value="${k}">${k}</option>`);
+    kelasSelect.innerHTML = htmlKelas;
+
+    // Isi Dropdown Guru Wali
+    let htmlGuru = '<option value="SEMUA">SEMUA GURU WALI</option>';
+    daftarGuru.forEach(g => htmlGuru += `<option value="${g}">${g}</option>`);
+    guruSelect.innerHTML = htmlGuru;
+};
+
+// Fungsi Render Profil yang diperbarui
 window.renderProfilList = () => {
     const container = document.getElementById('profil-list-container');
     const search = document.getElementById('search-profil').value.toLowerCase();
-    const filtered = state.master.siswa.filter(s => s.nama.toLowerCase().includes(search) || s.id.includes(search));
+    const filterKelas = document.getElementById('filter-profil-kelas').value;
+    const filterGuru = document.getElementById('filter-profil-guru').value;
     
+    // 1. Logika Filter Bertingkat (Search + Kelas + Guru Wali)
+    let filtered = state.master.siswa.filter(s => {
+        const matchSearch = s.nama.toLowerCase().includes(search) || s.id.includes(search);
+        const matchKelas = (filterKelas === 'SEMUA') || (s.kelas === filterKelas);
+        const matchGuru = (filterGuru === 'SEMUA') || (s.guruWali === filterGuru);
+        
+        return matchSearch && matchKelas && matchGuru;
+    });
+
+    // 2. Urutkan berdasarkan Nama secara default
+    filtered.sort((a, b) => a.nama.localeCompare(b.nama));
+    
+    if(filtered.length === 0) {
+        container.innerHTML = `<div class="text-center py-10 opacity-30 font-black text-[10px] uppercase">Siswa Tidak Ditemukan</div>`;
+        return;
+    }
+
     container.innerHTML = filtered.map(s => `
         <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-4 active:scale-95 transition-all cursor-pointer mb-3">
             <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 font-black text-xs">${s.nama.charAt(0)}</div>
             <div class="flex-grow">
                 <h4 class="text-[11px] font-black text-slate-800 uppercase">${s.nama}</h4>
-                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">${s.kelas} • ${s.id}</p>
+                <div class="flex gap-2 mt-1">
+                    <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">${s.kelas}</span>
+                    ${s.guruWali && s.guruWali !== '-' ? `<span class="text-[7px] font-black text-blue-500 uppercase">GW: ${s.guruWali}</span>` : ''}
+                </div>
             </div>
             <i class="fas fa-chevron-right text-slate-200 text-xs"></i>
         </div>
