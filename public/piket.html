@@ -55,6 +55,12 @@
     background-position: right 1rem center;
     background-size: 1em;
 }
+/* Tambahkan di bawah style yang sudah ada */
+button.bg-red-600 {
+    transform: scale(1.05);
+    box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.3);
+    z-index: 10;
+}
 
     </style>
 
@@ -184,7 +190,9 @@
             <div class="bg-red-600 p-6 rounded-[2.5rem] text-white shadow-2xl shadow-red-100 space-y-6">
                 <div class="text-center">
                     <div class="relative w-28 h-28 mx-auto mb-4">
-                        <img id="display-foto" src="" class="w-full h-full rounded-[2.5rem] object-cover shadow-2xl border-4 border-white ring-1 ring-white/20">
+                        <img id="display-foto"
+			onerror="this.src='https://www.w3schools.com/howto/img_avatar.png'"
+			src="" class="w-full h-full rounded-[2.5rem] object-cover shadow-2xl border-4 border-white ring-1 ring-white/20">
                     </div>
                     <h2 id="edit-nama-display" class="font-black text-white uppercase text-xl tracking-tight mb-1">...</h2>
                     <p id="display-nis" class="text-[10px] font-bold text-red-100 tracking-[0.2em] mb-4 uppercase"></p>
@@ -655,7 +663,7 @@
             currentMode: 'siswa',
             activeSession: 'Pagi', 
 	    profilSortMode: 'kelas',
-            today: new Date().toISOString().split('T')[0]
+            today: new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Jakarta' }).format(new Date()).split('T')[0]
         };
 
         window.showToast = (msg) => {
@@ -754,60 +762,69 @@ window.switchTab = (tab) => {
         };
 
 
-// Tambahkan di global state
-window.state.cachedPopularHTML = "";
+// Ganti blok fungsi calculatePopularData & renderPopularData (baris +/- 515) dengan ini:
+
+let isPopularDataDirty = true; // Letakkan paling atas di luar fungsi
 
 window.calculatePopularData = () => {
+    if (!isPopularDataDirty) return; // Jika tidak ada perubahan, jangan hitung ulang
+    
     const agg = {};
-    const today = new Date();
     const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(today.getMonth() - 6);
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
     Object.keys(state.records).forEach(dateStr => {
-        const recordDate = new Date(dateStr + 'T00:00:00');
-        if (recordDate < sixMonthsAgo) return;
+        if (new Date(dateStr) < sixMonthsAgo) return;
 
         Object.values(state.records[dateStr] || {}).forEach(rec => {
-            if (!agg[rec.personId]) {
-                agg[rec.personId] = { B: 0, A: 0, I: 0, S: 0, T: 0 };
-            }
-            if (rec.status === 'Bolos') { agg[rec.personId].B++; agg[rec.personId].T++; }
-            else if (rec.status === 'Alpa') { agg[rec.personId].A++; agg[rec.personId].T++; }
-            else if (rec.status === 'Izin') { agg[rec.personId].I++; agg[rec.personId].T++; }
-            else if (rec.status === 'Sakit') { agg[rec.personId].S++; agg[rec.personId].T++; }
+            if (!agg[rec.personId]) agg[rec.personId] = { B: 0, A: 0, I: 0, S: 0, T: 0 };
+            const s = rec.status;
+            if (s === 'Bolos') { agg[rec.personId].B++; agg[rec.personId].T++; }
+            else if (s === 'Alpa') { agg[rec.personId].A++; agg[rec.personId].T++; }
+            else if (s === 'Izin') { agg[rec.personId].I++; agg[rec.personId].T++; }
+            else if (s === 'Sakit') { agg[rec.personId].S++; agg[rec.personId].T++; }
         });
     });
 
     const sorted = Object.entries(agg)
         .map(([id, data]) => ({ id, ...data }))
         .sort((a, b) => b.T - a.T)
-        .slice(0, 50); // Batasi top 50 untuk performa
+        .slice(0, 50); // Ambil 50 besar saja agar render cepat
 
-    window.state.cachedPopularHTML = sorted.map(item => {
+    state.cachedPopularHTML = sorted.map(item => {
         const s = state.master.siswa.find(x => x.id === item.id);
         if (!s) return '';
-	// TAMBAHKAN onclick="window.openEditor('${s.id}')" pada tag <tr>
-        // TAMBAHKAN juga class "cursor-pointer active:bg-slate-50" untuk efek klik
         return `
-        <tr onclick="window.openEditor('${s.id}')" class="border-b border-slate-50 cursor-pointer active:bg-slate-100 transition-all">
+        <tr onclick="window.openEditor('${s.id}')" class="border-b border-slate-50 cursor-pointer active:bg-slate-100">
             <td class="px-4 py-3">
                 <p class="text-[9px] font-black uppercase text-slate-800">${s.nama}</p>
                 <p class="text-[7px] font-bold text-slate-400 uppercase">${s.kelas}</p>
             </td>
-            <td class="text-center text-[9px] font-bold w-8 text-orange-600">${item.B}</td>
-            <td class="text-center text-[9px] font-bold w-8 text-red-600">${item.A}</td>
-            <td class="text-center text-[9px] font-bold w-8 text-blue-600">${item.I}</td>
-            <td class="text-center text-[9px] font-bold w-8 text-green-600">${item.S}</td>
-            <td class="text-center w-10"><span class="text-[10px] font-black text-red-600">${item.T}</span></td>
+            <td class="text-center text-[9px] font-bold text-orange-600">${item.B}</td>
+            <td class="text-center text-[9px] font-bold text-red-600">${item.A}</td>
+            <td class="text-center text-[9px] font-bold text-blue-600">${item.I}</td>
+            <td class="text-center text-[9px] font-bold text-green-600">${item.S}</td>
+            <td class="text-center"><span class="text-[10px] font-black text-red-600">${item.T}</span></td>
         </tr>`;
     }).join('');
+    
+    isPopularDataDirty = false;
 };
 
-// Fungsi render tinggal memanggil cache
 window.renderPopularData = () => {
     const body = document.getElementById('popular-data-body');
-    body.innerHTML = window.state.cachedPopularHTML || `<tr><td colspan="6" class="text-center py-8 text-[8px] font-bold text-slate-300 italic uppercase">Belum ada data</td></tr>`;
+    if (isPopularDataDirty) window.calculatePopularData();
+    body.innerHTML = state.cachedPopularHTML || `<tr><td colspan="6" class="text-center py-8 text-[8px] font-bold text-slate-300 italic">Belum ada data</td></tr>`;
 };
+
+// PENTING: Tambahkan 'isPopularDataDirty = true' di dalam snapshot Firebase (baris +/- 645)
+// onSnapshot(collection(...), (snap) => {
+//    ... kode lama anda ...
+//    isPopularDataDirty = true; // Tambahkan ini
+//    refreshUI();
+// });
+
+
 
         window.renderRecentLogs = () => {
             const container = document.getElementById('recent-logs');
@@ -1347,28 +1364,23 @@ const autoSyncData = async (url) => {
     try {
         const res = await fetch(exportUrl);
         const csv = await res.text();
-        const rows = csv.split('\n').slice(1).filter(r => r.trim() !== '');
+        // Parsing CSV yang aman terhadap tanda koma di dalam tanda kutip
+        const rows = csv.split(/\r?\n/).slice(1).filter(line => line.trim() !== '');
         const gtk = [], siswa = [];
         
         rows.forEach(row => {
-            const c = row.match(/(".*?"|[^",\r\n]+)(?=\s*,|\s*$)/g)?.map(x => x.trim().replace(/^"|"$/g, '')) || [];
+            // Regex ini memisahkan koma tapi mengabaikan koma di dalam tanda kutip
+            const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(x => x.trim().replace(/^"|"$/g, ''));
+            
             if(c.length < 2) return;
 
-            // Mapping berdasarkan kolom A=0, B=1, C=2, dst.
             const item = { 
-                id: c[0],           // NIS (Kolom A)
-                nama: c[1],         // NAMA (Kolom B)
-                kelas: c[2] || '-', // KELAS (Kolom C)
-                sesi: c[3] || 'Pagi', // SESI (Kolom D)
-                tipe: (c[4] || 'siswa').toLowerCase().trim(), // TIPE (Kolom E)
-                alamat: c[5] || '-',    // ALAMAT (Kolom F)
-                nohp: c[6] || '-',      // NO HP (Kolom G)
-                orangtua: c[7] || '-',      // ORANG TUA (Kolom H)
-                hporangtua: c[8] || '-',      // HP ORANG TUA (Kolom I)
-                guruBK: c[9] || '-',    // GURU BK (Kolom J)
-                waliKelas: c[10] || '-', // WALI KELAS (Kolom K)
-                guruWali: c[11] || '-',  // GURU WALI (Kolom L)
-                kesiswaan: c[12] || '-' // KESISWAAN (Kolom M)
+                id: c[0], nama: c[1], kelas: c[2] || '-', sesi: c[3] || 'Pagi',
+                tipe: (c[4] || 'siswa').toLowerCase().trim(),
+                alamat: c[5] || '-', nohp: c[6] || '-',
+                orangtua: c[7] || '-', hporangtua: c[8] || '-',
+                guruBK: c[9] || '-', waliKelas: c[10] || '-',
+                guruWali: c[11] || '-', kesiswaan: c[12] || '-'
             };
 
             if (item.tipe === 'guru') gtk.push(item); else siswa.push(item);
@@ -1378,17 +1390,30 @@ const autoSyncData = async (url) => {
         localStorage.setItem('absensi_gtk', JSON.stringify(gtk));
         localStorage.setItem('absensi_siswa', JSON.stringify(siswa));
         refreshUI();
-    } catch (e) { console.error("Sync Error:", e); }
+    } catch (e) { console.error("Sync Error:", e); showToast("❌ Gagal Sinkron Database"); }
 };
 
-        window.saveAndSync = async () => {
-            const url = document.getElementById('sheet-url').value.trim();
-            if(!url) return;
-            showToast("🔄 Menyinkronkan...");
-            await autoSyncData(url);
-            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'master_link'), { url, updatedAt: Date.now() });
-            showToast("✅ Database Diperbarui!");
-        };
+window.saveAndSync = async () => {
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    const url = document.getElementById('sheet-url').value.trim();
+    
+    if(!url) return;
+    
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> PROSES...`;
+    
+    try {
+        await autoSyncData(url);
+        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'master_link'), { url, updatedAt: Date.now() });
+        showToast("✅ Database Diperbarui!");
+    } catch(e) {
+        showToast("❌ Gagal sinkron");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+};
 
         // --- AUTH & INITIALIZATION ---
         window.logout = () => { localStorage.clear(); location.reload(); };
@@ -1655,23 +1680,24 @@ window.openEditor = async (id) => {
     // 3. FOTO & WA LOGIC
     document.getElementById('display-foto').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(student.nama)}&background=EF4444&color=FFFFFF&bold=true`;
 
-    const processWA = (nohp, elementId, linkId, target) => {
-        const el = document.getElementById(elementId);
-        const link = document.getElementById(linkId);
-        el.innerText = nohp || '-';
-        if (nohp && nohp !== '-' && nohp.length > 5) {
-            let clean = nohp.replace(/\D/g, '');
-            if (clean.startsWith('0')) clean = '62' + clean.slice(1);
-            const msg = `Halo ${target}, saya Guru Piket SMK PGRI 2 Kedondong ingin berkoordinasi terkait ananda ${student.nama}...`;
-            link.href = `https://wa.me/${clean}?text=${encodeURIComponent(msg)}`;
-            link.style.opacity = '1';
-            link.style.pointerEvents = 'auto';
-        } else {
-            link.href = '#';
-            link.style.opacity = '0.3';
-            link.style.pointerEvents = 'none';
-        }
-    };
+const processWA = (nohp, elementId, linkId, target) => {
+    const el = document.getElementById(elementId);
+    const link = document.getElementById(linkId);
+    el.innerText = nohp || '-';
+    
+    if (nohp && nohp !== '-' && nohp.toString().length > 5) {
+        // Hapus semua karakter non-angka (spasi, strip, dll)
+        let clean = nohp.toString().replace(/\D/g, ''); 
+        if (clean.startsWith('0')) clean = '62' + clean.slice(1);
+        if (clean.startsWith('8')) clean = '62' + clean;
+        
+        const msg = `Halo ${target}, saya Guru Piket SMK PGRI 2 Kedondong ingin berkoordinasi terkait ananda ${student.nama}...`;
+        link.href = `https://wa.me/${clean}?text=${encodeURIComponent(msg)}`;
+        link.style.display = 'block'; // Pastikan terlihat
+    } else {
+        link.style.display = 'none'; // Sembunyikan jika tidak ada nomor
+    }
+};
     processWA(student.nohp, 'display-nohp', 'display-nohp-link', 'Siswa');
     processWA(student.hporangtua, 'display-hp-orangtua', 'display-hp-ortu-link', 'Bapak/Ibu');
 
