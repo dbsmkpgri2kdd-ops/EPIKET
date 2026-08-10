@@ -399,6 +399,12 @@
         grid-row: 2 !important;
     }
 
+    /* Tambahkan ini agar di desktop tampilannya jauh lebih panjang */
+    #tab-dashboard .max-h-\[320px\], 
+    #tab-dashboard .max-h-\[600px\] {
+        max-height: 800px !important;
+    }
+
     /* Aktivitas terbaru */
     #tab-dashboard.active > .space-y-4:last-child {
         grid-column: 1 / -1 !important;
@@ -798,7 +804,7 @@
                                 </thead>
                             </table>
                         </div>
-                        <div class="max-h-[320px] overflow-y-auto custom-scrollbar">
+                        <div class="max-h-[600px] overflow-y-auto custom-scrollbar">
                             <table class="w-full text-left border-collapse">
                                 <tbody id="popular-data-body" class="divide-y divide-slate-50"></tbody>
                             </table>
@@ -1265,7 +1271,7 @@ window.calculatePopularData = (force = false) => {
         <tr onclick="window.openEditor('${safeId}')" class="border-b border-slate-50 cursor-pointer active:bg-slate-100 transition-all">
             <td class="px-4 py-3">
                 <p class="text-[9px] font-black uppercase text-slate-800">${student.nama}</p>
-                <div class="flex flex-col gap-0.5 mt-0.5">
+                <div class="flex items-center gap-0.5 mt-0.5">
                     <span class="text-[7px] font-bold text-slate-400 uppercase leading-none">${student.kelas}</span>
                     <span class="text-[7px] font-black text-red-500 uppercase italic leading-none">GW: ${student.guruWali || '-'}</span>
                 </div>
@@ -1285,41 +1291,99 @@ window.calculatePopularData = (force = false) => {
 };
 
 // Fungsi render tinggal memanggil cache
-window.renderPopularData = () => {
-    const body = document.getElementById('popular-data-body');
-    if (!body) return;
-    const html = window.state.cachedPopularHTML;
-    body.innerHTML = html || `<tr><td colspan="6" class="text-center py-8 text-[8px] font-bold text-slate-300 italic uppercase">Belum ada data</td></tr>`;
-};
+window.calculatePopularData = () => {
+    // Jangan hitung sebelum master siswa tersedia
+    if (!state.master?.siswa?.length) {
+        window.state.cachedPopularHTML = "";
+        return;
+    }
 
-        window.renderRecentLogs = () => {
-            const container = document.getElementById('recent-logs');
-            if (!container) return;
+    const agg = {};
+    const today = new Date();
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(today.getMonth() - 6);
 
-            const todayLogs = Object.values(state.records[state.today] || {});
-            const logs = todayLogs.sort((a,b) => b.timestamp - a.timestamp).slice(0, 5);
+    // Hitung hanya data 6 bulan terakhir
+    Object.entries(state.records || {}).forEach(([dateStr, records]) => {
+        const recordDate = new Date(dateStr + 'T00:00:00');
 
-            if (logs.length === 0) {
-                container.innerHTML = `<div class="bg-white p-6 rounded-3xl border border-dashed border-slate-200 text-center text-[8px] font-bold text-slate-300 uppercase italic">Belum ada aktivitas hari ini</div>`;
-                return;
+        if (recordDate < sixMonthsAgo) return;
+
+        Object.values(records || {}).forEach(rec => {
+            if (!rec?.personId) return;
+
+            if (!agg[rec.personId]) {
+                agg[rec.personId] = {
+                    B: 0,
+                    A: 0,
+                    I: 0,
+                    S: 0,
+                    T: 0
+                };
             }
 
-            container.innerHTML = logs.map(l => {
-                const p = state.peopleById[String(l.personId)];
-                const time = new Date(l.timestamp).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
-                const clickAction = p?.tipe !== 'guru' && p?.id ? `onclick="window.openEditor('${p.id}')"` : '';
-                const cursorClass = p?.tipe !== 'guru' ? 'cursor-pointer active:scale-[0.98]' : '';
+            if (rec.status === 'Bolos') {
+                agg[rec.personId].B++;
+                agg[rec.personId].T++;
+            }
+            else if (rec.status === 'Alpa') {
+                agg[rec.personId].A++;
+                agg[rec.personId].T++;
+            }
+            else if (rec.status === 'Izin') {
+                agg[rec.personId].I++;
+                agg[rec.personId].T++;
+            }
+            else if (rec.status === 'Sakit') {
+                agg[rec.personId].S++;
+                agg[rec.personId].T++;
+            }
+        });
+    });
 
-                return `<div ${clickAction} class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-50 shadow-sm transition-all ${cursorClass}">
-                    <div class="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-[10px] font-black">${l.status ? l.status[0] : '?'}</div>
-                    <div class="flex-1">
-                        <h5 class="text-[9px] font-black uppercase text-slate-800">${p?.nama || 'N/A'}</h5>
-                        <p class="text-[7px] font-bold text-slate-400 uppercase">${l.status || '-'} • ${time}</p>
-                    </div>
-                    ${p?.tipe !== 'guru' ? '<i class="fas fa-chevron-right text-[8px] text-slate-200"></i>' : ''}
-                </div>`;
-            }).join('');
-        };
+    const sorted = Object.entries(agg)
+        .map(([id, data]) => ({
+            id,
+            ...data
+        }))
+        .sort((a, b) => b.T - a.T)
+        .slice(0, 100);
+
+    // Gunakan peopleById, jangan .find()
+    window.state.cachedPopularHTML = sorted.map(item => {
+        const s = state.peopleById?.[String(item.id)];
+
+        if (!s) return '';
+
+        return `
+        <tr onclick="window.openEditor('${s.id}')"
+            class="border-b border-slate-50 cursor-pointer active:bg-slate-100 transition-all">
+
+            <td class="px-4 py-3">
+                <p class="text-[9px] font-black uppercase text-slate-800">
+                    ${s.nama}
+                </p>
+
+                <div class="flex flex-col gap-0.5 mt-0.5">
+                    <span class="text-[7px] font-bold text-slate-400 uppercase leading-none">
+                        ${s.kelas}
+                    </span>
+
+                    <span class="text-[7px] font-black text-red-500 uppercase italic leading-none">
+                        GW: ${s.guruWali || '-'}
+                    </span>
+                </div>
+            </td>
+
+            <td class="text-center text-[9px] font-bold w-8 text-orange-600">${item.B}</td>
+            <td class="text-center text-[9px] font-bold w-8 text-red-600">${item.A}</td>
+            <td class="text-center text-[9px] font-bold w-8 text-blue-600">${item.I}</td>
+            <td class="text-center text-[9px] font-bold w-8 text-green-600">${item.S}</td>
+            <td class="text-center text-[9px] font-black w-10 text-slate-800">${item.T}</td>
+        </tr>`;
+    }).join('');
+};
+
 
         window.renderReport = () => {
             const container = document.getElementById('report-list-container');
@@ -1875,9 +1939,7 @@ const autoSyncData = async (url) => {
         localStorage.setItem('absensi_gtk', JSON.stringify(gtk));
         localStorage.setItem('absensi_siswa', JSON.stringify(siswa));
         localStorage.setItem('e_piket_master_sync_ts', String(Date.now()));
-        rebuildPeopleIndex();
-        state.popularDirty = true;
-        if (state.records && Object.keys(state.records).length) window.calculatePopularData(true);
+        window.calculatePopularData();
         refreshUI();
     } catch (e) { console.error("Sync Error:", e); }
 };
@@ -1983,7 +2045,7 @@ const autoSyncData = async (url) => {
                         }
 
                         state.popularDirty = true;
-                        window.calculatePopularData();
+                        if (state.master?.siswa?.length) { window.calculatePopularData(); }
                         refreshUI();
                     }
                 );
