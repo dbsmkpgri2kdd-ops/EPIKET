@@ -1060,7 +1060,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-	import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc, getDocs, query, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+	import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc, getDocs, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         // --- KONFIGURASI FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyC8KQzupwLouy6zSxiz5V5-kB6jPvigCII",
@@ -1086,6 +1086,9 @@
                 siswa: JSON.parse(localStorage.getItem('absensi_siswa')) || []
             },
             records: {},
+            popularReady: false,
+            popularDirty: true,
+            popularLastCalculated: 0,
             // Index master data untuk pencarian O(1) berdasarkan ID.
             peopleById: {},
             currentMode: 'siswa',
@@ -1223,46 +1226,48 @@ window.switchTab = (tab) => {
 
 
 // Tambahkan di global state
-window.state.cachedPopularHTML = "";
+window.state.cachedPopularHTML = localStorage.getItem('e_piket_popular_html') || "";
+window.state.popularReady = !!window.state.cachedPopularHTML;
+window.state.popularDirty = true;
 
-window.calculatePopularData = () => {
-    const agg = {};
+window.calculatePopularData = (force = false) => {
+    if (!force && !state.popularDirty && state.popularReady) return;
+
+    const agg = Object.create(null);
     const today = new Date();
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(today.getMonth() - 6);
+    const cutoff = sixMonthsAgo.toISOString().slice(0, 10);
 
-    Object.keys(state.records).forEach(dateStr => {
-        const recordDate = new Date(dateStr + 'T00:00:00');
-        if (recordDate < sixMonthsAgo) return;
-
-        Object.values(state.records[dateStr] || {}).forEach(rec => {
-            if (!agg[rec.personId]) {
-                agg[rec.personId] = { B: 0, A: 0, I: 0, S: 0, T: 0 };
-            }
-            if (rec.status === 'Bolos') { agg[rec.personId].B++; agg[rec.personId].T++; }
-            else if (rec.status === 'Alpa') { agg[rec.personId].A++; agg[rec.personId].T++; }
-            else if (rec.status === 'Izin') { agg[rec.personId].I++; agg[rec.personId].T++; }
-            else if (rec.status === 'Sakit') { agg[rec.personId].S++; agg[rec.personId].T++; }
-        });
-    });
+    for (const [dateStr, recordsForDate] of Object.entries(state.records)) {
+        if (dateStr < cutoff) continue;
+        for (const rec of Object.values(recordsForDate || {})) {
+            let bucket = agg[rec.personId];
+            if (!bucket) bucket = agg[rec.personId] = { B: 0, A: 0, I: 0, S: 0, T: 0 };
+            if (rec.status === 'Bolos') { bucket.B++; bucket.T++; }
+            else if (rec.status === 'Alpa') { bucket.A++; bucket.T++; }
+            else if (rec.status === 'Izin') { bucket.I++; bucket.T++; }
+            else if (rec.status === 'Sakit') { bucket.S++; bucket.T++; }
+        }
+    }
 
     const sorted = Object.entries(agg)
         .map(([id, data]) => ({ id, ...data }))
         .sort((a, b) => b.T - a.T)
-        .slice(0, 50); // Batasi top 50 untuk performa
+        .slice(0, 50);
 
-    window.state.cachedPopularHTML = sorted.map(item => {
-        const s = state.master.siswa.find(x => x.id === item.id);
-        if (!s) return '';
-
+    const people = state.peopleById || Object.create(null);
+    state.cachedPopularHTML = sorted.map(item => {
+        const student = people[String(item.id)];
+        if (!student || student.tipe === 'guru') return '';
+        const safeId = String(student.id).replace(/'/g, "\\'");
         return `
-        <tr onclick="window.openEditor('${s.id}')" class="border-b border-slate-50 cursor-pointer active:bg-slate-100 transition-all">
+        <tr onclick="window.openEditor('${safeId}')" class="border-b border-slate-50 cursor-pointer active:bg-slate-100 transition-all">
             <td class="px-4 py-3">
-                <p class="text-[9px] font-black uppercase text-slate-800">${s.nama}</p>
+                <p class="text-[9px] font-black uppercase text-slate-800">${student.nama}</p>
                 <div class="flex flex-col gap-0.5 mt-0.5">
-                    <span class="text-[7px] font-bold text-slate-400 uppercase leading-none">${s.kelas}</span>
-                    <!-- Tampilan Guru Wali -->
-                    <span class="text-[7px] font-black text-red-500 uppercase italic leading-none">GW: ${s.guruWali || '-'}</span>
+                    <span class="text-[7px] font-bold text-slate-400 uppercase leading-none">${student.kelas}</span>
+                    <span class="text-[7px] font-black text-red-500 uppercase italic leading-none">GW: ${student.guruWali || '-'}</span>
                 </div>
             </td>
             <td class="text-center text-[9px] font-bold w-8 text-orange-600">${item.B}</td>
@@ -1272,12 +1277,19 @@ window.calculatePopularData = () => {
             <td class="text-center w-10"><span class="text-[10px] font-black text-red-600">${item.T}</span></td>
         </tr>`;
     }).join('');
+
+    state.popularReady = true;
+    state.popularDirty = false;
+    state.popularLastCalculated = Date.now();
+    try { localStorage.setItem('e_piket_popular_html', state.cachedPopularHTML); } catch(e) {}
 };
 
 // Fungsi render tinggal memanggil cache
 window.renderPopularData = () => {
     const body = document.getElementById('popular-data-body');
-    body.innerHTML = window.state.cachedPopularHTML || `<tr><td colspan="6" class="text-center py-8 text-[8px] font-bold text-slate-300 italic uppercase">Belum ada data</td></tr>`;
+    if (!body) return;
+    const html = window.state.cachedPopularHTML;
+    body.innerHTML = html || `<tr><td colspan="6" class="text-center py-8 text-[8px] font-bold text-slate-300 italic uppercase">Belum ada data</td></tr>`;
 };
 
         window.renderRecentLogs = () => {
@@ -1862,6 +1874,10 @@ const autoSyncData = async (url) => {
         rebuildPeopleIndex();
         localStorage.setItem('absensi_gtk', JSON.stringify(gtk));
         localStorage.setItem('absensi_siswa', JSON.stringify(siswa));
+        localStorage.setItem('e_piket_master_sync_ts', String(Date.now()));
+        rebuildPeopleIndex();
+        state.popularDirty = true;
+        if (state.records && Object.keys(state.records).length) window.calculatePopularData(true);
         refreshUI();
     } catch (e) { console.error("Sync Error:", e); }
 };
@@ -1923,13 +1939,24 @@ const autoSyncData = async (url) => {
             } else { showToast("❌ Akun tidak valid"); }
         };
 
+        // Tampilkan cache Data Populer secepat mungkin sebelum sinkronisasi Firebase selesai.
+        try { window.renderPopularData(); } catch(e) {}
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 // PERFORMANCE: proses perubahan Firestore secara incremental.
                 // Snapshot awal tetap memuat data yang sudah ada, tetapi update berikutnya
                 // tidak lagi membangun ulang seluruh state.records dari nol.
-                onSnapshot(
+                const popularCutoff = new Date();
+                popularCutoff.setMonth(popularCutoff.getMonth() - 6);
+                const popularCutoffStr = popularCutoff.toISOString().slice(0, 10);
+                const attendanceQuery = query(
                     collection(db, 'artifacts', appId, 'public', 'data', 'attendance_records'),
+                    where('date', '>=', popularCutoffStr)
+                );
+
+                onSnapshot(
+                    attendanceQuery,
                     (snap) => {
                         if (snap.metadata.fromCache && Object.keys(state.records).length > 0 && snap.docChanges().length === 0) {
                             return;
@@ -1955,6 +1982,7 @@ const autoSyncData = async (url) => {
                             }
                         }
 
+                        state.popularDirty = true;
                         window.calculatePopularData();
                         refreshUI();
                     }
@@ -1964,8 +1992,12 @@ const autoSyncData = async (url) => {
                 getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'master_link')).then(d => { 
                     if(d.exists()) {
                         const url = d.data().url;
-                        document.getElementById('sheet-url').value = url; 
-                        autoSyncData(url); // Sinkronkan data master secara otomatis
+                        document.getElementById('sheet-url').value = url;
+                        const lastSync = Number(localStorage.getItem('e_piket_master_sync_ts') || 0);
+                        const SYNC_INTERVAL = 15 * 60 * 1000;
+                        if (!lastSync || (Date.now() - lastSync) > SYNC_INTERVAL) {
+                            autoSyncData(url);
+                        }
                     }
                 });
             }
