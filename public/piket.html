@@ -1235,8 +1235,10 @@ window.state.cachedPopularHTML = "";
 window.state.popularDataReady = false;
 
 window.calculatePopularData = () => {
-    if (!state.master?.siswa?.length) {
+    const siswa = state.master?.siswa || [];
+    if (!siswa.length) {
         state.popularDataReady = false;
+        state.cachedPopularHTML = '';
         return;
     }
 
@@ -1245,6 +1247,11 @@ window.calculatePopularData = () => {
     const sixMonthsAgo = new Date(today);
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
+    const siswaIds = new Set(siswa
+            .filter(s => s?.id != null)
+            .map(s => String(s.id))
+    );
+
     for (const [dateStr, records] of Object.entries(state.records || {})) {
         const recordDate = new Date(`${dateStr}T00:00:00`);
         if (isNaN(recordDate.getTime()) || recordDate < sixMonthsAgo) continue;
@@ -1252,6 +1259,7 @@ window.calculatePopularData = () => {
         for (const rec of Object.values(records || {})) {
             if (!rec?.personId) continue;
             const id = String(rec.personId);
+	    if (!siswaIds.has(id)) continue;
             if (!agg[id]) agg[id] = { B: 0, A: 0, I: 0, S: 0, T: 0 };
 
             if (rec.status === 'Bolos') { agg[id].B++; agg[id].T++; }
@@ -1267,7 +1275,7 @@ window.calculatePopularData = () => {
     .slice(0, state.master?.siswa?.length || 99);
 
     state.cachedPopularHTML = sorted.map(item => {
-        const s = state.peopleById?.[String(item.id)];
+        const s = siswa.find(siswaItem => String(siswaItem.id) === String(item.id) );
         if (!s) return '';
         return `
         <tr onclick="window.openEditor('${s.id}')" class="border-b border-slate-50 cursor-pointer active:bg-slate-100 transition-all">
@@ -1275,7 +1283,7 @@ window.calculatePopularData = () => {
                 <p class="text-[9px] font-black uppercase text-slate-800">${s.nama}</p>
                 <div class="flex items-center gap-0.5 mt-0.5">
                     <span class="text-[7px] font-bold text-slate-400 uppercase leading-none">${s.kelas || '-'}</span>
-                    <span class="text-[7px] font-black text-red-500 uppercase italic leading-none">GW: ${s.guruWali || '-'}</span>
+                    <span class="text-[6px] font-black text-red-500 uppercase italic leading-none">GW: ${s.guruWali || '-'}</span>
                 </div>
             </td>
             <td class="text-center text-[9px] font-bold w-8 text-orange-600">${item.B}</td>
@@ -1288,6 +1296,7 @@ window.calculatePopularData = () => {
 
     state.popularDataReady = true;
 };
+
 
 window.renderPopularData = () => {
     const body = document.getElementById('popular-data-body');
