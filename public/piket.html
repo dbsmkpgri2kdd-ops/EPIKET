@@ -416,13 +416,72 @@
         grid-template-columns: minmax(0, 1.35fr) minmax(390px, .65fr) !important;
     }
 }
-#popular-data-body {height: auto; }
-#popular-data-body tr {height: auto;}
-#popular-data-body td {vertical-align: middle; padding-top: 7px; padding-bottom: 7px;}
-/* Desktop */
-@media (min-width: 1024px) {#popular-data-body td {padding-top: 6px; padding-bottom: 6px;}}
-@media (max-width: 1023px) {#popular-data-body td {padding-top: 6px; padding-bottom: 6px;}}
+/* =========================================================
+   DATA POPULER — TAMPIL ±12 SISWA + SCROLLBAR
+   Tidak mengubah data atau JavaScript.
+   ========================================================= */
+#popular-data-body {
+    height: auto;
 }
+
+#popular-data-body tr {
+    height: 64px;
+}
+
+#popular-data-body td {
+    vertical-align: middle;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.popular-scroll-container {
+    height: 768px;
+    max-height: 768px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: #94a3b8 #f1f5f9;
+}
+
+.popular-scroll-container::-webkit-scrollbar {
+    width: 7px;
+}
+
+.popular-scroll-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.popular-scroll-container::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 10px;
+}
+
+.popular-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* Header Data Populer tetap di atas */
+#tab-dashboard .bg-white > .bg-green-600 {
+    position: relative;
+    z-index: 10;
+}
+
+@media (max-width: 1023px) {
+    .popular-scroll-container {
+        height: 768px;
+        max-height: 768px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .popular-scroll-container {
+        height: 768px;
+        max-height: 768px;
+    }
+}
+
 
 
 </style>
@@ -806,7 +865,7 @@
                                 </thead>
                             </table>
                         </div>
-                        <div class="w-full overflow-visible">
+                        <div class="w-full popular-scroll-container">
                             <table class="w-full text-left border-collapse">
                                 <tbody id="popular-data-body" class="divide-y divide-slate-50"></tbody>
                             </table>
