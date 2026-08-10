@@ -416,6 +416,13 @@
         grid-template-columns: minmax(0, 1.35fr) minmax(390px, .65fr) !important;
     }
 }
+#popular-data-body {height: auto; }
+#popular-data-body tr {min-height: 64px;}
+#popular-data-body td {vertical-align: middle;}
+@media (min-width: 1024px) {#popular-data-body tr {height: 68px;}}
+@media (max-width: 1023px) {#popular-data-body tr {height: 64px;}
+}
+
 
 </style>
 
@@ -798,7 +805,7 @@
                                 </thead>
                             </table>
                         </div>
-                        <div class="max-h-[320px] overflow-y-auto custom-scrollbar">
+                        <div class="w-full overflow-visible">
                             <table class="w-full text-left border-collapse">
                                 <tbody id="popular-data-body" class="divide-y divide-slate-50"></tbody>
                             </table>
@@ -1256,7 +1263,7 @@ window.calculatePopularData = () => {
     const sorted = Object.entries(agg)
         .map(([id, data]) => ({ id, ...data }))
         .sort((a, b) => b.T - a.T)
-        .slice(0, 50);
+        .slice(0, 99);
 
     state.cachedPopularHTML = sorted.map(item => {
         const s = state.peopleById?.[String(item.id)];
@@ -1265,7 +1272,7 @@ window.calculatePopularData = () => {
         <tr onclick="window.openEditor('${s.id}')" class="border-b border-slate-50 cursor-pointer active:bg-slate-100 transition-all">
             <td class="px-4 py-3">
                 <p class="text-[9px] font-black uppercase text-slate-800">${s.nama}</p>
-                <div class="flex flex-col gap-0.5 mt-0.5">
+                <div class="flex items-center gap-0.5 mt-0.5">
                     <span class="text-[7px] font-bold text-slate-400 uppercase leading-none">${s.kelas || '-'}</span>
                     <span class="text-[7px] font-black text-red-500 uppercase italic leading-none">GW: ${s.guruWali || '-'}</span>
                 </div>
