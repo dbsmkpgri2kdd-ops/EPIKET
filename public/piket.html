@@ -7,43 +7,475 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        body { -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; overflow-x: hidden; }
+        body { -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .status-pill { font-size: 0.55rem; padding: 2px 8px; border-radius: 9999px; font-weight: 800; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
+        .nav-btn.active { color: #dc2626; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         #login-screen { display: none; }
         #login-screen.active { display: flex; }
         #app-content { display: none; }
         #app-content.active { display: block; }
-        
-        /* MODAL EDITOR STYLE */
-        .modal-full-screen {
-            position: fixed;
-            inset: 0;
-            background-color: white;
-            z-index: 1000;
-            display: none;
-            flex-direction: column;
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+        #profile-modal { display: none; }
+        #profile-modal.active { display: flex; }
 
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+/* MODAL FULL SCREEN STYLE */
+.modal-full-screen {
+    position: fixed;
+    inset: 0;
+    background-color: white;
+    z-index: 1000;
+    display: none; /* Dikontrol JS */
+    flex-direction: column;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
-        /* DESKTOP SIDEBAR LOGIC */
-        @media (min-width: 768px) {
-            #sidebar { display: flex !important; width: 260px; }
-            .content-wrapper { padding-left: 260px; width: 100%; }
-            .modal-full-screen { left: 260px; }
-            .mobile-nav { display: none; }
-        }
-    </style>
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+/* Custom Scrollbar Sembunyi */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Select Dark Arrow Fix */
+.select-dark {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+}
+
+
+/* =========================================================
+   DESKTOP SIDEBAR UI
+   Tidak mengubah fungsi/navigasi, hanya mengubah layout desktop.
+   Mobile tetap menggunakan bottom navigation seperti semula.
+   ========================================================= */
+.desktop-sidebar-brand { display: none; }
+
+@media (min-width: 1024px) {
+    body {
+        background: #f1f5f9;
+    }
+
+    /* Sidebar */
+    #app-content > nav {
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: auto;
+        width: 250px;
+        height: 100vh;
+        padding: 0.75rem;
+        border: 0;
+        border-right: 1px solid #e2e8f0;
+        border-radius: 0;
+        background: rgba(255,255,255,0.97);
+        box-shadow: 8px 0 30px rgba(15,23,42,0.06);
+        backdrop-filter: blur(16px);
+        display: flex;
+        flex-direction: column;
+        z-index: 60;
+    }
+
+    #app-content > nav > .max-w-md {
+        max-width: none;
+        width: 100%;
+        height: 100% !important;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 0.35rem;
+    }
+
+    .desktop-sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 0.75rem 1.25rem;
+        margin-bottom: 0.5rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .desktop-sidebar-brand .brand-icon {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        border-radius: 14px;
+        background: linear-gradient(135deg,#dc2626,#991b1b);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 18px rgba(220,38,38,.20);
+    }
+
+    .desktop-sidebar-brand .brand-title {
+        font-size: 11px;
+        line-height: 1.15;
+        font-weight: 900;
+        color: #0f172a;
+        letter-spacing: .04em;
+    }
+
+    .desktop-sidebar-brand .brand-subtitle {
+        margin-top: 3px;
+        font-size: 8px;
+        line-height: 1.2;
+        font-weight: 800;
+        color: #94a3b8;
+        letter-spacing: .08em;
+    }
+
+    #app-content > nav .nav-btn {
+        width: 100%;
+        min-height: 48px;
+        padding: 0.7rem 0.8rem;
+        border-radius: 14px;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.8rem;
+        color: #64748b;
+        text-align: left;
+        transition: all .2s ease;
+    }
+
+    #app-content > nav .nav-btn i {
+        width: 24px;
+        text-align: center;
+        font-size: 1rem;
+    }
+
+    #app-content > nav .nav-btn span {
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: .08em;
+    }
+
+    #app-content > nav .nav-btn:hover {
+        background: #fef2f2;
+        color: #dc2626;
+        transform: translateX(2px);
+    }
+
+    #app-content > nav .nav-btn.active {
+        background: linear-gradient(90deg,#fef2f2,#fff);
+        color: #dc2626 !important;
+        box-shadow: inset 3px 0 0 #dc2626, 0 4px 12px rgba(15,23,42,.04);
+    }
+
+    /* Header bergeser mengikuti sidebar */
+    #app-content > header {
+        margin-left: 250px;
+        width: calc(100% - 250px);
+    }
+
+    #app-content > header > div {
+        max-width: none;
+        margin-left: 0;
+        margin-right: 0;
+        border-radius: 0;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        min-height: 76px;
+    }
+
+    /* Area isi menjadi lebar desktop */
+    #app-content > main {
+        margin-left: 250px;
+        width: calc(100% - 250px);
+        max-width: none;
+        padding: 2rem 2.25rem 3rem;
+    }
+
+    /* Beri ruang agar kartu tidak terlalu melebar */
+    #app-content > main > .tab-content.active {
+        width: 100%;
+        max-width: 1500px;
+        margin: 0 auto;
+    }
+
+    /* Dashboard desktop lebih lega */
+    #tab-dashboard {
+        gap: 1.25rem;
+    }
+
+    /* Bottom-nav spacing tidak diperlukan di desktop */
+    #app-content > main {
+        padding-bottom: 2.5rem;
+    }
+
+    /* Modal tetap full-screen dan tidak ikut terkena layout sidebar */
+    #editor-modal,
+    #profile-modal {
+        margin-left: 0;
+    }
+}
+
+    
+/* =========================================================
+   DESKTOP PROFESSIONAL POLISH — CSS ONLY
+   Tidak mengubah fungsi, ID, event, data, atau JavaScript.
+   ========================================================= */
+@media (min-width: 1024px) {
+  :root { --sidebar: 250px; --content-max: 1500px; --gap: 20px; }
+  html { scroll-behavior: smooth; }
+  body { overflow-x: hidden; }
+  #app-content > header { position: sticky; top: 0; }
+  #app-content > header > div {
+    min-height: 70px;
+    background: rgba(220,38,38,.97);
+    box-shadow: 0 8px 24px rgba(15,23,42,.08);
+  }
+  #app-content > main {
+    padding: 24px 28px 40px;
+    min-height: calc(100vh - 70px);
+  }
+  #app-content > main > .tab-content.active { max-width: var(--content-max); }
+
+  /* Semua halaman desktop punya rhythm yang konsisten */
+  #app-content > main > .tab-content.active > * { max-width: 100%; }
+  #tab-dashboard { display: none; }
+  #tab-dashboard.active {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(340px, .65fr);
+    gap: var(--gap);
+    align-items: start;
+  }
+  #tab-dashboard > .bg-slate-900:first-child { grid-column: 1 / -1; }
+  #tab-dashboard > #session-card { grid-column: 1; }
+  #tab-dashboard > .space-y-4 { grid-column: 2; }
+  #tab-dashboard > .space-y-4:last-child { grid-column: 1 / -1; }
+
+  /* Card lebih konsisten */
+  #app-content > main .rounded-\[2\.5rem\] { border-radius: 22px !important; }
+  #app-content > main .shadow-xl,
+  #app-content > main .shadow-2xl { box-shadow: 0 10px 30px rgba(15,23,42,.07) !important; }
+
+  /* LAPOR & REKAP: ruang horizontal dimaksimalkan */
+  #tab-absensi.active, #tab-laporan.active, #tab-download.active, #tab-profil.active {
+    width: 100%;
+  }
+  #tab-absensi .grid.grid-cols-2, #tab-laporan .grid.grid-cols-2 { max-width: 520px; }
+  #attendance-container, #report-list-container, #profil-list-container {
+    max-width: none;
+  }
+
+  /* Tabel/populer lebih mudah dibaca */
+  #tab-dashboard table th { letter-spacing: .08em; }
+  #tab-dashboard table td { padding-top: 10px; padding-bottom: 10px; }
+
+  /* Profil */
+  #tab-profil > div { padding: 0 !important; }
+  #tab-profil .grid.grid-cols-2 { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+
+  /* Modal desktop menjadi panel lebar, mobile tetap full screen */
+  #editor-modal.active, #profile-modal.active {
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+    background: rgba(15,23,42,.55);
+    backdrop-filter: blur(5px);
+  }
+  #editor-modal.active > *, #profile-modal.active > * {
+    width: min(1180px, calc(100vw - 56px));
+    max-height: calc(100vh - 56px);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 25px 70px rgba(15,23,42,.22);
+  }
+}
+
+@media (min-width: 1280px) {
+  #app-content > main { padding-left: 34px; padding-right: 34px; }
+  #tab-dashboard.active { grid-template-columns: minmax(0, 1.55fr) minmax(380px, .75fr); }
+}
+
+
+/* =========================================================
+   DESKTOP UPDATE — SIDEBAR MERAH + DASHBOARD 2 KOLOM
+   Sidebar desktop merah. Mobile/bottom navigation tetap.
+   Dashboard desktop:
+   - Sistem Pemantauan Aktif + Sesi Saat Ini berjajar
+   - Data Populer menjadi blok/area sendiri
+   - Aktivitas Terbaru tetap di bawah
+   ========================================================= */
+@media (min-width: 1024px) {
+    /* SIDEBAR MERAH */
+    #app-content > nav {
+        background: #dc2626 !important;
+        border-right: 1px solid rgba(255,255,255,.12) !important;
+        box-shadow: 8px 0 30px rgba(127,29,29,.18) !important;
+    }
+
+    #app-content > nav .desktop-sidebar-brand {
+        border-bottom-color: rgba(255,255,255,.16) !important;
+    }
+
+    #app-content > nav .desktop-sidebar-brand .brand-icon {
+        background: rgba(255,255,255,.16) !important;
+        box-shadow: none !important;
+        border: 1px solid rgba(255,255,255,.16);
+    }
+
+    #app-content > nav .desktop-sidebar-brand .brand-title,
+    #app-content > nav .desktop-sidebar-brand .brand-subtitle {
+        color: #fff !important;
+    }
+
+    #app-content > nav .desktop-sidebar-brand .brand-subtitle {
+        opacity: .72;
+    }
+
+    #app-content > nav .nav-btn {
+        color: rgba(255,255,255,.78) !important;
+    }
+
+    #app-content > nav .nav-btn:hover {
+        background: rgba(255,255,255,.12) !important;
+        color: #fff !important;
+        transform: translateX(2px);
+    }
+
+    #app-content > nav .nav-btn.active {
+        background: #fff !important;
+        color: #dc2626 !important;
+        box-shadow: 0 6px 18px rgba(127,29,29,.22) !important;
+    }
+
+    #app-content > nav .nav-btn.active i,
+    #app-content > nav .nav-btn.active span {
+        color: #dc2626 !important;
+    }
+
+    /* DASHBOARD DESKTOP */
+    #tab-dashboard.active {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(360px, .72fr) !important;
+        gap: 20px !important;
+        align-items: start !important;
+    }
+
+    /* Sistem Pemantauan Aktif */
+    #tab-dashboard.active > .bg-slate-900:first-child {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        height: 100%;
+        min-height: 230px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    /* Sesi Saat Ini */
+    #tab-dashboard.active > #session-card {
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        min-height: 230px;
+    }
+
+    /* Data Populer berdiri sendiri di bawah dua kartu hitam */
+    #tab-dashboard.active > .space-y-4 {
+        grid-column: 1 / -1 !important;
+    }
+
+    /* Blok Data Populer (tepat setelah Sesi Saat Ini) */
+    #tab-dashboard.active > #session-card + .space-y-4 {
+        grid-row: 2 !important;
+    }
+
+    /* Aktivitas terbaru */
+    #tab-dashboard.active > .space-y-4:last-child {
+        grid-column: 1 / -1 !important;
+        grid-row: 3 !important;
+    }
+
+    /* Data populer dibuat lebih lapang */
+    #tab-dashboard.active > .space-y-4:first-of-type .bg-white {
+        min-height: 150px;
+    }
+}
+
+@media (min-width: 1280px) {
+    #tab-dashboard.active {
+        grid-template-columns: minmax(0, 1.35fr) minmax(390px, .65fr) !important;
+    }
+}
+
+</style>
+
+
+
+
+
+
+
+
+
+<style>
+/* =========================================================
+   FINAL UPDATE — SIDEBAR HITAM
+   Hanya mengubah tampilan sidebar desktop.
+   Fungsi, navigasi, layout, dan mobile tetap.
+   ========================================================= */
+@media (min-width: 1024px) {
+    #app-content > nav {
+        background: #0f172a !important;
+        border-right-color: rgba(255,255,255,.12) !important;
+        box-shadow: 8px 0 30px rgba(0,0,0,.25) !important;
+    }
+
+    #app-content > nav .desktop-sidebar-brand {
+        border-bottom-color: rgba(255,255,255,.14) !important;
+    }
+
+    #app-content > nav .desktop-sidebar-brand .brand-icon {
+        background: rgba(255,255,255,.10) !important;
+        border-color: rgba(255,255,255,.14) !important;
+        box-shadow: none !important;
+    }
+
+    #app-content > nav .desktop-sidebar-brand .brand-title,
+    #app-content > nav .desktop-sidebar-brand .brand-subtitle {
+        color: #ffffff !important;
+    }
+
+    #app-content > nav .nav-btn {
+        color: rgba(255,255,255,.78) !important;
+    }
+
+    #app-content > nav .nav-btn:hover {
+        background: rgba(255,255,255,.10) !important;
+        color: #ffffff !important;
+    }
+
+    #app-content > nav .nav-btn.active {
+        background: #ffffff !important;
+        color: #111827 !important;
+        box-shadow: 0 6px 18px rgba(0,0,0,.25) !important;
+    }
+
+    #app-content > nav .nav-btn.active i,
+    #app-content > nav .nav-btn.active span {
+        color: #111827 !important;
+    }
+}
+</style>
 
 </head>
 <body class="text-slate-900">
@@ -69,169 +501,360 @@
                 </div>
                 <button id="btn-login-action" class="w-full bg-red-600 text-white py-4 rounded-xl font-black text-xs uppercase shadow-lg active:scale-95 transition">Masuk</button>
             </div>
-            <div class="pt-4 text-center">
-                <p class="text-slate-500 text-[9px]">Buka absensi wajah? <a href="index.html" class="text-green-600 font-bold underline">klik disini</a></p>
-            </div>
+
+	<div class="pt-4">
+	<p class="text-slate-500 text-[9px] leading-relaxed">Buka absensi pindai wajah biometrik?
+	<a href="index.html"
+	class="text-green-600 font-bold hover:text-green-800 underline decoration-2 underline-offset-4 transition-colors">klik disini</a></div>
+        </div>
+
         </div>
     </div>
 
-    <!-- App Content Wrapper -->
+
+    <!-- App Content -->
     <div id="app-content">
-        <div id="app-layout" class="relative min-h-screen">
+        <header class="sticky top-0 z-50">
+            <div class="max-w-md mx-auto bg-red-600 text-white p-4 shadow-lg rounded-b-[2.5rem] flex justify-between items-center px-6">
+                <div class="flex flex-col text-left">
+                    <span class="text-[9px] font-black opacity-70 tracking-widest leading-none">E-PIKET</span>
+                    <h1 class="text-xs font-black uppercase">SMK PGRI 2 KEDONDONG</h1>
+                </div>
+                <div onclick="document.getElementById('profile-modal').classList.add('active')" class="flex items-center gap-2 bg-white/10 p-1 rounded-full backdrop-blur-sm border border-white/10 cursor-pointer active:scale-95">
+                    <div class="leading-tight pl-3 text-right">
+                        <p id="display-name" class="text-[10px] font-black truncate max-w-[80px]">Nama</p>
+                        <p class="text-[7px] font-bold opacity-60 uppercase">Profil</p>
+                    </div>
+                    <img id="user-photo" src="https://ui-avatars.com/api/?background=random" class="w-9 h-9 rounded-full border-2 border-white/30 object-cover">
+                </div>
+            </div>
+        </header>
+
+        <main class="pb-32 p-4 max-w-md mx-auto">
+
+
+<!-- TAB PROFIL -->
+<div id="tab-profil" class="tab-content">
+    <div class="px-6 py-4 pb-24">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-xl font-black text-slate-800 tracking-tighter uppercase">Profil Siswa</h2>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pencarian & Filter Data</p>
+            </div>
+            <div class="w-10 h-10 bg-red-50 rounded-2xl flex items-center justify-center text-red-600">
+                <i class="fas fa-filter text-lg"></i>
+            </div>
+        </div>
+        
+        <div class="space-y-3 mb-6">
+            <!-- Search Bar -->
+            <div class="relative">
+                <input type="text" id="search-profil" onkeyup="window.renderProfilList()" 
+                       placeholder="Cari Nama Siswa..." 
+                       class="w-full bg-white border border-slate-200 rounded-2xl py-3.5 px-6 text-[11px] font-bold focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm">
+                <i class="fas fa-search absolute right-6 top-4 text-slate-300"></i>
+            </div>
+
+            <!-- Filter Kelas & Guru Wali -->
+            <div class="grid grid-cols-2 gap-2">
+                <div class="relative">
+                    <select id="filter-profil-kelas" onchange="window.renderProfilList()" 
+                        class="w-full bg-slate-900 text-white p-3 rounded-xl text-[9px] font-black uppercase appearance-none outline-none border-none shadow-lg">
+                        <option value="SEMUA">SEMUA KELAS</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-white/50 text-[8px] pointer-events-none"></i>
+                </div>
+                <div class="relative">
+                    <select id="filter-profil-guru" onchange="window.renderProfilList()" 
+                        class="w-full bg-slate-900 text-white p-3 rounded-xl text-[9px] font-black uppercase appearance-none outline-none border-none shadow-lg">
+                        <option value="SEMUA">SEMUA GURU WALI</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-white/50 text-[8px] pointer-events-none"></i>
+                </div>
+            </div>
+        </div>
+
+        <div id="profil-list-container" class="space-y-3"></div>
+    </div>
+</div>
+
+
+<div id="editor-modal" class="modal-full-screen">
+    <div class="flex justify-between items-center p-5 border-b border-slate-100 flex-shrink-0 bg-white">
+        <button onclick="window.closeEditor()" class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 active:scale-90 transition-all">
+            <i class="fas fa-times text-lg"></i>
+        </button>
+        <h3 class="font-black text-slate-900 text-[10px] uppercase tracking-[0.2em]">Profil & Pembinaan</h3>
+        <div class="w-10"></div>
+    </div>
+
+    <input type="hidden" id="edit-id">
+
+    <div class="flex-grow overflow-y-auto no-scrollbar bg-white">
+        <div class="p-6 space-y-8 pb-32">
             
-            <!-- SIDEBAR (Desktop) -->
-            <aside id="sidebar" class="hidden md:flex w-[260px] bg-white border-r border-slate-100 flex-col fixed h-screen z-[60]">
-                <div class="p-6">
-                    <div class="bg-red-600 p-5 rounded-2xl text-white mb-8 shadow-lg shadow-red-100">
-                        <span class="text-[10px] font-black opacity-80 tracking-widest block mb-1">E-PIKET</span>
-                        <h1 class="text-xs font-black uppercase leading-tight">SMK PGRI 2 KEDONDONG</h1>
+            <div class="bg-red-600 p-6 rounded-[2.5rem] text-white shadow-2xl shadow-red-100 space-y-6">
+                <div class="text-center">
+                    <div class="relative w-28 h-28 mx-auto mb-4">
+                        <img id="display-foto" src="" class="w-full h-full rounded-[2.5rem] object-cover shadow-2xl border-4 border-white ring-1 ring-white/20">
                     </div>
-                    <nav class="space-y-1">
-                        <button onclick="switchTab('dashboard')" id="side-dashboard" class="nav-btn-sidebar w-full flex items-center gap-3 p-3.5 rounded-xl text-slate-500 font-bold text-xs hover:bg-slate-50 transition-all">
-                            <i class="fas fa-house-chimney text-lg w-6"></i> BERANDA
-                        </button>
-                        <button onclick="switchTab('absensi')" id="side-absensi" class="nav-btn-sidebar w-full flex items-center gap-3 p-3.5 rounded-xl text-slate-500 font-bold text-xs hover:bg-slate-50 transition-all">
-                            <i class="fas fa-user-check text-lg w-6"></i> LAPOR PRESENSI
-                        </button>
-                        <button onclick="switchTab('profil')" id="side-profil" class="nav-btn-sidebar w-full flex items-center gap-3 p-3.5 rounded-xl text-slate-500 font-bold text-xs hover:bg-slate-50 transition-all">
-                            <i class="fas fa-address-card text-lg w-6"></i> PROFIL SISWA
-                        </button>
-                        <button onclick="switchTab('laporan')" id="side-laporan" class="nav-btn-sidebar w-full flex items-center gap-3 p-3.5 rounded-xl text-slate-500 font-bold text-xs hover:bg-slate-50 transition-all">
-                            <i class="fas fa-file-waveform text-lg w-6"></i> REKAP HARIAN
-                        </button>
-                        <button onclick="switchTab('download')" id="side-download" class="nav-btn-sidebar w-full flex items-center gap-3 p-3.5 rounded-xl text-slate-500 font-bold text-xs hover:bg-slate-50 transition-all">
-                            <i class="fas fa-download text-lg w-6"></i> UNDUH EXCEL
-                        </button>
-                        <button onclick="switchTab('config')" id="side-config" class="nav-btn-sidebar w-full flex items-center gap-3 p-3.5 rounded-xl text-slate-500 font-bold text-xs hover:bg-slate-50 transition-all">
-                            <i class="fas fa-database text-lg w-6"></i> DATABASE
-                        </button>
-                    </nav>
+                    <h2 id="edit-nama-display" class="font-black text-white uppercase text-xl tracking-tight mb-1">...</h2>
+                    <p id="display-nis" class="text-[10px] font-bold text-red-100 tracking-[0.2em] mb-4 uppercase"></p>
+                    <div class="flex items-center justify-center gap-2">
+                        <span id="display-kelas" class="px-4 py-1.5 bg-white/20 text-white font-black text-[9px] rounded-full uppercase backdrop-blur-sm">...</span>
+                        <span id="display-sesi" class="px-4 py-1.5 bg-white/20 text-white font-black text-[9px] rounded-full uppercase backdrop-blur-sm">...</span>
+                        <span id="display-tipe" class="px-4 py-1.5 bg-yellow-400 text-red-800 font-black text-[9px] rounded-full uppercase">...</span>
+                    </div>
                 </div>
-                <div class="mt-auto p-6 border-t border-slate-50">
-                    <div onclick="document.getElementById('profile-modal').classList.add('active')" class="flex items-center gap-3 cursor-pointer p-2 hover:bg-red-50 rounded-2xl transition-all group">
-                        <img id="user-photo-side" src="" class="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover">
-                        <div class="overflow-hidden text-left">
-                            <p id="display-name-side" class="text-[11px] font-black truncate text-slate-800">Nama</p>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase">Petugas Piket</p>
+
+                <div class="grid grid-cols-5 gap-2">
+                    <div class="bg-white/10 p-3 rounded-2xl text-center border border-white/10">
+                        <p class="text-[7px] font-black text-white/60 mb-1 uppercase">Alpa</p>
+                        <p id="rekap-a" class="text-base font-black text-white">0</p>
+                    </div>
+                    <div class="bg-white/10 p-3 rounded-2xl text-center border border-white/10">
+                        <p class="text-[7px] font-black text-white/60 mb-1 uppercase">Bolos</p>
+                        <p id="rekap-b" class="text-base font-black text-white">0</p>
+                    </div>
+                    <div class="bg-white/10 p-3 rounded-2xl text-center border border-white/10">
+                        <p class="text-[7px] font-black text-white/60 mb-1 uppercase">Izin</p>
+                        <p id="rekap-i" class="text-base font-black text-white">0</p>
+                    </div>
+                    <div class="bg-white/10 p-3 rounded-2xl text-center border border-white/10">
+                        <p class="text-[7px] font-black text-white/60 mb-1 uppercase">Sakit</p>
+                        <p id="rekap-s" class="text-base font-black text-white">0</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-2xl text-center shadow-lg">
+                        <p class="text-[7px] font-black text-red-600 mb-1 uppercase">TOTAL</p>
+                        <p id="rekap-t" class="text-base font-black text-red-600">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 p-6 rounded-[2.5rem] text-white shadow-2xl shadow-slate-200 space-y-3">
+                <div class="flex items-center justify-between bg-white/5 p-3 rounded-2xl border border-white/5">
+                    <div class="flex items-center gap-3">
+                        <i class="fab fa-whatsapp text-xl text-green-400"></i>
+                        <div>
+                            <p class="text-[7px] font-black text-white/30 uppercase mb-0.5">Siswa</p>
+                            <p id="display-nohp" class="text-xs font-bold">...</p>
                         </div>
                     </div>
+                    <a id="display-nohp-link" href="#" target="_blank" class="bg-white text-slate-900 text-[9px] font-black px-4 py-2 rounded-xl active:scale-95 transition-all">HUBUNGI</a>
                 </div>
-            </aside>
 
-            <!-- MAIN AREA -->
-            <div class="content-wrapper md:pl-[260px] flex flex-col min-h-screen">
+                <div class="flex items-center justify-between bg-white/5 p-3 rounded-2xl border border-white/5">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-user-friends text-lg text-blue-400"></i>
+                        <div>
+                            <p class="text-[7px] font-black text-white/30 uppercase mb-0.5 text-ellipsis">Ortu: <span id="display-orangtua" class="text-white ml-1">...</span></p>
+                            <p id="display-hp-orangtua" class="text-xs font-bold">...</p>
+                        </div>
+                    </div>
+                    <a id="display-hp-ortu-link" href="#" target="_blank" class="bg-white text-slate-900 text-[9px] font-black px-4 py-2 rounded-xl active:scale-95 transition-all">HUBUNGI</a>
+                </div>
+
+                <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <i class="fas fa-map-marker-alt text-lg text-slate-400"></i>
+                    <p id="display-alamat" class="text-[11px] font-bold leading-relaxed">...</p>
+                </div>
+
+                <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <i class="fas fa-envelope text-lg text-slate-400"></i>
+                    <p id="display-emailsiswa" class="text-[11px] font-bold">...</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-6 rounded-[2.5rem] border border-slate-100 grid grid-cols-2 gap-6">
+                <div class="flex flex-col">
+                    <span class="text-[8px] font-black text-red-400 uppercase tracking-widest mb-1">Kesiswaan</span>
+                    <span id="display-kesiswaan" class="text-[11px] font-bold text-slate-800">...</span>
+                </div>
+                <div class="flex flex-col border-l border-slate-200 pl-4">
+                    <span class="text-[8px] font-black text-purple-400 uppercase tracking-widest mb-1">Guru BK</span>
+                    <span id="display-guru-bk" class="text-[11px] font-bold text-slate-800">...</span>
+                </div>
+                <div class="flex flex-col border-t border-slate-200 pt-4">
+                    <span class="text-[8px] font-black text-orange-400 uppercase tracking-widest mb-1">Wali Kelas</span>
+                    <span id="display-wali-kelas" class="text-[11px] font-bold text-slate-800">...</span>
+                </div>
+                <div class="flex flex-col border-t border-l border-slate-200 pt-4 pl-4">
+                    <span class="text-[8px] font-black text-green-400 uppercase tracking-widest mb-1">Guru Wali</span>
+                    <span id="display-guru-wali" class="text-[11px] font-bold text-slate-800">...</span>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h4 class="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] px-2">Riwayat Pembinaan</h4>
+                <div id="history-container" class="space-y-4"></div>
                 
-                <!-- Header (Mobile & Desktop) -->
-                <header class="sticky top-0 z-50">
-                    <div class="max-w-md md:max-w-full mx-auto bg-red-600 text-white p-4 shadow-lg md:shadow-none rounded-b-[2.5rem] md:rounded-none flex justify-between items-center px-6">
-                        <div class="flex flex-col text-left">
-                            <span class="text-[9px] font-black opacity-70 tracking-widest leading-none">Aplikasi Piket Digital</span>
-                            <h1 class="text-xs font-black uppercase">SMK PGRI 2 KEDONDONG</h1>
+                <div class="pt-4">
+                    <button onclick="window.toggleNoteForm()" id="btn-toggle-note" class="w-full py-5 bg-green-500 hover:bg-green-600 rounded-[2rem] text-[10px] font-black text-white uppercase tracking-[0.2em] active:bg-green-700 transition-all border-none">
+                        + Tambah Catatan
+                    </button>
+
+                    <div id="wrapper-note-form" class="hidden bg-slate-950 p-6 rounded-[2.5rem] shadow-2xl mt-4">
+                        <div class="flex justify-between items-center mb-6 px-1">
+                            <h4 class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Input Baru</h4>
+                            <button onclick="window.toggleNoteForm()" class="text-white/20 p-2"><i class="fas fa-times"></i></button>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <span id="session-time-badge" class="hidden md:block bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold">--:--</span>
-                            <div onclick="document.getElementById('profile-modal').classList.add('active')" class="md:hidden">
-                                <img id="user-photo" src="" class="w-9 h-9 rounded-full border-2 border-white/30 object-cover">
-                            </div>
+                        <select id="select-peran" class="w-full bg-white/10 text-white p-4 rounded-2xl text-[11px] font-bold mb-4 border-none outline-none focus:ring-2 focus:ring-red-600 appearance-none shadow-inner">
+                            <option value="Kesiswaan">KESISWAAN</option>
+                            <option value="Guru BK">GURU BK</option>
+                            <option value="Wali Kelas">WALI KELAS</option>
+                            <option value="Guru Wali">GURU WALI</option>
+                            <option value="Guru Mapel">GURU MAPEL</option>
+                        </select>
+                        <textarea id="new-note-text" placeholder="Detail pembinaan..." class="w-full bg-white/10 text-white p-5 rounded-3xl text-[11px] min-h-[120px] border-none outline-none mb-6 focus:ring-2 focus:ring-red-600 placeholder:text-white/10 resize-none"></textarea>
+                        <button onclick="window.addNewNote()" class="w-full bg-red-600 text-white py-5 rounded-3xl font-black text-[11px] uppercase shadow-xl active:scale-95 transition-all">Simpan Catatan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+            <!-- TAB BERANDA -->
+            <div id="tab-dashboard" class="tab-content active space-y-6">
+    <div class="bg-slate-900 p-6 rounded-[2.5rem] shadow-xl shadow-slate-200/50 relative overflow-hidden border border-white/5">
+        <div class="absolute right-0 top-0 opacity-[0.03] transform translate-x-4 -translate-y-4">
+            <i class="fas fa-shield-alt text-9xl text-white"></i>
+        </div>
+
+        <div class="relative z-10 mb-6">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
+                </span>
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Sistem Pemantauan Aktif</p>
+            </div>
+            <h4 class="text-white text-[12px] font-bold leading-relaxed mb-2">
+                PASTIKAN SETIAP KETIDAKHADIRAN SISWA TERCATAT DENGAN AKURAT HARI INI.
+            </h4>
+            <p class="text-slate-400 text-[9px] leading-snug opacity-80">Guru Mapel, Guru Wali,  Wali Kelas, dan Guru BK dapat melakukan bimbingan serta mencatatnya langsung pada sistem aplikasi. Buka absensi pindai wajah biometrik?
+		<a href="index.html"
+		class="text-green-600 font-bold hover:text-green-800 underline decoration-2 underline-offset-4 transition-colors">klik disini</a>
+            </p>
+        </div>
+
+
+        <div class="relative z-10">
+            <button onclick="switchTab('profil')" 
+                class="w-full group relative bg-slate-800/40 hover:bg-slate-800 p-4 rounded-[2rem] border border-white/5 transition-all active:scale-[0.97] text-left">
+                <div class="absolute right-0 top-0 w-24 h-24 bg-red-600/10 rounded-full blur-2xl -mr-8 -mt-8 group-hover:bg-red-600/20 transition-colors"></div>
+                <div class="flex items-center gap-4 relative z-10">
+                    <div class="flex-shrink-0 w-11 h-11 bg-gradient-to-br from-red-500 to-red-700 rounded-2xl flex items-center justify-center shadow-lg shadow-red-900/40 group-hover:rotate-3 transition-transform">
+                        <i class="fas fa-user-check text-white text-base"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="text-[10px] font-black text-white uppercase tracking-wider">Cek Profil & Catatan Siswa</h3>
+                    </div>
+                    <div class="flex-shrink-0 w-7 h-7 rounded-full bg-white/5 group-hover:bg-red-500 transition-all flex items-center justify-center">
+                        <i class="fas fa-chevron-right text-white text-[9px]"></i>
+                    </div>
+                </div>
+            </button>
+        </div>
+    </div>
+
+  <div id="session-card" class="relative overflow-hidden p-6 text-white shadow-xl bg-slate-900 rounded-[2.5rem]">
+        <div class="relative z-10">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                <p class="text-[9px] font-black opacity-60 uppercase tracking-wider">Sesi Saat Ini</p>
+            </div>
+            <div class="mb-4">
+                <h3 id="active-session-display" class="text-3xl font-black leading-none uppercase">MEMUAT...</h3>
+                <p id="dashboard-date" class="text-[9px] text-slate-500 font-bold mt-1 uppercase"></p>
+            </div>
+            <div class="inline-flex items-center gap-2 px-4 py-2 border bg-white/10 backdrop-blur-md rounded-2xl text-[10px] font-bold border-white/10">
+                <i class="far fa-clock"></i>
+                <span id="session-time-badge">--:--</span>
+            </div>
+        </div>
+        <i id="session-bg-icon" class="absolute fas fa-sun -right-4 -bottom-4 text-9xl opacity-10 rotate-12"></i>
+    </div>
+
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between px-2">
+                        <h2 class="font-black text-slate-800 text-[11px] uppercase tracking-wider flex items-center gap-2">
+                            <i class="fas fa-fire text-red-500"></i> DATA POPULER (6 BLN)
+                        </h2>
+                    </div>
+                    <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+                        <div class="bg-green-600 border-b border-slate-100">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-3 text-[8px] font-black text-white uppercase">Nama/Kelas/Guru Wali</th>
+                                        <th class="px-2 py-3 text-[8px] font-black text-white uppercase text-center w-8">B</th>
+                                        <th class="px-2 py-3 text-[8px] font-black text-white uppercase text-center w-8">A</th>
+                                        <th class="px-2 py-3 text-[8px] font-black text-white uppercase text-center w-8">I</th>
+                                        <th class="px-2 py-3 text-[8px] font-black text-white uppercase text-center w-8">S</th>
+                                        <th class="px-2 py-3 text-[8px] font-black text-white uppercase text-center w-10">T</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="max-h-[320px] overflow-y-auto custom-scrollbar">
+                            <table class="w-full text-left border-collapse">
+                                <tbody id="popular-data-body" class="divide-y divide-slate-50"></tbody>
+                            </table>
                         </div>
                     </div>
-                </header>
+                </div>
 
-                <!-- Content Area -->
-                <main class="flex-grow p-4 md:p-8 max-w-5xl mx-auto w-full pb-32">
-                    
-                    <!-- TAB: BERANDA -->
-                    <div id="tab-dashboard" class="tab-content active space-y-6">
-                        <div class="bg-slate-900 p-6 rounded-[2.5rem] shadow-xl text-white relative overflow-hidden">
-                            <div class="relative z-10">
-                                <div class="flex items-center gap-2 mb-3">
-                                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                                    <p class="text-[9px] font-black opacity-60 uppercase tracking-widest">Sistem Aktif</p>
-                                </div>
-                                <h3 id="active-session-display" class="text-3xl font-black uppercase leading-none">SESI ...</h3>
-                                <p id="dashboard-date" class="text-[10px] text-slate-400 font-bold mt-2 uppercase"></p>
-                            </div>
-                            <i class="fas fa-shield-alt absolute -right-4 -bottom-4 text-9xl opacity-10 rotate-12"></i>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
-                                <h2 class="text-[11px] font-black text-slate-800 uppercase mb-4 flex items-center gap-2">
-                                    <i class="fas fa-fire text-red-500"></i> Data Populer (6 Bln)
-                                </h2>
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-left text-[10px]">
-                                        <thead class="bg-slate-50 text-slate-400">
-                                            <tr>
-                                                <th class="p-2">Siswa</th>
-                                                <th class="p-2 text-center">B</th>
-                                                <th class="p-2 text-center">A</th>
-                                                <th class="p-2 text-center">T</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="popular-data-body"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
-                                <h2 class="text-[11px] font-black text-slate-800 uppercase mb-4 flex items-center gap-2">
-                                    <i class="fas fa-history text-blue-500"></i> Aktivitas Terbaru
-                                </h2>
-                                <div id="recent-logs" class="space-y-3"></div>
-                            </div>
-                        </div>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center px-2">
+                        <h2 class="font-black text-slate-800 text-[11px] uppercase flex items-center gap-2 tracking-wider"><i class="fas fa-history text-red-500"></i> Aktivitas Terbaru</h2>
                     </div>
+                    <div id="recent-logs" class="space-y-3"></div>
+                </div>
+            </div>
 
-                    <!-- TAB: LAPOR (PRESENSI) -->
-                    <div id="tab-absensi" class="tab-content space-y-4">
-                        <div class="flex flex-col md:flex-row justify-between gap-4">
-                            <h2 class="font-black text-xs uppercase text-slate-800">Input Data Presensi</h2>
-                            <input type="date" id="report-date" onchange="state.today = this.value; refreshUI();" class="p-2 border rounded-xl text-xs font-bold outline-none">
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button id="btn-session-pagi-input" onclick="updateSessionUI('Pagi')" class="py-3 rounded-2xl text-[10px] font-black transition">PAGI</button>
-                            <button id="btn-session-siang-input" onclick="updateSessionUI('Siang')" class="py-3 rounded-2xl text-[10px] font-black transition">SIANG</button>
-                        </div>
-                        <div class="flex bg-slate-100 p-1 rounded-2xl">
-                            <button id="mode-gtk" onclick="updateModeUI('gtk')" class="flex-1 py-2 rounded-xl text-[10px] font-black transition">GTK</button>
-                            <button id="mode-siswa" onclick="updateModeUI('siswa')" class="flex-1 py-2 rounded-xl text-[10px] font-black transition">SISWA</button>
-                        </div>
-                        <div class="relative">
-                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                            <input type="text" id="search-input" oninput="renderAttendanceList()" class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-xs outline-none" placeholder="Cari nama...">
-                        </div>
-                        <div id="attendance-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+            <!-- TAB LAPOR -->
+            <div id="tab-absensi" class="tab-content">
+                <div class="flex justify-between items-center mb-4 px-1">
+                    <h2 class="font-black text-xs uppercase text-slate-800">Rekap Data Presensi</h2>
+                    <input type="date" id="report-date" onchange="state.today = this.value; refreshUI();" class="text-[10px] border border-slate-200 rounded-lg p-2 font-bold outline-none bg-white">
+                </div>
+                <div class="mb-4 space-y-3">
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="btn-session-pagi-input" onclick="updateSessionUI('Pagi')" class="py-3 rounded-2xl text-[10px] font-black">PAGI</button>
+                        <button id="btn-session-siang-input" onclick="updateSessionUI('Siang')" class="py-3 rounded-2xl text-[10px] font-black">SIANG</button>
                     </div>
-
-                    <!-- TAB: PROFIL SISWA -->
-                    <div id="tab-profil" class="tab-content space-y-4">
-                        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-                                <input type="text" id="search-profil" onkeyup="renderProfilList()" placeholder="Cari Siswa..." class="p-3 border rounded-2xl text-xs font-bold outline-none focus:ring-2 focus:ring-red-500">
-                                <select id="filter-profil-kelas" onchange="renderProfilList()" class="p-3 border rounded-2xl text-xs font-bold outline-none"></select>
-                                <select id="filter-profil-guru" onchange="renderProfilList()" class="p-3 border rounded-2xl text-xs font-bold outline-none"></select>
-                            </div>
-                            <div id="profil-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-                        </div>
+                    <div class="flex bg-slate-200 p-1 rounded-2xl">
+                        <button id="mode-gtk" onclick="updateModeUI('gtk')" class="flex-1 py-2 rounded-xl text-[10px] font-black transition">GTK</button>
+                        <button id="mode-siswa" onclick="updateModeUI('siswa')" class="flex-1 py-2 rounded-xl text-[10px] font-black transition">SISWA</button>
                     </div>
-
-                    <!-- TAB: REKAP HARIAN -->
-                    <div id="tab-laporan" class="tab-content space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <button onclick="shareReport('wa')" class="bg-green-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase flex items-center justify-center gap-2 shadow-lg"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-                            <button onclick="shareReport('copy')" class="bg-slate-800 text-white py-4 rounded-2xl font-black text-[10px] uppercase flex items-center justify-center gap-2 shadow-lg"><i class="fas fa-copy"></i> Salin Teks</button>
-                            <button onclick="printRekapHarianPDF()" class="bg-red-700 text-white py-4 rounded-2xl font-black text-[10px] uppercase flex items-center justify-center gap-2 shadow-lg"><i class="fas fa-file-pdf"></i> Kirim PDF</button>
-                        </div>
-                        <div id="report-list-container" class="space-y-3"></div>
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" id="search-input" class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl text-xs outline-none focus:ring-2 focus:ring-red-500 shadow-sm" placeholder="Cari nama atau kelas...">
                     </div>
+                </div>
+                <div id="attendance-container" class="space-y-3"></div>
+            </div>
+
+
+            <!-- TAB REKAP -->
+            <div id="tab-laporan" class="tab-content">
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                    <button id="btn-session-pagi-report" onclick="updateSessionUI('Pagi')" class="py-3 rounded-2xl text-[10px] font-black shadow-sm">PAGI</button>
+                    <button id="btn-session-siang-report" onclick="updateSessionUI('Siang')" class="py-3 rounded-2xl text-[10px] font-black shadow-sm">SIANG</button>
+                </div>
+                <div class="flex gap-2 mb-6">
+                    <button onclick="shareReport('wa')" class="flex-1 bg-green-600 text-white py-4 rounded-xl font-black text-[9px] flex items-center justify-center gap-2 active:scale-95 transition uppercase"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                    <button onclick="shareReport('copy')" class="flex-1 bg-slate-800 text-white py-4 rounded-xl font-black text-[9px] flex items-center justify-center gap-2 active:scale-95 transition uppercase"><i class="fas fa-copy"></i> Salin Teks</button>
+                    <button onclick="printRekapHarianPDF()" class="flex-1 bg-red-700 text-white py-4 rounded-xl font-black text-[10px] flex items-center justify-center gap-2 uppercase"> <i class="fas fa-file-pdf"></i> Kirim PDF </button>
+                </div>
+                <div id="report-list-container" class="space-y-3"></div>
+            </div>
 
 
 
-
-
-
-
-
+            <!-- TAB UNDUH -->
 <div id="tab-download" class="tab-content">
     <div class="flex bg-gray-100 p-1 rounded-xl mb-6 shadow-inner">
         <button onclick="setDownloadSession('Pagi')" id="btn-dl-pagi" 
@@ -340,113 +963,92 @@
 
 
 
-
-
-
-
-
-
-
-
-                    <!-- TAB: DATABASE -->
-                    <div id="tab-config" class="tab-content max-w-lg mx-auto">
-                        <div class="bg-white p-8 rounded-3xl border border-slate-100 text-center shadow-sm">
-                            <div id="kesiswaan-lock">
-                                <i class="fas fa-lock text-4xl text-slate-200 mb-4"></i>
-                                <h3 class="text-xs font-black text-slate-800 uppercase mb-4">Panel Kesiswaan</h3>
-                                <input type="password" id="kesiswaan-pass" class="w-full p-4 bg-slate-50 border rounded-2xl text-center mb-4 font-bold" placeholder="••••">
-                                <button onclick="unlockDb()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs">BUKA AKSES</button>
-                            </div>
-                            <div id="kesiswaan-content" class="hidden text-left space-y-6">
-                                <a href="https://docs.google.com/spreadsheets/d/16P8Xa3WFx7y6JKG8vZfL2Tp31Ppchs9b/edit" target="_blank" class="w-full bg-green-600 text-white py-4 rounded-2xl font-black text-xs flex items-center justify-center gap-2"><i class="fas fa-table"></i> BUKA GOOGLE SHEETS</a>
-                                <textarea id="sheet-url" class="w-full p-4 border rounded-2xl text-[10px] h-24 font-mono" placeholder="CSV Link..."></textarea>
-                                <button onclick="saveAndSync()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black text-xs">SIMPAN & UPDATE</button>
-                                <button onclick="resetAllFirebaseData()" class="w-full border-2 border-red-600 text-red-600 py-4 rounded-2xl font-black text-xs">KOSONGKAN RIWAYAT</button>
-                            </div>
-                        </div>
+            <!-- TAB DATABASE -->
+            <div id="tab-config" class="tab-content">
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 text-center">
+                    <div id="kesiswaan-lock">
+                        <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-lock text-xl"></i></div>
+                        <h3 class="text-xs font-black text-slate-800 uppercase mb-2">Panel Kesiswaan</h3>
+                        <input type="password" id="kesiswaan-pass" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs mb-4 text-center outline-none font-bold focus:ring-2 focus:ring-red-500" placeholder="••••">
+                        <button onclick="unlockDb()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-[10px] uppercase active:scale-95 transition">BUKA AKSES</button>
                     </div>
 
-                </main>
-            </div>
-        </div>
+		<div id="kesiswaan-content" class="hidden text-left">
+		    <div class="flex items-center justify-between mb-4 pb-2 border-b">
+		        <h3 class="text-xs font-black text-red-600 uppercase">Database Master</h3>
+		    </div>
+		   <!-- Tombol Langsung ke Google Sheets -->
+		    <a href="https://docs.google.com/spreadsheets/d/16P8Xa3WFx7y6JKG8vZfL2Tp31Ppchs9b/edit?usp=sharing&ouid=106742461028090272241&rtpof=true&sd=true" target="_blank" 
+		       class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-[10px] uppercase mb-4 active:scale-95 transition flex items-center justify-center gap-3 shadow-xl">
+		        <i class="fas fa-table text-green-400"></i> BUKA SPREADSHEET MASTER
+		    </a>
 
-        <!-- BOTTOM NAV (Mobile) -->
-        <nav class="mobile-nav fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-4 pb-8 pt-3 z-50 rounded-t-[2.5rem] shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
-            <div class="max-w-md mx-auto flex justify-between items-center px-4">
-                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center gap-1 text-slate-400">
-                    <i class="fas fa-house-chimney text-lg"></i><span class="text-[7px] font-black uppercase">Beranda</span>
-                </button>
-                <button onclick="switchTab('absensi')" id="nav-absensi" class="nav-btn flex flex-col items-center gap-1 text-slate-400">
-                    <i class="fas fa-user-check text-lg"></i><span class="text-[7px] font-black uppercase">Lapor</span>
-                </button>
-                <button onclick="switchTab('laporan')" id="nav-laporan" class="nav-btn flex flex-col items-center gap-1 text-slate-400">
-                    <i class="fas fa-file-waveform text-lg"></i><span class="text-[7px] font-black uppercase">Rekap</span>
-                </button>
-                <button onclick="switchTab('download')" id="nav-download" class="nav-btn flex flex-col items-center gap-1 text-slate-400">
-                    <i class="fas fa-download text-lg"></i><span class="text-[7px] font-black uppercase">Unduh</span>
-                </button>
-                <button onclick="switchTab('profil')" id="nav-profil" class="nav-btn flex flex-col items-center gap-1 text-slate-400">
-                    <i class="fas fa-address-card text-lg"></i><span class="text-[7px] font-black uppercase">Profil</span>
-                </button>
+		    <p class="text-[9px] font-bold text-slate-400 uppercase mb-2 ml-1">Link CSV Google Sheets</p>
+
+		    <textarea id="sheet-url" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[10px] h-28 mb-4 outline-none font-mono focus:ring-2 focus:ring-red-500" placeholder="CSV Google Sheets URL"></textarea>
+		    <button onclick="saveAndSync()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black text-xs uppercase shadow-lg shadow-red-200 active:scale-95 transition flex items-center justify-center gap-2"><i class="fas fa-cloud-upload-alt"></i> SIMPAN & UPDATE</button>
+
+		    <div class="mt-8 pt-6 border-t border-dashed border-slate-200">
+		        <p class="text-[9px] font-bold text-slate-400 uppercase mb-3 text-center">WARNING!</p>
+		        <button onclick="resetAllFirebaseData()" class="w-full bg-white text-red-600 border-2 border-red-600 py-4 rounded-2xl font-black text-xs uppercase active:bg-red-50 transition flex items-center justify-center gap-2">
+		            <i class="fas fa-eraser"></i> Kosongkan Semua Riwayat
+		        </button>
+		        <p class="text-[8px] text-slate-400 mt-2 text-center leading-relaxed italic">Catatan: Gunakan tombol ini hanya saat memulai tahun ajaran baru untuk menghapus seluruh riwayat absen & pembinaan.</p>
+		    </div>
+		</div>
             </div>
+        </main>
+
+        <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-slate-100 px-4 pb-9 pt-3 z-50 rounded-t-[2.5rem] shadow-lg">
+            <div class="desktop-sidebar-brand">
+                <div class="brand-icon"><i class="fas fa-user-shield text-4xl"></i></div>
+                <div>
+                    <div class="brand-title">E-PIKET</div>
+                    <div class="brand-subtitle">SMK PGRI 2 KEDONDONG</div>
+                </div>
+            </div>
+            <div class="max-w-md mx-auto flex justify-between items-center px-4">
+                <button onclick="switchTab('dashboard')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="nav-dashboard"><i class="fas fa-house-chimney text-lg"></i><span class="text-[7px] font-black">BERANDA</span></button>
+                <button onclick="switchTab('absensi')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="nav-absensi"><i class="fas fa-user-check text-lg"></i><span class="text-[7px] font-black">LAPOR</span></button>
+                <button onclick="switchTab('laporan')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="nav-laporan"><i class="fas fa-file-waveform text-lg"></i><span class="text-[7px] font-black">REKAP</span></button>
+                <button onclick="switchTab('download')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="nav-download"><i class="fas fa-download text-lg"></i><span class="text-[7px] font-black">UNDUH</span></button>
+		<button onclick="switchTab('profil')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="nav-profil"><i class="fas fa-address-card text-lg"></i><span class="text-[7px] font-black">PROFIL</span></button>
+                <button onclick="switchTab('config')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" id="nav-config"><i class="fas fa-database text-lg"></i><span class="text-[7px] font-black">SETTING DATA</span></button>
+            
+		<div class="mt-auto w-full hidden lg:block pt-4 border-t border-white/10">
+            <!-- Tanda Online Palsu -->
+            <div class="flex items-center gap-3 px-3 py-2 mb-2 bg-white/5 rounded-xl">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
+                </span>
+                <span class="text-[8px] font-black text-white/40 tracking-[0.2em] uppercase">Sistem Online</span>
+            </div>
+
+            <!-- Menu Keluar -->
+            <button onclick="logout()" class="nav-btn group flex items-center gap-3 w-full px-3 py-4 rounded-xl text-white/60 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300">
+                <i class="fas fa-sign-out-alt text-sm group-hover:scale-110 transition-transform"></i><span class="text-[9px] font-black uppercase tracking-widest">Keluar Akun</span></button>
+		 </div>
+		</div>
         </nav>
     </div>
 
-    <!-- MODAL: EDITOR SISWA (Full Screen) -->
-    <div id="editor-modal" class="modal-full-screen">
-        <div class="flex justify-between items-center p-5 border-b border-slate-100 bg-white sticky top-0 z-20">
-            <button onclick="closeEditor()" class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 active:scale-90 transition-all"><i class="fas fa-times"></i></button>
-            <h3 class="font-black text-slate-900 text-[10px] uppercase tracking-widest">Detail & Pembinaan</h3>
-            <div class="w-10"></div>
-        </div>
-        <div class="flex-grow overflow-y-auto p-6 space-y-6 pb-20">
-            <input type="hidden" id="edit-id">
-            <div class="bg-red-600 p-6 rounded-[2.5rem] text-white shadow-xl text-center space-y-4">
-                <img id="display-foto" src="" class="w-24 h-24 mx-auto rounded-3xl border-4 border-white/20 object-cover shadow-2xl">
-                <div>
-                    <h2 id="edit-nama-display" class="text-xl font-black uppercase leading-tight">...</h2>
-                    <p id="display-nis" class="text-[9px] font-bold opacity-60"></p>
-                </div>
-                <div class="flex justify-center gap-2 flex-wrap">
-                    <span id="display-kelas" class="bg-white/20 px-3 py-1 rounded-full text-[8px] font-black uppercase">...</span>
-                    <span id="display-sesi" class="bg-white/20 px-3 py-1 rounded-full text-[8px] font-black uppercase">...</span>
-                </div>
-                <div class="grid grid-cols-4 gap-2 pt-4">
-                    <div class="bg-white/10 p-2 rounded-xl"><p class="text-[7px] opacity-60">A</p><p id="rekap-a" class="font-black">0</p></div>
-                    <div class="bg-white/10 p-2 rounded-xl"><p class="text-[7px] opacity-60">B</p><p id="rekap-b" class="font-black">0</p></div>
-                    <div class="bg-white/10 p-2 rounded-xl"><p class="text-[7px] opacity-60">I</p><p id="rekap-i" class="font-black">0</p></div>
-                    <div class="bg-white/10 p-2 rounded-xl text-yellow-400 font-black"><p class="text-[7px] text-white opacity-60">T</p><p id="rekap-t">0</p></div>
-                </div>
-            </div>
-
-            <div class="space-y-3">
-                <h4 class="text-[10px] font-black uppercase text-slate-400">Konten Pembinaan</h4>
-                <div id="history-container" class="space-y-3"></div>
-                <div class="pt-4 space-y-3">
-                    <select id="select-peran" class="w-full p-4 bg-slate-50 border rounded-2xl text-xs font-bold">
-                        <option value="Kesiswaan">KESISWAAN</option>
-                        <option value="Guru BK">GURU BK</option>
-                        <option value="Wali Kelas">WALI KELAS</option>
-                        <option value="Guru Wali">GURU WALI</option>
-                    </select>
-                    <textarea id="new-note-text" class="w-full p-5 bg-slate-50 border rounded-3xl text-xs h-32" placeholder="Tulis detail pembinaan..."></textarea>
-                    <button onclick="addNewNote()" class="w-full bg-red-600 text-white py-5 rounded-2xl font-black text-xs uppercase">Simpan Catatan</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: PROFIL USER -->
-    <div id="profile-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm items-center justify-center p-6" style="display:none;">
-        <div class="w-full max-w-xs bg-white rounded-[2.5rem] p-8 text-center relative shadow-2xl">
-            <button onclick="document.getElementById('profile-modal').style.display='none'" class="absolute top-5 right-5 text-slate-300"><i class="fas fa-times"></i></button>
-            <img id="modal-photo" src="" class="w-24 h-24 rounded-full mx-auto border-4 border-red-50 object-cover mb-4">
-            <h3 id="modal-name" class="font-black text-slate-800 text-lg uppercase mb-6">...</h3>
-            <button onclick="logout()" class="w-full bg-red-50 text-red-600 py-4 rounded-2xl font-black text-xs uppercase"><i class="fas fa-sign-out-alt mr-2"></i> Keluar</button>
+    <div id="profile-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm items-center justify-center p-6">
+        <div class="w-full max-w-xs bg-white rounded-[2.5rem] p-6 shadow-2xl relative text-center">
+            <button onclick="document.getElementById('profile-modal').classList.remove('active')" class="absolute top-4 right-4 text-slate-400 p-2"><i class="fas fa-times"></i></button>
+            <img id="modal-photo" src="" class="w-24 h-24 rounded-full mx-auto border-4 border-red-50 object-cover mb-4 mt-4">
+            <h3 id="modal-name" class="font-black text-slate-800 text-lg uppercase">Nama</h3>
+            <button onclick="logout()" class="w-full bg-red-50 text-red-600 py-4 rounded-2xl font-black text-[10px]"><i class="fas fa-sign-out-alt mr-2"></i>KELUAR</button>
         </div>
     </div>
 
     <div id="toast" class="fixed bottom-28 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white px-6 py-3 rounded-2xl text-[10px] font-black opacity-0 transition-all pointer-events-none z-[200]"></div>
+
+
+
+
+
+
 
 
 
@@ -479,16 +1081,39 @@
         // --- GLOBAL STATE ---
         window.state = {
             currentUser: localStorage.getItem('absen_user') || null,
-            master: { 
-                gtk: JSON.parse(localStorage.getItem('absensi_gtk')) || [], 
-                siswa: JSON.parse(localStorage.getItem('absensi_siswa')) || [] 
+            master: {
+                gtk: JSON.parse(localStorage.getItem('absensi_gtk')) || [],
+                siswa: JSON.parse(localStorage.getItem('absensi_siswa')) || []
             },
-            records: {}, 
+            records: {},
+            // Index master data untuk pencarian O(1) berdasarkan ID.
+            peopleById: {},
             currentMode: 'siswa',
-            activeSession: 'Pagi', 
-	    profilSortMode: 'kelas',
+            activeSession: 'Pagi',
+            profilSortMode: 'kelas',
             today: new Date().toISOString().split('T')[0]
         };
+
+        // ============================================================
+        // PERFORMANCE: INDEX MASTER DATA
+        // Menghindari .find() berulang pada seluruh data GTK + siswa.
+        // ============================================================
+        window.rebuildPeopleIndex = function() {
+            const index = Object.create(null);
+            const gtk = state.master?.gtk || [];
+            const siswa = state.master?.siswa || [];
+
+            for (const person of gtk) {
+                if (person?.id != null) index[String(person.id)] = person;
+            }
+            for (const person of siswa) {
+                if (person?.id != null) index[String(person.id)] = person;
+            }
+
+            state.peopleById = index;
+        };
+
+        window.rebuildPeopleIndex();
 
         window.showToast = (msg) => {
             const t = document.getElementById('toast');
@@ -499,34 +1124,22 @@
 
         // --- LOGIKA NAVIGASI ---
 window.switchTab = (tab) => {
-    // 1. Sembunyikan semua tab
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active', 'text-red-600'));
     
-    // 2. Reset semua button (Sidebar & Bottom Nav)
-    document.querySelectorAll('.nav-btn, .nav-btn-sidebar').forEach(b => {
-        b.classList.remove('active', 'text-red-600', 'bg-red-50');
-        b.classList.add('text-slate-400');
-    });
-
-    // 3. Aktifkan tab & button yang dipilih
     document.getElementById(`tab-${tab}`).classList.add('active');
-    
-    // Bottom Nav (Mobile)
-    const mobileBtn = document.getElementById(`nav-${tab}`);
-    if(mobileBtn) mobileBtn.classList.add('active', 'text-red-600');
+    document.getElementById(`nav-${tab}`).classList.add('active', 'text-red-600');
 
-    // Sidebar Nav (Desktop)
-    const sideBtn = document.getElementById(`side-${tab}`);
-    if(sideBtn) {
-        sideBtn.classList.add('text-red-600', 'bg-red-50');
-        sideBtn.classList.remove('text-slate-400');
+    if (tab !== 'config') {
+        document.getElementById('kesiswaan-lock').classList.remove('hidden');
+        document.getElementById('kesiswaan-content').classList.add('hidden');
+        document.getElementById('kesiswaan-pass').value = '';
     }
 
-    // 4. Trigger fungsi khusus tiap tab
-    if(tab === 'profil') populateProfilFilters();
-    if(tab === 'download') updateDownloadClassList(state.activeSession);
+    // PERBAIKAN DI SINI
+    if(tab === 'download') { if(typeof updateDownloadClassList === 'function') {updateDownloadClassList(state.activeSession); }}
     
-    window.scrollTo(0,0);
+    if(tab === 'profil') { if(typeof window.renderProfilList === 'function') {window.populateProfilFilters(); window.renderProfilList();} }
     refreshUI();
 };
 
@@ -545,6 +1158,17 @@ window.switchTab = (tab) => {
 
             refreshUI();
         };
+
+        // PERFORMANCE: debounce pencarian agar tidak render pada setiap karakter.
+        (() => {
+            const searchInput = document.getElementById('search-input');
+            if (!searchInput) return;
+            let searchTimer = null;
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(() => renderAttendanceList(), 150);
+            });
+        })();
 
         window.updateModeUI = (m) => {
             state.currentMode = m;
@@ -630,13 +1254,16 @@ window.calculatePopularData = () => {
     window.state.cachedPopularHTML = sorted.map(item => {
         const s = state.master.siswa.find(x => x.id === item.id);
         if (!s) return '';
-	// TAMBAHKAN onclick="window.openEditor('${s.id}')" pada tag <tr>
-        // TAMBAHKAN juga class "cursor-pointer active:bg-slate-50" untuk efek klik
+
         return `
         <tr onclick="window.openEditor('${s.id}')" class="border-b border-slate-50 cursor-pointer active:bg-slate-100 transition-all">
             <td class="px-4 py-3">
                 <p class="text-[9px] font-black uppercase text-slate-800">${s.nama}</p>
-                <p class="text-[7px] font-bold text-slate-400 uppercase">${s.kelas}</p>
+                <div class="flex flex-col gap-0.5 mt-0.5">
+                    <span class="text-[7px] font-bold text-slate-400 uppercase leading-none">${s.kelas}</span>
+                    <!-- Tampilan Guru Wali -->
+                    <span class="text-[7px] font-black text-red-500 uppercase italic leading-none">GW: ${s.guruWali || '-'}</span>
+                </div>
             </td>
             <td class="text-center text-[9px] font-bold w-8 text-orange-600">${item.B}</td>
             <td class="text-center text-[9px] font-bold w-8 text-red-600">${item.A}</td>
@@ -655,58 +1282,65 @@ window.renderPopularData = () => {
 
         window.renderRecentLogs = () => {
             const container = document.getElementById('recent-logs');
+            if (!container) return;
+
             const todayLogs = Object.values(state.records[state.today] || {});
             const logs = todayLogs.sort((a,b) => b.timestamp - a.timestamp).slice(0, 5);
-            
-            if(logs.length === 0) {
+
+            if (logs.length === 0) {
                 container.innerHTML = `<div class="bg-white p-6 rounded-3xl border border-dashed border-slate-200 text-center text-[8px] font-bold text-slate-300 uppercase italic">Belum ada aktivitas hari ini</div>`;
                 return;
             }
 
             container.innerHTML = logs.map(l => {
-        const p = [...state.master.gtk, ...state.master.siswa].find(i => i.id === l.personId);
-        const time = new Date(l.timestamp).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
-        
-        // Jika yang absen adalah siswa, berikan fungsi klik openEditor
-        const clickAction = p?.tipe !== 'guru' ? `onclick="window.openEditor('${p.id}')"` : '';
-        const cursorClass = p?.tipe !== 'guru' ? 'cursor-pointer active:scale-[0.98]' : '';
+                const p = state.peopleById[String(l.personId)];
+                const time = new Date(l.timestamp).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
+                const clickAction = p?.tipe !== 'guru' && p?.id ? `onclick="window.openEditor('${p.id}')"` : '';
+                const cursorClass = p?.tipe !== 'guru' ? 'cursor-pointer active:scale-[0.98]' : '';
 
-        return `<div ${clickAction} class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-50 shadow-sm transition-all ${cursorClass}">
-            <div class="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-[10px] font-black">${l.status[0]}</div>
-            <div class="flex-1">
-                <h5 class="text-[9px] font-black uppercase text-slate-800">${p?.nama || 'N/A'}</h5>
-                <p class="text-[7px] font-bold text-slate-400 uppercase">${l.status} • ${time}</p>
-            </div>
-            ${p?.tipe !== 'guru' ? '<i class="fas fa-chevron-right text-[8px] text-slate-200"></i>' : ''}
-        </div>`;
-    }).join('');
-};
+                return `<div ${clickAction} class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-slate-50 shadow-sm transition-all ${cursorClass}">
+                    <div class="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-[10px] font-black">${l.status ? l.status[0] : '?'}</div>
+                    <div class="flex-1">
+                        <h5 class="text-[9px] font-black uppercase text-slate-800">${p?.nama || 'N/A'}</h5>
+                        <p class="text-[7px] font-bold text-slate-400 uppercase">${l.status || '-'} • ${time}</p>
+                    </div>
+                    ${p?.tipe !== 'guru' ? '<i class="fas fa-chevron-right text-[8px] text-slate-200"></i>' : ''}
+                </div>`;
+            }).join('');
+        };
 
         window.renderReport = () => {
             const container = document.getElementById('report-list-container');
-            const todayRecs = Object.values(state.records[state.today] || {}).filter(r => r.session === state.activeSession);
-            const classes = [...new Set(state.master.siswa.map(s => s.kelas))].filter(Boolean).sort();
+            if (!container) return;
+
+            const todayRecs = Object.values(state.records[state.today] || {})
+                .filter(r => r.session === state.activeSession);
+            const classes = [...new Set(state.master.siswa.map(s => s.kelas))]
+                .filter(Boolean).sort();
             const groups = ['GTK', ...classes];
-            
+            const grouped = Object.create(null);
+
+            for (const rec of todayRecs) {
+                const p = state.peopleById[String(rec.personId)];
+                if (!p) continue;
+                const group = p.tipe === 'guru' ? 'GTK' : p.kelas;
+                if (!grouped[group]) grouped[group] = [];
+                grouped[group].push({ rec, p });
+            }
+
             container.innerHTML = groups.map(cls => {
-                const recs = todayRecs.filter(r => {
-                    const p = [...state.master.gtk, ...state.master.siswa].find(i => i.id === r.personId);
-                    return cls === 'GTK' ? p?.tipe === 'guru' : p?.kelas === cls;
-                });
-                if(recs.length === 0) return '';
+                const items = grouped[cls] || [];
+                if (!items.length) return '';
+
                 return `<div class="bg-white p-4 rounded-3xl border border-slate-100 mb-3 shadow-sm">
                     <h4 class="text-[10px] font-black text-red-600 uppercase mb-2 border-b border-slate-50 pb-1 flex justify-between">
-                        <span>${cls}</span>
-                        <span class="opacity-30">${recs.length}</span>
+                        <span>${cls}</span><span class="opacity-30">${items.length}</span>
                     </h4>
                     <div class="flex flex-col gap-1">
-                        ${recs.map(r => {
-                            const p = [...state.master.gtk, ...state.master.siswa].find(i => i.id === r.personId);
-                            return `<div class="bg-slate-50 px-3 py-1.5 rounded-xl text-[9px] font-bold flex justify-between items-center uppercase">
-                                <span class="text-slate-700">${p?.nama}</span>
-                                <span class="text-red-600 font-black">${r.status}</span>
-                            </div>`;
-                        }).join('')}
+                        ${items.map(({rec, p}) => `<div class="bg-slate-50 px-3 py-1.5 rounded-xl text-[9px] font-bold flex justify-between items-center uppercase">
+                            <span class="text-slate-700">${p?.nama || 'N/A'}</span>
+                            <span class="text-red-600 font-black">${rec.status || '-'}</span>
+                        </div>`).join('')}
                     </div>
                 </div>`;
             }).join('') || `<div class="text-center py-20 opacity-20 font-black text-[10px] uppercase">Tidak Ada Laporan Masuk</div>`;
@@ -1003,37 +1637,42 @@ const updateDownloadClassList = (sesi) => {
 };
 
         window.shareReport = (mode) => {
-            const todayRecs = Object.values(state.records[state.today] || {}).filter(r => r.session === state.activeSession);
-            if(todayRecs.length === 0) { showToast("❌ Belum ada data!"); return; }
-	          const dateStr = new Date(state.today).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            const todayRecs = Object.values(state.records[state.today] || {})
+                .filter(r => r.session === state.activeSession);
+            if (todayRecs.length === 0) { showToast("❌ Belum ada data!"); return; }
+
+            const dateStr = new Date(state.today).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
             let text = `📢 *LAPORAN PRESENSI SMKS PGRI 2 KEDONDONG*\n`;
             text += `📅 *${dateStr.toUpperCase()}*\n`;
             text += `🕒 *SESI ${state.activeSession.toUpperCase()}*\n\n`;
 
-            [...new Set([...state.master.gtk, ...state.master.siswa].map(x => x.tipe === 'guru' ? 'GTK' : x.kelas))].forEach(grp => {
+            const groups = [...new Set(Object.values(state.peopleById)
+                .map(x => x.tipe === 'guru' ? 'GTK' : x.kelas)
+                .filter(Boolean))];
+
+            for (const grp of groups) {
                 const recs = todayRecs.filter(r => {
-                    const p = [...state.master.gtk, ...state.master.siswa].find(i => i.id === r.personId);
-                    return grp === 'GTK' ? p?.tipe === 'guru' : p?.kelas === grp;
+                    const p = state.peopleById[String(r.personId)];
+                    return p && (grp === 'GTK' ? p.tipe === 'guru' : p.kelas === grp);
                 });
-                if(recs.length > 0) {
-                    text += `*${grp}:*\n`;
-                    recs.forEach(r => {
-                        const p = [...state.master.gtk, ...state.master.siswa].find(i => i.id === r.personId);
-                        const kodeStatus = r.status === 'Tanpa Keterangan' ? 'TK' :
-                   r.status === 'Dinas Luar' ? 'DL' :
-                   r.status === 'Bolos' ? 'B' :
-                   r.status === 'Alpa' ? 'A' :
-                   r.status === 'Izin' ? 'I' :
-                   r.status === 'Sakit' ? 'S' : '';
+                if (!recs.length) continue;
 
-			text += `- ${p?.nama} (${kodeStatus})\n`;
-                    });
-                    text += `\n`;
+                text += `*${grp}:*\n`;
+                for (const r of recs) {
+                    const p = state.peopleById[String(r.personId)];
+                    const kodeStatus = r.status === 'Tanpa Keterangan' ? 'TK' :
+                        r.status === 'Dinas Luar' ? 'DL' :
+                        r.status === 'Bolos' ? 'B' :
+                        r.status === 'Alpa' ? 'A' :
+                        r.status === 'Izin' ? 'I' :
+                        r.status === 'Sakit' ? 'S' : '';
+                    text += `- ${p?.nama || 'N/A'} (${kodeStatus})\n`;
                 }
-            });
+                text += `\n`;
+            }
 
-	text += `👤 *Petugas Piket:* ${state.currentUser}\n`;
-        text += `_Dibuat melalui E-Piket_`;
+            text += `👤 *Petugas Piket:* ${state.currentUser}\n`;
+            text += `_Dibuat melalui E-Piket_`;
 
             if (mode === 'wa') {
                 window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
@@ -1042,7 +1681,8 @@ const updateDownloadClassList = (sesi) => {
                 ta.value = text;
                 document.body.appendChild(ta);
                 ta.select();
-                try { document.execCommand('copy'); showToast("📋 Laporan Tersalin!"); } catch(e) { showToast("❌ Gagal menyalin"); }
+                try { document.execCommand('copy'); showToast("📋 Laporan Tersalin!"); }
+                catch(e) { showToast("❌ Gagal menyalin"); }
                 document.body.removeChild(ta);
             }
         };
@@ -1113,14 +1753,14 @@ function downloadXLSX(wb, filename) {
               return;
             }
 
-            const allPeople = [...state.master.gtk, ...state.master.siswa];
+            
 
             const payload = {
               date: today,
               session: session,
               petugas: state.currentUser,
               records: dayRecords.map(r => {
-                const p = allPeople.find(x => x.id === r.personId) || {};
+                const p = state.peopleById[String(r.personId)] || {};
                 return {
                   nama: p.nama || "N/A",
                   kelas: p.kelas || "-",
@@ -1219,6 +1859,7 @@ const autoSyncData = async (url) => {
         });
 
         state.master = { gtk, siswa };
+        rebuildPeopleIndex();
         localStorage.setItem('absensi_gtk', JSON.stringify(gtk));
         localStorage.setItem('absensi_siswa', JSON.stringify(siswa));
         refreshUI();
@@ -1264,8 +1905,6 @@ const autoSyncData = async (url) => {
                 document.getElementById('app-content').classList.add('active');
                 document.getElementById('display-name').innerText = state.currentUser;
                 document.getElementById('modal-name').innerText = state.currentUser;
-document.getElementById('display-name-side').innerText = state.currentUser;
-        document.getElementById('user-photo-side').src = `https://ui-avatars.com/api/?name=${state.currentUser}&background=ef4444&color=fff&bold=true`;
                 document.getElementById('user-photo').src = `https://ui-avatars.com/api/?name=${state.currentUser}&background=ef4444&color=fff&bold=true`;
                 document.getElementById('modal-photo').src = `https://ui-avatars.com/api/?name=${state.currentUser}&background=ef4444&color=fff&bold=true`;
                 await signInAnonymously(auth);
@@ -1285,19 +1924,41 @@ document.getElementById('display-name-side').innerText = state.currentUser;
         };
 
         onAuthStateChanged(auth, (user) => {
-            if (user) {onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'attendance_records'),
-  (snap) => {
-    const recs = {};
-    snap.forEach(d => {
-        const data = d.data();
-        if(!recs[data.date]) recs[data.date] = {};
-        recs[data.date][`${data.personId}_${data.session}`] = data;
-    });
-    state.records = recs; 
-    window.calculatePopularData(); 
-    refreshUI();
-});
+            if (user) {
+                // PERFORMANCE: proses perubahan Firestore secara incremental.
+                // Snapshot awal tetap memuat data yang sudah ada, tetapi update berikutnya
+                // tidak lagi membangun ulang seluruh state.records dari nol.
+                onSnapshot(
+                    collection(db, 'artifacts', appId, 'public', 'data', 'attendance_records'),
+                    (snap) => {
+                        if (snap.metadata.fromCache && Object.keys(state.records).length > 0 && snap.docChanges().length === 0) {
+                            return;
+                        }
 
+                        for (const change of snap.docChanges()) {
+                            const data = change.doc.data();
+                            if (!data?.date || !data?.personId || !data?.session) continue;
+
+                            if (!state.records[data.date]) {
+                                state.records[data.date] = {};
+                            }
+
+                            const key = `${data.personId}_${data.session}`;
+
+                            if (change.type === 'removed') {
+                                delete state.records[data.date][key];
+                                if (Object.keys(state.records[data.date]).length === 0) {
+                                    delete state.records[data.date];
+                                }
+                            } else {
+                                state.records[data.date][key] = data;
+                            }
+                        }
+
+                        window.calculatePopularData();
+                        refreshUI();
+                    }
+                );
 
                 // AUTO-SYNC MASTER DATA DARI FIREBASE SETIAP KALI PIKET LOGIN
                 getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'master_link')).then(d => { 
@@ -1404,19 +2065,24 @@ window.onload = () => {
 // --- RENDER LIST SISWA DI TAB PROFIL ---
 // Fungsi untuk mengisi pilihan di Dropdown Filter
 window.populateProfilFilters = () => {
-    const kSelect = document.getElementById('filter-profil-kelas');
-    const gSelect = document.getElementById('filter-profil-guru');
+    const kelasSelect = document.getElementById('filter-profil-kelas');
+    const guruSelect = document.getElementById('filter-profil-guru');
     
-    // Ambil data unik dari master siswa
-    const listKelas = [...new Set(state.master.siswa.map(s => s.kelas))].sort();
-    const listGuru = [...new Set(state.master.siswa.map(s => s.guruWali))].filter(g => g && g !== '-').sort();
+    if(!kelasSelect || !guruSelect) return;
 
-    kSelect.innerHTML = '<option value="SEMUA">SEMUA KELAS</option>' + 
-                        listKelas.map(k => `<option value="${k}">${k}</option>`).join('');
-    gSelect.innerHTML = '<option value="SEMUA">SEMUA GURU WALI</option>' + 
-                        listGuru.map(g => `<option value="${g}">${g}</option>`).join('');
-    
-    renderProfilList(); // Langsung tampilkan list setelah filter siap
+    // Ambil daftar unik dan urutkan
+    const daftarKelas = [...new Set(state.master.siswa.map(s => s.kelas))].filter(Boolean).sort();
+    const daftarGuru = [...new Set(state.master.siswa.map(s => s.guruWali))].filter(g => g && g !== '-').sort();
+
+    // Isi Dropdown Kelas
+    let htmlKelas = '<option value="SEMUA">SEMUA KELAS</option>';
+    daftarKelas.forEach(k => htmlKelas += `<option value="${k}">${k}</option>`);
+    kelasSelect.innerHTML = htmlKelas;
+
+    // Isi Dropdown Guru Wali
+    let htmlGuru = '<option value="SEMUA">SEMUA GURU WALI</option>';
+    daftarGuru.forEach(g => htmlGuru += `<option value="${g}">${g}</option>`);
+    guruSelect.innerHTML = htmlGuru;
 };
 
 // Fungsi Render Profil yang diperbarui
@@ -1616,7 +2282,9 @@ window.addEventListener('offline', () => {
 
 window.addEventListener('online', () => {
     showToast("✨ Anda kembali online. Menyinkronkan...");
-    location.reload(); // Refresh untuk mengambil data terbaru
+    // Tidak reload halaman; Firestore onSnapshot akan menyinkronkan data otomatis.
+    rebuildPeopleIndex();
+    refreshUI();
 });
 
     </script>
