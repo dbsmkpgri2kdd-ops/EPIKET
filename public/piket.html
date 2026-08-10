@@ -417,10 +417,11 @@
     }
 }
 #popular-data-body {height: auto; }
-#popular-data-body tr {min-height: 64px;}
-#popular-data-body td {vertical-align: middle;}
-@media (min-width: 1024px) {#popular-data-body tr {height: 68px;}}
-@media (max-width: 1023px) {#popular-data-body tr {height: 64px;}
+#popular-data-body tr {height: auto;}
+#popular-data-body td {vertical-align: middle; padding-top: 7px; padding-bottom: 7px;}
+/* Desktop */
+@media (min-width: 1024px) {#popular-data-body td {padding-top: 6px; padding-bottom: 6px;}}
+@media (max-width: 1023px) {#popular-data-body td {padding-top: 6px; padding-bottom: 6px;}}
 }
 
 
@@ -1261,9 +1262,9 @@ window.calculatePopularData = () => {
     }
 
     const sorted = Object.entries(agg)
-        .map(([id, data]) => ({ id, ...data }))
-        .sort((a, b) => b.T - a.T)
-        .slice(0, 99);
+    .map(([id, data]) => ({ id, ...data }))
+    .sort((a, b) => b.T - a.T)
+    .slice(0, state.master?.siswa?.length || 99);
 
     state.cachedPopularHTML = sorted.map(item => {
         const s = state.peopleById?.[String(item.id)];
