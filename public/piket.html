@@ -544,6 +544,115 @@
         color: #111827 !important;
     }
 }
+
+/* =========================================================
+   PROFIL LIST — FINAL RESPONSIVE POLISH
+   ========================================================= */
+#profil-list-container {
+    width: 100%;
+}
+
+.profil-student-card {
+    width: 100%;
+    min-height: 68px;
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) 112px 14px;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-bottom: 9px;
+    background: #fff;
+    border: 1px solid #e8edf3;
+    border-radius: 18px;
+    box-shadow: 0 3px 12px rgba(15,23,42,.045);
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.profil-student-card:active { transform: scale(.985); }
+.profil-student-card:hover { border-color: #dbe3ec; box-shadow: 0 7px 18px rgba(15,23,42,.07); }
+.profil-avatar {
+    width: 42px; height: 42px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff1f2; color: #dc2626; font-size: 11px; font-weight: 900;
+}
+.profil-student-name {
+    min-width: 0; font-size: 10px; line-height: 1.2; font-weight: 900;
+    color: #1e293b; text-transform: uppercase; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+}
+.profil-student-meta {
+    min-width: 0; margin-top: 4px; font-size: 6.5px; line-height: 1.15;
+    font-weight: 800; letter-spacing: .055em; text-transform: uppercase;
+    color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.profil-attendance { width: 112px; min-width: 0; }
+.profil-attendance-pills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; }
+.profil-attendance-pill {
+    min-width: 0; height: 18px; padding: 0 2px; border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 6.5px; line-height: 1; font-weight: 900; white-space: nowrap;
+}
+.profil-attendance-total {
+    display: flex; align-items: center; justify-content: flex-end; gap: 4px;
+    margin-top: 3px; white-space: nowrap;
+}
+.profil-attendance-label { font-size: 5.5px; font-weight: 900; color: #64748b; text-transform: uppercase; }
+.profil-attendance-total-badge {
+    min-width: 18px; height: 17px; padding: 0 5px; border-radius: 5px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #dc2626; color: #fff; font-size: 6.5px; font-weight: 900;
+}
+.profil-chevron { color: #cbd5e1; font-size: 9px; text-align: center; }
+
+@media (max-width: 767px) {
+    #tab-profil { padding-bottom: 78px; }
+    #tab-profil > div { padding-left: 0 !important; padding-right: 0 !important; }
+    #profil-list-container { padding: 0 1px; }
+    .profil-student-card {
+        grid-template-columns: 36px minmax(0, 1fr) 104px 10px;
+        gap: 7px;
+        min-height: 62px;
+        padding: 9px 9px;
+        border-radius: 17px;
+        margin-bottom: 7px;
+    }
+    .profil-avatar { width: 36px; height: 36px; border-radius: 12px; font-size: 10px; }
+    .profil-student-name { font-size: 9px; }
+    .profil-student-meta { font-size: 5.8px; margin-top: 3px; letter-spacing: .04em; }
+    .profil-attendance { width: 104px; }
+    .profil-attendance-pill { height: 17px; font-size: 6px; }
+    .profil-attendance-label { font-size: 5px; }
+    .profil-attendance-total-badge { height: 16px; min-width: 17px; font-size: 6px; }
+    .profil-chevron { font-size: 8px; }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .profil-student-card { max-width: 900px; margin-left: auto; margin-right: auto; }
+}
+
+@media (min-width: 1024px) {
+    #tab-profil > div { padding-left: 0 !important; padding-right: 0 !important; }
+    #profil-list-container { max-width: 1180px !important; margin: 14px auto 0; }
+    .profil-student-card {
+        grid-template-columns: 44px minmax(0, 1fr) 132px 16px;
+        min-height: 70px;
+        padding: 11px 14px;
+        border-radius: 18px;
+        gap: 12px;
+    }
+    .profil-avatar { width: 44px; height: 44px; border-radius: 14px; }
+    .profil-student-name { font-size: 10px; }
+    .profil-student-meta { font-size: 6.5px; }
+    .profil-attendance { width: 132px; }
+    .profil-attendance-pill { height: 19px; font-size: 6.5px; }
+    .profil-attendance-label { font-size: 5.5px; }
+    .profil-attendance-total-badge { height: 18px; font-size: 6.5px; }
+}
+
+/* =========================================================
+   FIREBASE STORAGE / SERVICE WORKER SAFETY
+   ========================================================= */
+.note-photo-image { display:block; width:100%; max-height:300px; object-fit:cover; }
+.note-photo-status { font-size:8px; font-weight:800; color:#94a3b8; }
 </style>
 
 </head>
@@ -1162,6 +1271,30 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
         const appId = 'stm-pgri2-kdd-v3';
+
+
+        // Service worker lama dapat mengintersep request Firebase Storage dan menyebabkan
+        // NetworkError/CORS. Hapus controller lama sekali agar request Storage langsung ke Firebase.
+        (async () => {
+            if (!('serviceWorker' in navigator)) return;
+            try {
+                const regs = await navigator.serviceWorker.getRegistrations();
+                const targetRegs = regs.filter(r => {
+                    const url = r.active?.scriptURL || r.waiting?.scriptURL || r.installing?.scriptURL || '';
+                    return /\/sw\.js(?:[?#]|$)/i.test(url);
+                });
+                const hasController = !!navigator.serviceWorker.controller;
+                if (targetRegs.length && hasController && !sessionStorage.getItem('epi_sw_cleaned_v2')) {
+                    sessionStorage.setItem('epi_sw_cleaned_v2', '1');
+                    await Promise.all(targetRegs.map(r => r.unregister()));
+                    const keys = await caches.keys();
+                    await Promise.all(keys.map(k => caches.delete(k)));
+                    location.reload();
+                }
+            } catch (e) {
+                console.warn('Pembersihan service worker dilewati:', e);
+            }
+        })();
 
 
         // --- GLOBAL STATE ---
@@ -2224,36 +2357,30 @@ window.renderProfilList = () => {
 
     container.innerHTML = filtered.map(s => {
         const r = state.attendanceSummary6m[String(s.id)] || {B:0,A:0,I:0,S:0,T:0};
+        const studentId = String(s.id).replace(/'/g, "\\'");
         return `
-        <div onclick="window.openEditor('${String(s.id).replace(/'/g, "\\'")}')" class="bg-white p-3.5 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-3 active:scale-[0.98] transition-all cursor-pointer mb-3">
-            <div class="w-12 h-12 flex-shrink-0 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 font-black text-xs">${String(s.nama || '?').charAt(0)}</div>
-
-            <div class="flex-1 min-w-0">
-                <h4 class="text-[11px] font-black text-slate-800 uppercase truncate leading-tight">${s.nama || '-'}</h4>
-                <div class="text-[7px] font-bold text-slate-400 uppercase tracking-widest truncate mt-1">
-                    ${s.kelas || '-'}${s.guruWali && s.guruWali !== '-' ? ` • GW: ${s.guruWali}` : ''}
+        <div onclick="window.openEditor('${studentId}')" class="profil-student-card cursor-pointer" role="button" tabindex="0">
+            <div class="profil-avatar">${String(s.nama || '?').charAt(0)}</div>
+            <div class="min-w-0">
+                <div class="profil-student-name">${escapeHtml(s.nama || '-')}</div>
+                <div class="profil-student-meta">${escapeHtml(s.kelas || '-')} ${s.guruWali && s.guruWali !== '-' ? `• GW: ${escapeHtml(s.guruWali)}` : ''}</div>
+            </div>
+            <div class="profil-attendance" aria-label="Ringkasan ketidakhadiran">
+                <div class="profil-attendance-pills">
+                    <span class="profil-attendance-pill bg-orange-50 text-orange-600">B ${r.B || 0}</span>
+                    <span class="profil-attendance-pill bg-red-50 text-red-600">A ${r.A || 0}</span>
+                    <span class="profil-attendance-pill bg-blue-50 text-blue-600">I ${r.I || 0}</span>
+                    <span class="profil-attendance-pill bg-green-50 text-green-600">S ${r.S || 0}</span>
+                </div>
+                <div class="profil-attendance-total">
+                    <span class="profil-attendance-label">Ketidakhadiran</span>
+                    <span class="profil-attendance-total-badge">T ${r.T || 0}</span>
                 </div>
             </div>
-
-            <!-- Ketidakhadiran tetap di kanan dan hanya 2 baris -->
-            <div class="flex-shrink-0 w-[118px]">
-                <div class="grid grid-cols-4 gap-1 mb-1">
-                    <span class="text-[7px] font-black text-orange-600 bg-orange-50 px-1 py-1 rounded-md text-center">B ${r.B}</span>
-                    <span class="text-[7px] font-black text-red-600 bg-red-50 px-1 py-1 rounded-md text-center">A ${r.A}</span>
-                    <span class="text-[7px] font-black text-blue-600 bg-blue-50 px-1 py-1 rounded-md text-center">I ${r.I}</span>
-                    <span class="text-[7px] font-black text-green-600 bg-green-50 px-1 py-1 rounded-md text-center">S ${r.S}</span>
-                </div>
-                <div class="flex justify-end items-center gap-1">
-                    <span class="text-[7px] font-black text-slate-500 uppercase">Ketidakhadiran</span>
-                    <span class="text-[7px] font-black text-white bg-red-600 px-1.5 py-1 rounded-md">T ${r.T}</span>
-                </div>
-            </div>
-
-            <i class="fas fa-chevron-right text-slate-200 text-[10px] flex-shrink-0"></i>
+            <i class="fas fa-chevron-right profil-chevron"></i>
         </div>`;
     }).join('');
 };
-
 // --- TOGGLE FORM CATATAN ---
 window.toggleNoteForm = () => {
     const form = document.getElementById('wrapper-note-form');
@@ -2445,7 +2572,7 @@ window.openEditor = async (id) => {
                         </div>
                     </div>
                     ${n.text ? `<p class="text-[11px] font-bold text-slate-700 leading-relaxed whitespace-pre-line">${escapeHtml(n.text)}</p>` : ""}
-                    ${n.photo?.url ? `<a href="${n.photo.url}" target="_blank" rel="noopener" class="mt-3 block rounded-2xl overflow-hidden border border-slate-200 bg-white"><img src="${n.photo.url}" loading="lazy" class="w-full max-h-72 object-cover" alt="Foto pembinaan"></a>` : ""}
+                    ${n.photo?.url ? `<a href="${escapeHtml(n.photo.url)}" target="_blank" rel="noopener" class="mt-3 block rounded-2xl overflow-hidden border border-slate-200 bg-white"><img src="${escapeHtml(n.photo.url)}" loading="lazy" class="note-photo-image" alt="Foto pembinaan" onerror="this.closest('a').innerHTML='<div class="p-4 text-center note-photo-status">Foto tersimpan, tetapi belum dapat dimuat. Periksa koneksi Firebase Storage.</div>'"></a>` : (n.photo?.path ? `<div class="mt-3 p-3 rounded-2xl bg-white border border-slate-200 note-photo-status"><i class="fas fa-image mr-1"></i> Foto tersimpan: ${escapeHtml(n.photo.path)}</div>` : "")}
                 </div>`;
             }).join('');
         } else {
@@ -2531,9 +2658,9 @@ window.addNewNote = async () => {
 
     let uploadedPhoto = null;
     let saved = false;
+    const saveButton = document.querySelector('#wrapper-note-form button[onclick*="addNewNote"]');
 
     try {
-        const saveButton = document.querySelector('#wrapper-note-form button[onclick*="addNewNote"]');
         if (saveButton) {
             saveButton.disabled = true;
             saveButton.dataset.oldText = saveButton.innerText;
@@ -2543,16 +2670,31 @@ window.addNewNote = async () => {
         showToast(photoFile ? '⏳ Mengompres & mengunggah foto...' : '⏳ Menyimpan catatan...');
 
         if (photoFile) {
-            const compressed = await window.compressNotePhoto(photoFile);
-            const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.webp`;
+            const compressed = await window.compressNotePhoto(photoFile, 1024, 0.68);
+            // UUID-ish filename menghindari benturan nama ketika beberapa pengguna menyimpan bersamaan.
+            const fileName = `${Date.now()}-${crypto.randomUUID ? crypto.randomUUID().slice(0,8) : Math.random().toString(36).slice(2,10)}.webp`;
             const path = `student_notes/${id}/${fileName}`;
             const photoRef = storageRef(storage, path);
+
             await uploadBytes(photoRef, compressed, {
                 contentType: 'image/webp',
-                cacheControl: 'public,max-age=31536000'
+                cacheControl: 'public,max-age=31536000,immutable'
             });
-            const url = await getDownloadURL(photoRef);
-            uploadedPhoto = { url, path, size: compressed.size, type: 'image/webp' };
+
+            // Jangan membuat proses simpan Firestore bergantung pada getDownloadURL().
+            // Service worker/CORS dapat membuat getDownloadURL gagal padahal file sudah berhasil upload.
+            uploadedPhoto = {
+                path,
+                size: compressed.size,
+                type: 'image/webp',
+                uploadedAt: Date.now()
+            };
+
+            try {
+                uploadedPhoto.url = await getDownloadURL(photoRef);
+            } catch (urlError) {
+                console.warn('Foto berhasil di-upload, tetapi URL download belum dapat diambil:', urlError);
+            }
         }
 
         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id);
@@ -2564,31 +2706,29 @@ window.addNewNote = async () => {
         };
         if (uploadedPhoto) note.photo = uploadedPhoto;
 
-        // Transaction mencegah catatan baru menimpa catatan lain
-        // jika dua pengguna menyimpan hampir bersamaan.
         await runTransaction(db, async transaction => {
             const snap = await transaction.get(docRef);
             const history = snap.exists() && Array.isArray(snap.data().history) ? [...snap.data().history] : [];
             history.push(note);
-            transaction.set(docRef, {
-                history,
-                lastUpdate: Date.now()
-            }, { merge: true });
+            transaction.set(docRef, { history, lastUpdate: Date.now() }, { merge: true });
         });
 
         saved = true;
-        showToast('✅ Catatan tersimpan');
+        showToast(uploadedPhoto && !uploadedPhoto.url
+            ? '✅ Catatan & foto tersimpan. URL foto akan dimuat setelah koneksi normal.'
+            : '✅ Catatan tersimpan');
         document.getElementById('new-note-text').value = '';
         window.clearNotePhoto();
         await window.openEditor(id);
     } catch (e) {
         console.error('Gagal menyimpan catatan:', e);
         if (!saved && uploadedPhoto?.path) {
-            try { await deleteObject(storageRef(storage, uploadedPhoto.path)); } catch (_) {}
+            try { await deleteObject(storageRef(storage, uploadedPhoto.path)); } catch (cleanupError) {
+                console.warn('Gagal membersihkan file foto setelah transaksi gagal:', cleanupError);
+            }
         }
         showToast('❌ Gagal menyimpan: ' + (e.message || 'Kesalahan sistem'));
     } finally {
-        const saveButton = document.querySelector('#wrapper-note-form button[onclick*="addNewNote"]');
         if (saveButton) {
             saveButton.disabled = false;
             saveButton.innerText = saveButton.dataset.oldText || 'SIMPAN CATATAN';
