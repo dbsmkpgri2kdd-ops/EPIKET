@@ -809,7 +809,7 @@
                                 <img id="note-photo-preview-img" src="" class="w-full max-h-48 object-cover rounded-2xl border border-white/10">
                                 <button type="button" onclick="window.clearNotePhoto()" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/70 text-white"><i class="fas fa-times text-xs"></i></button>
                             </div>
-                            <p class="text-[7px] text-white/20 mt-2">Foto dikompres di perangkat dan disimpan di Firebase Storage, bukan di Firestore.</p>
+                            <p class="text-[7px] text-white/20 mt-2">Foto dikompres di perangkat dan disimpan di Firestore Base64 agar tidak memakai Firebase Storage.</p>
                         </div>
 
                         <button id="btn-save-note" onclick="window.addNewNote()" class="w-full bg-red-600 text-white py-5 rounded-3xl font-black text-[11px] uppercase shadow-xl active:scale-95 transition-all">Simpan Catatan</button>
@@ -1167,7 +1167,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 	import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc, getDocs, query, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
         // --- KONFIGURASI FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyC8KQzupwLouy6zSxiz5V5-kB6jPvigCII",
@@ -1182,7 +1181,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const storage = getStorage(app);
         const appId = 'stm-pgri2-kdd-v3';
 
 
@@ -2360,7 +2358,7 @@ window.openEditor = async (id) => {
                         </div>
                     </div>
                     <p class="text-[10px] font-bold text-slate-700 leading-relaxed">${escapeHtml(n.text)}</p>
-                    ${n.photoUrl ? `<button onclick="window.viewNotePhoto('${escapeAttr(n.photoUrl)}')" class="mt-3 block"><img src="${escapeAttr(n.photoUrl)}" loading="lazy" class="w-24 h-20 object-cover rounded-xl border border-slate-200" alt="Lampiran catatan"></button>` : ''}
+                    ${n.photoBase64 ? `<button onclick="window.viewNotePhoto('${escapeAttr(n.photoBase64)}')" class="mt-3 block"><img src="${escapeAttr(n.photoBase64)}" loading="lazy" class="w-24 h-20 object-cover rounded-xl border border-slate-200" alt="Lampiran catatan"></button>` : ''}
                 </div>
             `).join('');
         } else {
@@ -2476,11 +2474,12 @@ window.editNote = async (studentId, index) => {
         document.getElementById('btn-save-note').innerText = 'Simpan Perubahan';
         document.getElementById('select-peran').value = note.peran || 'Kesiswaan';
         document.getElementById('new-note-text').value = note.text || '';
-        window.notePhotoState.oldPhotoPath = note.photoPath || null;
+        window.notePhotoState.oldPhotoPath = null;
+        window.notePhotoState.oldPhotoBase64 = note.photoBase64 || null;
         window.clearNotePhoto();
-        if (note.photoUrl) {
+        if (note.photoBase64) {
             const img = document.getElementById('note-photo-preview-img');
-            img.src = note.photoUrl;
+            img.src = note.photoBase64;
             document.getElementById('note-photo-preview').classList.remove('hidden');
         }
         document.getElementById('wrapper-note-form').classList.remove('hidden');
@@ -2501,9 +2500,6 @@ window.deleteNote = async (studentId, index) => {
         if (!snap.exists()) return;
         const history = snap.data().history || [];
         const [removed] = history.splice(index, 1);
-        if (removed?.photoPath) {
-            try { await deleteObject(storageRef(storage, removed.photoPath)); } catch (photoErr) { console.warn('Foto tidak dihapus:', photoErr); }
-        }
         if (history.length) await setDoc(docRef, { history, lastUpdate: Date.now() }, { merge: true });
         else await deleteDoc(docRef);
         showToast('🗑️ Catatan dihapus');
@@ -2517,6 +2513,18 @@ window.deleteNote = async (studentId, index) => {
 window.viewNotePhoto = (url) => {
     const win = window.open('', '_blank');
     if (win) win.document.write(`<title>Foto Catatan</title><meta name="viewport" content="width=device-width,initial-scale=1"><body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${String(url).replace(/"/g,'&quot;')}" style="max-width:100%;max-height:100vh;object-fit:contain"></body>`);
+};
+
+window.getYearPhotoCounterRef = (year = new Date().getFullYear()) =>
+    doc(db, 'artifacts', appId, 'public', 'data', 'system_counters', `photos_${year}`);
+
+window.checkAndReservePhotoSlot = async (year = new Date().getFullYear()) => {
+    const ref = window.getYearPhotoCounterRef(year);
+    const snap = await getDoc(ref);
+    const count = snap.exists() ? Number(snap.data().count || 0) : 0;
+    if (count >= 2000) throw new Error('Batas 2.000 foto/tahun sudah tercapai.');
+    await setDoc(ref, { count: count + 1, year, updatedAt: Date.now() }, { merge: true });
+    return true;
 };
 
 window.addNewNote = async () => {
@@ -2535,16 +2543,18 @@ window.addNewNote = async () => {
         note.peran = peran;
         note.text = text;
         note.updatedAt = Date.now();
-
         if (window.notePhotoState.blob) {
-            const path = `student_notes/${id}/${note.noteId}.jpg`;
-            const fileRef = storageRef(storage, path);
-            await uploadBytes(fileRef, window.notePhotoState.blob, { contentType: 'image/jpeg', cacheControl: 'public,max-age=31536000' });
-            note.photoUrl = await getDownloadURL(fileRef);
-            note.photoPath = path;
-            if (window.notePhotoState.oldPhotoPath && window.notePhotoState.oldPhotoPath !== path) {
-                try { await deleteObject(storageRef(storage, window.notePhotoState.oldPhotoPath)); } catch (photoErr) { console.warn('Foto lama tidak dihapus:', photoErr); }
-            }
+            // Firestore Base64: foto sudah dikompres di perangkat.
+            const base64 = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('Gagal membaca foto'));
+                reader.readAsDataURL(window.notePhotoState.blob);
+            });
+            // Jaga agar dokumen Firestore tetap di bawah batas 1 MiB.
+            if (String(base64).length > 850000) throw new Error('Foto masih terlalu besar setelah kompresi. Pilih foto lain.');
+            note.photoBase64 = base64;
+        }
         }
 
         if (editingIndex >= 0 && history[editingIndex]) history[editingIndex] = note;
@@ -2556,7 +2566,7 @@ window.addNewNote = async () => {
         await window.openEditor(id);
     } catch (e) {
         console.error(e);
-        showToast('❌ Gagal: ' + (e.message || 'periksa koneksi/Storage Firebase'));
+        showToast('❌ Gagal: ' + (e.message || 'periksa koneksi Firebase'));
     }
 };
 
