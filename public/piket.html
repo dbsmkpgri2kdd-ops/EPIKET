@@ -546,6 +546,22 @@
 }
 </style>
 
+
+<style>
+/* PROFIL SISWA — ringkas satu baris + rekap BAIST di samping */
+.profil-student-card { min-width: 0; }
+.profil-student-main { min-width: 0; }
+.profil-student-name { font-size: 9px !important; line-height: 1.15 !important; }
+.profil-student-meta { font-size: 6px !important; line-height: 1.2 !important; }
+.profil-absence-wrap { display:flex; align-items:center; gap:3px; flex-shrink:0; }
+.profil-absence-pill { min-width:20px; padding:3px 4px; border-radius:7px; text-align:center; font-size:6px; line-height:1; font-weight:900; }
+.profil-absence-pill b { display:block; font-size:7px; margin-top:2px; }
+@media (max-width: 420px) {
+  .profil-absence-wrap { gap:2px; }
+  .profil-absence-pill { min-width:18px; padding:3px 2px; font-size:5px; }
+  .profil-absence-pill b { font-size:6px; }
+}
+</style>
 </head>
 <body class="text-slate-900">
 
@@ -764,9 +780,10 @@
 
                     <div id="wrapper-note-form" class="hidden bg-slate-950 p-6 rounded-[2.5rem] shadow-2xl mt-4">
                         <div class="flex justify-between items-center mb-6 px-1">
-                            <h4 class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Input Baru</h4>
-                            <button onclick="window.toggleNoteForm()" class="text-white/20 p-2"><i class="fas fa-times"></i></button>
+                            <h4 id="note-form-title" class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Input Baru</h4>
+                            <button onclick="window.cancelNoteEdit()" class="text-white/20 p-2"><i class="fas fa-times"></i></button>
                         </div>
+                        <input type="hidden" id="editing-note-index" value="-1">
                         <select id="select-peran" class="w-full bg-white/10 text-white p-4 rounded-2xl text-[11px] font-bold mb-4 border-none outline-none focus:ring-2 focus:ring-red-600 appearance-none shadow-inner">
                             <option value="Kesiswaan">KESISWAAN</option>
                             <option value="Guru BK">GURU BK</option>
@@ -774,8 +791,28 @@
                             <option value="Guru Wali">GURU WALI</option>
                             <option value="Guru Mapel">GURU MAPEL</option>
                         </select>
-                        <textarea id="new-note-text" placeholder="Detail pembinaan..." class="w-full bg-white/10 text-white p-5 rounded-3xl text-[11px] min-h-[120px] border-none outline-none mb-6 focus:ring-2 focus:ring-red-600 placeholder:text-white/10 resize-none"></textarea>
-                        <button onclick="window.addNewNote()" class="w-full bg-red-600 text-white py-5 rounded-3xl font-black text-[11px] uppercase shadow-xl active:scale-95 transition-all">Simpan Catatan</button>
+                        <textarea id="new-note-text" placeholder="Detail pembinaan..." class="w-full bg-white/10 text-white p-5 rounded-3xl text-[11px] min-h-[120px] border-none outline-none mb-4 focus:ring-2 focus:ring-red-600 placeholder:text-white/10 resize-none"></textarea>
+
+                        <div class="mb-5">
+                            <p class="text-[8px] font-black text-white/30 uppercase tracking-widest mb-2">Lampiran Foto (opsional)</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" onclick="document.getElementById('note-file-input').click()" class="py-3 rounded-2xl bg-white/10 text-white text-[9px] font-black uppercase border border-white/10">
+                                    <i class="fas fa-image mr-1"></i> Upload Foto
+                                </button>
+                                <button type="button" onclick="document.getElementById('note-camera-input').click()" class="py-3 rounded-2xl bg-white/10 text-white text-[9px] font-black uppercase border border-white/10">
+                                    <i class="fas fa-camera mr-1"></i> Ambil Foto
+                                </button>
+                            </div>
+                            <input id="note-file-input" type="file" accept="image/*" class="hidden" onchange="window.handleNotePhoto(this)">
+                            <input id="note-camera-input" type="file" accept="image/*" capture="environment" class="hidden" onchange="window.handleNotePhoto(this)">
+                            <div id="note-photo-preview" class="hidden mt-3 relative">
+                                <img id="note-photo-preview-img" src="" class="w-full max-h-48 object-cover rounded-2xl border border-white/10">
+                                <button type="button" onclick="window.clearNotePhoto()" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/70 text-white"><i class="fas fa-times text-xs"></i></button>
+                            </div>
+                            <p class="text-[7px] text-white/20 mt-2">Foto dikompres di perangkat dan disimpan di Firebase Storage, bukan di Firestore.</p>
+                        </div>
+
+                        <button id="btn-save-note" onclick="window.addNewNote()" class="w-full bg-red-600 text-white py-5 rounded-3xl font-black text-[11px] uppercase shadow-xl active:scale-95 transition-all">Simpan Catatan</button>
                     </div>
                 </div>
             </div>
@@ -1130,6 +1167,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 	import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc, getDocs, query, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
         // --- KONFIGURASI FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyC8KQzupwLouy6zSxiz5V5-kB6jPvigCII",
@@ -1144,6 +1182,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app);
         const appId = 'stm-pgri2-kdd-v3';
 
 
@@ -2174,97 +2213,63 @@ window.populateProfilFilters = () => {
 };
 
 // Fungsi Render Profil yang diperbarui
-// Fungsi Render Profil yang diperbarui dengan Ringkasan BAIST
 window.renderProfilList = () => {
     const container = document.getElementById('profil-list-container');
     const search = document.getElementById('search-profil').value.toLowerCase();
     const filterKelas = document.getElementById('filter-profil-kelas').value;
     const filterGuru = document.getElementById('filter-profil-guru').value;
-    
+
     let filtered = state.master.siswa.filter(s => {
-        const matchSearch = s.nama.toLowerCase().includes(search) || s.id.includes(search);
+        const matchSearch = (s.nama || '').toLowerCase().includes(search) || String(s.id || '').toLowerCase().includes(search);
         const matchKelas = (filterKelas === 'SEMUA') || (s.kelas === filterKelas);
         const matchGuru = (filterGuru === 'SEMUA') || (s.guruWali === filterGuru);
         return matchSearch && matchKelas && matchGuru;
     });
 
-    filtered.sort((a, b) => a.nama.localeCompare(b.nama));
-    
+    filtered.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
+
     if(filtered.length === 0) {
         container.innerHTML = `<div class="text-center py-10 opacity-30 font-black text-[10px] uppercase">Siswa Tidak Ditemukan</div>`;
         return;
     }
 
-    container.innerHTML = filtered.map(s => {
-        // --- HITUNG REKAP BAIST UNTUK SETIAP SISWA ---
-        let rekap = { A: 0, B: 0, I: 0, S: 0, T: 0 };
-        const id = String(s.id);
-        
-        Object.values(state.records).forEach(day => {
-            ['Pagi', 'Siang'].forEach(sess => {
-                const entry = day[`${id}_${sess}`];
-                if (entry) {
-                    if (entry.status === 'Alpa') rekap.A++;
-                    else if (entry.status === 'Bolos') rekap.B++;
-                    else if (entry.status === 'Izin') rekap.I++;
-                    else if (entry.status === 'Sakit') rekap.S++;
-                    rekap.T++;
-                }
-            });
+    // Hitung rekap BAIST sekali untuk seluruh siswa yang tampil.
+    const absenceMap = Object.create(null);
+    Object.values(state.records || {}).forEach(day => {
+        Object.values(day || {}).forEach(rec => {
+            if (!rec || !rec.personId || !['Bolos','Alpa','Izin','Sakit'].includes(rec.status)) return;
+            const key = String(rec.personId);
+            if (!absenceMap[key]) absenceMap[key] = { B:0, A:0, I:0, S:0, T:0 };
+            const code = rec.status === 'Bolos' ? 'B' : rec.status === 'Alpa' ? 'A' : rec.status === 'Izin' ? 'I' : 'S';
+            absenceMap[key][code]++;
+            absenceMap[key].T++;
         });
+    });
 
+    const pill = (code, value, cls) => `<span class="profil-absence-pill ${cls}">${code}<b>${value}</b></span>`;
+
+    container.innerHTML = filtered.map(s => {
+        const r = absenceMap[String(s.id)] || {B:0,A:0,I:0,S:0,T:0};
         return `
-        <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col gap-3 active:scale-95 transition-all cursor-pointer mb-3">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 font-black text-xs">${s.nama.charAt(0)}</div>
-                <div class="flex-grow">
-                    <h4 class="text-[11px] font-black text-slate-800 uppercase">${s.nama}</h4>
-                    <div class="flex gap-2 mt-1">
-                        <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">${s.kelas}</span>
-                        ${s.guruWali && s.guruWali !== '-' ? `<span class="text-[7px] font-black text-blue-500 uppercase">GW: ${s.guruWali}</span>` : ''}
-                    </div>
-                </div>
-                <div class="text-right">
-                    <p class="text-[10px] font-black text-red-600">${rekap.T}</p>
-                    <p class="text-[6px] font-bold text-slate-300 uppercase">Total</p>
+        <div onclick="window.openEditor('${s.id}')" class="profil-student-card bg-white p-3 rounded-[1.5rem] shadow-sm border border-slate-100 flex items-center gap-3 active:scale-95 transition-all cursor-pointer mb-2">
+            <div class="w-9 h-9 flex-shrink-0 bg-red-50 rounded-xl flex items-center justify-center text-red-600 font-black text-[10px]">${(s.nama || '?').charAt(0)}</div>
+            <div class="profil-student-main flex-grow min-w-0">
+                <h4 class="profil-student-name font-black text-slate-800 uppercase truncate">${s.nama || '-'}</h4>
+                <div class="profil-student-meta flex items-center gap-2 mt-1 min-w-0">
+                    <span class="font-bold text-slate-400 uppercase tracking-wider truncate">${s.kelas || '-'}</span>
+                    ${s.guruWali && s.guruWali !== '-' ? `<span class="font-black text-blue-500 uppercase truncate">GW: ${s.guruWali}</span>` : ''}
                 </div>
             </div>
-            
-            <!-- RINGKASAN BAIST -->
-            <div class="grid grid-cols-4 gap-1 border-t border-slate-50 pt-3">
-                <div class="bg-orange-50 rounded-lg py-1 text-center">
-                    <p class="text-[6px] font-black text-orange-400 uppercase">Bolos</p>
-                    <p class="text-[9px] font-black text-orange-600">${rekap.B}</p>
-                </div>
-                <div class="bg-red-50 rounded-lg py-1 text-center">
-                    <p class="text-[6px] font-black text-red-400 uppercase">Alpa</p>
-                    <p class="text-[9px] font-black text-red-600">${rekap.A}</p>
-                </div>
-                <div class="bg-blue-50 rounded-lg py-1 text-center">
-                    <p class="text-[6px] font-black text-blue-400 uppercase">Izin</p>
-                    <p class="text-[9px] font-black text-blue-600">${rekap.I}</p>
-                </div>
-                <div class="bg-green-50 rounded-lg py-1 text-center">
-                    <p class="text-[6px] font-black text-green-400 uppercase">Sakit</p>
-                    <p class="text-[9px] font-black text-green-600">${rekap.S}</p>
-                </div>
+            <div class="profil-absence-wrap" title="Bolos / Alpa / Izin / Sakit / Total">
+                ${pill('B',r.B,'bg-amber-50 text-amber-600')}
+                ${pill('A',r.A,'bg-red-50 text-red-600')}
+                ${pill('I',r.I,'bg-blue-50 text-blue-600')}
+                ${pill('S',r.S,'bg-purple-50 text-purple-600')}
+                ${pill('T',r.T,'bg-slate-100 text-slate-600')}
             </div>
-        </div>
-        `;
+            <i class="fas fa-chevron-right text-slate-200 text-[9px] flex-shrink-0"></i>
+        </div>`;
     }).join('');
-};
-
-// --- TOGGLE FORM CATATAN ---
-window.toggleNoteForm = () => {
-    const form = document.getElementById('wrapper-note-form');
-    const btn = document.getElementById('btn-toggle-note');
-    if (form.classList.contains('hidden')) {
-        form.classList.remove('hidden');
-        btn.classList.add('hidden');
-    } else {
-        form.classList.add('hidden');
-        btn.classList.remove('hidden');
-    }
 };
 
 // --- OPEN EDITOR (FULL SCREEN MODE) ---
@@ -2335,18 +2340,27 @@ window.openEditor = async (id) => {
     // 5. LOAD RIWAYAT (FIREBASE)
     const container = document.getElementById('history-container');
     container.innerHTML = '<div class="text-center py-10 text-[10px] text-slate-300 italic">Memuat riwayat pembinaan...</div>';
-    
+
     try {
         const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id));
         if (docSnap.exists() && docSnap.data().history) {
             const history = docSnap.data().history;
-            container.innerHTML = history.slice().reverse().map(n => `
-                <div class="p-5 bg-slate-50 border border-slate-100 rounded-[2rem] border-l-4 ${getNoteColor(n.peran)}">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[8px] font-black uppercase text-slate-400">${n.peran}</span>
-                        <span class="text-[8px] font-bold text-slate-300">${new Date(n.date).toLocaleString('id-ID')}</span>
+            const escapeHtml = (value) => String(value ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+            const escapeAttr = escapeHtml;
+            container.innerHTML = history.map((n, index) => ({n, index})).reverse().map(({n, index}) => `
+                <div class="p-4 bg-slate-50 border border-slate-100 rounded-[1.5rem] border-l-4 ${getNoteColor(n.peran)}">
+                    <div class="flex justify-between items-start gap-2 mb-2">
+                        <div class="min-w-0">
+                            <span class="text-[8px] font-black uppercase text-slate-400">${escapeHtml(n.peran)}</span>
+                            <span class="text-[7px] font-bold text-slate-300 ml-2">${new Date(n.date).toLocaleString('id-ID')}</span>
+                        </div>
+                        <div class="flex gap-1 flex-shrink-0">
+                            <button onclick="window.editNote('${id}', ${index})" class="w-7 h-7 rounded-lg bg-white text-blue-500 border border-slate-100" title="Edit"><i class="fas fa-pen text-[9px]"></i></button>
+                            <button onclick="window.deleteNote('${id}', ${index})" class="w-7 h-7 rounded-lg bg-white text-red-500 border border-slate-100" title="Hapus"><i class="fas fa-trash text-[9px]"></i></button>
+                        </div>
                     </div>
-                    <p class="text-[11px] font-bold text-slate-700 leading-relaxed">${n.text}</p>
+                    <p class="text-[10px] font-bold text-slate-700 leading-relaxed">${escapeHtml(n.text)}</p>
+                    ${n.photoUrl ? `<button onclick="window.viewNotePhoto('${escapeAttr(n.photoUrl)}')" class="mt-3 block"><img src="${escapeAttr(n.photoUrl)}" loading="lazy" class="w-24 h-20 object-cover rounded-xl border border-slate-200" alt="Lampiran catatan"></button>` : ''}
                 </div>
             `).join('');
         } else {
@@ -2354,38 +2368,196 @@ window.openEditor = async (id) => {
         }
     } catch (e) { console.error(e); }
 
-    // Reset Form & Tampilkan Modal
-    document.getElementById('wrapper-note-form').classList.add('hidden');
-    document.getElementById('btn-toggle-note').classList.remove('hidden');
+    window.cancelNoteEdit();
     document.getElementById('editor-modal').style.display = 'flex';
     document.body.style.height = '100vh';
-    document.body.style.overflow = 'hidden'; // Lock background scroll
+    document.body.style.overflow = 'hidden';
 };
 
 window.closeEditor = () => {
     document.getElementById('editor-modal').style.display = 'none';
     document.body.style.height = 'auto';
-    document.body.style.overflow = 'auto'; // Unlock background scroll
+    document.body.style.overflow = 'auto';
+};
+
+window.compressNoteImage = (file, maxSize = 1280, quality = 0.72) => new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith('image/')) return reject(new Error('File bukan gambar'));
+    const reader = new FileReader();
+    reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+            const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(img.width * scale));
+            canvas.height = Math.max(1, Math.round(img.height * scale));
+            const ctx = canvas.getContext('2d', { alpha: false });
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Kompresi foto gagal')), 'image/jpeg', quality);
+        };
+        img.onerror = () => reject(new Error('Foto tidak dapat dibaca'));
+        img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('File tidak dapat dibaca'));
+    reader.readAsDataURL(file);
+});
+
+window.notePhotoState = { file: null, blob: null, oldPhotoPath: null };
+
+window.handleNotePhoto = async (input) => {
+    const file = input.files?.[0];
+    if (!file) return;
+    try {
+        showToast('⏳ Mengompres foto...');
+        const blob = await window.compressNoteImage(file);
+        window.notePhotoState.file = file;
+        window.notePhotoState.blob = blob;
+        const previewUrl = URL.createObjectURL(blob);
+        const img = document.getElementById('note-photo-preview-img');
+        if (img.dataset.objectUrl) URL.revokeObjectURL(img.dataset.objectUrl);
+        img.dataset.objectUrl = previewUrl;
+        img.src = previewUrl;
+        document.getElementById('note-photo-preview').classList.remove('hidden');
+        showToast('📷 Foto siap diunggah');
+    } catch (e) {
+        console.error(e);
+        showToast('❌ Foto tidak valid');
+        input.value = '';
+    }
+};
+
+window.clearNotePhoto = () => {
+    const img = document.getElementById('note-photo-preview-img');
+    if (img.dataset.objectUrl) URL.revokeObjectURL(img.dataset.objectUrl);
+    img.dataset.objectUrl = '';
+    img.src = '';
+    document.getElementById('note-photo-preview').classList.add('hidden');
+    document.getElementById('note-file-input').value = '';
+    document.getElementById('note-camera-input').value = '';
+    window.notePhotoState.file = null;
+    window.notePhotoState.blob = null;
+};
+
+window.resetNoteForm = () => {
+    document.getElementById('editing-note-index').value = '-1';
+    document.getElementById('note-form-title').innerText = 'Input Baru';
+    document.getElementById('btn-save-note').innerText = 'Simpan Catatan';
+    document.getElementById('select-peran').value = 'Kesiswaan';
+    document.getElementById('new-note-text').value = '';
+    window.notePhotoState.oldPhotoPath = null;
+    window.clearNotePhoto();
+};
+
+window.cancelNoteEdit = () => {
+    window.resetNoteForm();
+    document.getElementById('wrapper-note-form').classList.add('hidden');
+    document.getElementById('btn-toggle-note').classList.remove('hidden');
+};
+
+window.toggleNoteForm = () => {
+    const form = document.getElementById('wrapper-note-form');
+    const btn = document.getElementById('btn-toggle-note');
+    if (form.classList.contains('hidden')) {
+        window.resetNoteForm();
+        form.classList.remove('hidden');
+        btn.classList.add('hidden');
+    } else {
+        window.cancelNoteEdit();
+    }
+};
+
+window.editNote = async (studentId, index) => {
+    try {
+        const snap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', studentId));
+        const history = snap.exists() ? (snap.data().history || []) : [];
+        const note = history[index];
+        if (!note) return showToast('❌ Catatan tidak ditemukan');
+        document.getElementById('editing-note-index').value = String(index);
+        document.getElementById('note-form-title').innerText = 'Edit Catatan';
+        document.getElementById('btn-save-note').innerText = 'Simpan Perubahan';
+        document.getElementById('select-peran').value = note.peran || 'Kesiswaan';
+        document.getElementById('new-note-text').value = note.text || '';
+        window.notePhotoState.oldPhotoPath = note.photoPath || null;
+        window.clearNotePhoto();
+        if (note.photoUrl) {
+            const img = document.getElementById('note-photo-preview-img');
+            img.src = note.photoUrl;
+            document.getElementById('note-photo-preview').classList.remove('hidden');
+        }
+        document.getElementById('wrapper-note-form').classList.remove('hidden');
+        document.getElementById('btn-toggle-note').classList.add('hidden');
+        document.getElementById('new-note-text').focus();
+    } catch (e) {
+        console.error(e);
+        showToast('❌ Gagal membuka catatan');
+    }
+};
+
+window.deleteNote = async (studentId, index) => {
+    if (!confirm('Hapus catatan pembinaan ini?')) return;
+    try {
+        showToast('⏳ Menghapus...');
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', studentId);
+        const snap = await getDoc(docRef);
+        if (!snap.exists()) return;
+        const history = snap.data().history || [];
+        const [removed] = history.splice(index, 1);
+        if (removed?.photoPath) {
+            try { await deleteObject(storageRef(storage, removed.photoPath)); } catch (photoErr) { console.warn('Foto tidak dihapus:', photoErr); }
+        }
+        if (history.length) await setDoc(docRef, { history, lastUpdate: Date.now() }, { merge: true });
+        else await deleteDoc(docRef);
+        showToast('🗑️ Catatan dihapus');
+        await window.openEditor(studentId);
+    } catch (e) {
+        console.error(e);
+        showToast('❌ Gagal menghapus catatan');
+    }
+};
+
+window.viewNotePhoto = (url) => {
+    const win = window.open('', '_blank');
+    if (win) win.document.write(`<title>Foto Catatan</title><meta name="viewport" content="width=device-width,initial-scale=1"><body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${String(url).replace(/"/g,'&quot;')}" style="max-width:100%;max-height:100vh;object-fit:contain"></body>`);
 };
 
 window.addNewNote = async () => {
     const id = document.getElementById('edit-id').value;
     const peran = document.getElementById('select-peran').value;
     const text = document.getElementById('new-note-text').value.trim();
-    if (!text) return;
+    const editingIndex = Number(document.getElementById('editing-note-index').value);
+    if (!text && !window.notePhotoState.blob) return showToast('⚠️ Isi catatan atau pilih foto');
 
     try {
-        showToast("⏳ Menyimpan...");
+        showToast('⏳ Menyimpan...');
         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id);
         const docSnap = await getDoc(docRef);
         let history = docSnap.exists() ? (docSnap.data().history || []) : [];
-        history.push({ peran, text, date: Date.now() });
+        let note = editingIndex >= 0 && history[editingIndex] ? { ...history[editingIndex] } : { noteId: `${Date.now()}_${Math.random().toString(36).slice(2,8)}`, date: Date.now() };
+        note.peran = peran;
+        note.text = text;
+        note.updatedAt = Date.now();
+
+        if (window.notePhotoState.blob) {
+            const path = `student_notes/${id}/${note.noteId}.jpg`;
+            const fileRef = storageRef(storage, path);
+            await uploadBytes(fileRef, window.notePhotoState.blob, { contentType: 'image/jpeg', cacheControl: 'public,max-age=31536000' });
+            note.photoUrl = await getDownloadURL(fileRef);
+            note.photoPath = path;
+            if (window.notePhotoState.oldPhotoPath && window.notePhotoState.oldPhotoPath !== path) {
+                try { await deleteObject(storageRef(storage, window.notePhotoState.oldPhotoPath)); } catch (photoErr) { console.warn('Foto lama tidak dihapus:', photoErr); }
+            }
+        }
+
+        if (editingIndex >= 0 && history[editingIndex]) history[editingIndex] = note;
+        else history.push(note);
         await setDoc(docRef, { history, lastUpdate: Date.now() }, { merge: true });
-        
-        showToast("✅ Tersimpan");
+
+        showToast(editingIndex >= 0 ? '✅ Perubahan tersimpan' : '✅ Tersimpan');
         document.getElementById('new-note-text').value = '';
-        window.openEditor(id); // Refresh data
-    } catch (e) { showToast("❌ Gagal"); }
+        await window.openEditor(id);
+    } catch (e) {
+        console.error(e);
+        showToast('❌ Gagal: ' + (e.message || 'periksa koneksi/Storage Firebase'));
+    }
 };
 
 function getNoteColor(peran) {
