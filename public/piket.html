@@ -697,6 +697,432 @@
 .note-photo-status { font-size:8px; font-weight:800; color:#94a3b8; }
 </style>
 
+
+<style>
+/* =========================================================
+   PROFIL SISWA — RESPONSIVE PROFESSIONAL UI
+   Desktop: 2-column card grid, compact but spacious.
+   Android/iOS: single-column, touch-friendly cards.
+   Tidak mengubah fungsi JavaScript/data.
+   ========================================================= */
+
+#tab-profil > div {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+#tab-profil .profil-page-head {
+    margin-bottom: 18px;
+}
+
+/* Search & filter area */
+#tab-profil #search-profil {
+    height: 48px;
+    border-radius: 15px !important;
+    padding-left: 18px !important;
+    padding-right: 48px !important;
+    font-size: 12px !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 4px 14px rgba(15,23,42,.045) !important;
+}
+
+#tab-profil #search-profil:focus {
+    border-color: #fecaca !important;
+    box-shadow: 0 0 0 4px rgba(220,38,38,.08) !important;
+}
+
+#tab-profil .grid.grid-cols-2 > div select {
+    height: 44px;
+    border-radius: 13px !important;
+    padding-left: 14px !important;
+    padding-right: 34px !important;
+    font-size: 9px !important;
+    letter-spacing: .04em;
+}
+
+/* Main list */
+#profil-list-container {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 10px !important;
+    width: 100%;
+    max-width: none !important;
+    margin: 0 !important;
+}
+
+/* Card */
+.profil-student-card {
+    position: relative;
+    display: grid !important;
+    grid-template-columns: 48px minmax(0, 1fr) auto 12px !important;
+    align-items: center;
+    gap: 12px !important;
+    min-height: 72px;
+    padding: 11px 14px !important;
+    background: rgba(255,255,255,.98) !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 17px !important;
+    box-shadow: 0 3px 12px rgba(15,23,42,.045) !important;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.profil-student-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 3px;
+    border-radius: 0 6px 6px 0;
+    background: #dc2626;
+    opacity: .9;
+}
+
+.profil-student-card:hover {
+    border-color: #fecaca !important;
+    background: #fff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 10px 24px rgba(15,23,42,.08) !important;
+}
+
+.profil-student-card:active {
+    transform: scale(.985) !important;
+    background: #f8fafc !important;
+}
+
+/* Avatar */
+.profil-avatar {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 14px !important;
+    background: linear-gradient(145deg,#fff1f2,#ffe4e6) !important;
+    color: #b91c1c !important;
+    border: 1px solid #fecdd3 !important;
+    font-size: 13px !important;
+    letter-spacing: .02em;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+/* Student information */
+.profil-info-wrapper {
+    min-width: 0;
+    padding-right: 4px;
+}
+
+.profil-student-name {
+    font-size: 12px !important;
+    line-height: 1.35;
+    font-weight: 900 !important;
+    color: #0f172a !important;
+    letter-spacing: -.015em !important;
+}
+
+.profil-student-meta {
+    display: flex !important;
+    align-items: center;
+    min-width: 0;
+    gap: 5px !important;
+    margin-top: 5px !important;
+    font-size: 8px !important;
+    line-height: 1.25;
+    font-weight: 800 !important;
+    color: #64748b !important;
+    text-transform: uppercase;
+    letter-spacing: .025em;
+    overflow: hidden;
+}
+
+.profil-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profil-meta-item i {
+    font-size: 7px;
+    color: #94a3b8;
+    flex: 0 0 auto;
+}
+
+.profil-meta-guru {
+    max-width: 55%;
+}
+
+.profil-meta-separator {
+    color: #cbd5e1;
+    flex: 0 0 auto;
+}
+
+/* Attendance */
+.profil-attendance-group {
+    display: flex !important;
+    align-items: center;
+    gap: 5px !important;
+    flex-shrink: 0;
+}
+
+.profil-pill {
+    width: 34px !important;
+    height: 38px !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(15,23,42,.045) !important;
+    box-shadow: 0 2px 5px rgba(15,23,42,.025);
+}
+
+.pill-tag {
+    font-size: 6px !important;
+    line-height: 1;
+    font-weight: 900 !important;
+    margin-bottom: 3px !important;
+    opacity: .58 !important;
+}
+
+.pill-num {
+    font-size: 11px !important;
+    line-height: 1;
+    font-weight: 900 !important;
+}
+
+/* Total */
+.profil-total-badge {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 11px !important;
+    margin-left: 2px !important;
+    background: #0f172a !important;
+    box-shadow: 0 5px 12px rgba(15,23,42,.13) !important;
+}
+
+.total-tag {
+    font-size: 6px !important;
+    line-height: 1;
+    letter-spacing: .08em;
+}
+
+.total-num {
+    font-size: 13px !important;
+    line-height: 1;
+    margin-top: 3px;
+}
+
+/* Chevron */
+.profil-chevron {
+    font-size: 9px !important;
+    color: #cbd5e1 !important;
+    transition: transform .18s ease, color .18s ease;
+}
+
+.profil-student-card:hover .profil-chevron {
+    color: #dc2626 !important;
+    transform: translateX(2px);
+}
+
+/* Empty state */
+#profil-list-container > .py-20 {
+    grid-column: 1 / -1;
+    background: #fff;
+    border: 1px dashed #cbd5e1;
+    border-radius: 18px;
+    padding: 48px 20px !important;
+    opacity: 1 !important;
+    color: #94a3b8;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+    #tab-profil > div {
+        padding-bottom: 36px !important;
+    }
+
+    #tab-profil .space-y-3.mb-6 {
+        display: grid;
+        grid-template-columns: minmax(0,1fr) minmax(340px, .55fr);
+        gap: 10px;
+        align-items: center;
+    }
+
+    #tab-profil .space-y-3.mb-6 > .relative {
+        grid-column: 1;
+    }
+
+    #tab-profil .space-y-3.mb-6 > .grid {
+        grid-column: 2;
+    }
+
+    #profil-list-container {
+        grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+        gap: 12px !important;
+    }
+
+    .profil-student-card {
+        min-height: 78px;
+        padding: 12px 16px !important;
+    }
+}
+
+@media (min-width: 1280px) {
+    #profil-list-container {
+        grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+        gap: 14px !important;
+    }
+
+    .profil-student-card {
+        grid-template-columns: 52px minmax(0,1fr) auto 12px !important;
+        min-height: 82px;
+        padding: 13px 17px !important;
+    }
+
+    .profil-avatar {
+        width: 52px !important;
+        height: 52px !important;
+        border-radius: 15px !important;
+    }
+
+    .profil-student-name {
+        font-size: 13px !important;
+    }
+
+    .profil-pill {
+        width: 35px !important;
+        height: 39px !important;
+    }
+
+    .profil-total-badge {
+        width: 44px !important;
+        height: 44px !important;
+    }
+}
+
+/* Android / narrow screens */
+@media (max-width: 480px) {
+    #tab-profil > div {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    #tab-profil .flex.items-center.justify-between.mb-6 {
+        margin-bottom: 14px !important;
+    }
+
+    #tab-profil .space-y-3.mb-6 {
+        margin-bottom: 14px !important;
+    }
+
+    #profil-list-container {
+        gap: 8px !important;
+    }
+
+    .profil-student-card {
+        grid-template-columns: 42px minmax(0,1fr) auto 8px !important;
+        gap: 9px !important;
+        min-height: 68px;
+        padding: 9px 10px 9px 12px !important;
+        border-radius: 15px !important;
+    }
+
+    .profil-student-card::before {
+        top: 11px;
+        bottom: 11px;
+        width: 2px;
+    }
+
+    .profil-avatar {
+        width: 42px !important;
+        height: 42px !important;
+        border-radius: 12px !important;
+        font-size: 12px !important;
+    }
+
+    .profil-student-name {
+        font-size: 10.5px !important;
+    }
+
+    .profil-student-meta {
+        font-size: 7px !important;
+        gap: 4px !important;
+        margin-top: 4px !important;
+    }
+
+    .profil-meta-guru {
+        max-width: 50%;
+    }
+
+    .profil-attendance-group {
+        gap: 3px !important;
+    }
+
+    .profil-pill {
+        width: 27px !important;
+        height: 31px !important;
+        border-radius: 8px !important;
+    }
+
+    .pill-tag {
+        font-size: 5px !important;
+        margin-bottom: 2px !important;
+    }
+
+    .pill-num {
+        font-size: 9px !important;
+    }
+
+    .profil-total-badge {
+        width: 33px !important;
+        height: 33px !important;
+        border-radius: 9px !important;
+        margin-left: 1px !important;
+    }
+
+    .total-tag {
+        font-size: 5px !important;
+    }
+
+    .total-num {
+        font-size: 10px !important;
+        margin-top: 2px;
+    }
+
+    .profil-chevron {
+        font-size: 8px !important;
+    }
+}
+
+/* Very narrow Android devices */
+@media (max-width: 360px) {
+    .profil-student-card {
+        grid-template-columns: 38px minmax(0,1fr) auto 6px !important;
+        gap: 7px !important;
+        padding: 8px 8px 8px 10px !important;
+    }
+
+    .profil-avatar {
+        width: 38px !important;
+        height: 38px !important;
+    }
+
+    .profil-pill {
+        width: 24px !important;
+        height: 29px !important;
+    }
+
+    .profil-total-badge {
+        width: 30px !important;
+        height: 30px !important;
+    }
+
+    .profil-student-meta .profil-meta-guru,
+    .profil-meta-separator {
+        display: none;
+    }
+}
+</style>
+
 </head>
 <body class="text-slate-900">
 
@@ -2425,7 +2851,9 @@ window.renderProfilList = () => {
             <div class="profil-info-wrapper">
                 <div class="profil-student-name">${escapeHtml(s.nama || '-')}</div>
                 <div class="profil-student-meta">
-                    <span>${escapeHtml(s.kelas || '-')}</span>
+                    <span class="profil-meta-item"><i class="fas fa-graduation-cap"></i>${escapeHtml(s.kelas || '-')}</span>
+                    <span class="profil-meta-separator">•</span>
+                    <span class="profil-meta-item profil-meta-guru"><i class="fas fa-user-tie"></i>${escapeHtml(s.guruWali || '-')}</span>
                 </div>
             </div>
 
