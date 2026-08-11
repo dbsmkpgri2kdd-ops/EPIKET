@@ -1144,7 +1144,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-	import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc, getDocs, query, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+	import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc, getDocs, query, writeBatch, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
         // --- KONFIGURASI FIREBASE ---
         const firebaseConfig = {
@@ -2201,23 +2201,23 @@ window.populateProfilFilters = () => {
 // Fungsi Render Profil yang diperbarui
 window.renderProfilList = () => {
     const container = document.getElementById('profil-list-container');
-    const search = document.getElementById('search-profil').value.toLowerCase();
-    const filterKelas = document.getElementById('filter-profil-kelas').value;
-    const filterGuru = document.getElementById('filter-profil-guru').value;
+    const search = document.getElementById('search-profil')?.value.toLowerCase() || '';
+    const filterKelas = document.getElementById('filter-profil-kelas')?.value || 'SEMUA';
+    const filterGuru = document.getElementById('filter-profil-guru')?.value || 'SEMUA';
 
     if (!state.attendanceSummary6m || Object.keys(state.attendanceSummary6m).length !== (state.master.siswa || []).length) {
         if (typeof window.calculatePopularData === 'function') window.calculatePopularData();
     }
 
-    let filtered = state.master.siswa.filter(s => {
+    let filtered = (state.master.siswa || []).filter(s => {
         const matchSearch = String(s.nama || '').toLowerCase().includes(search) || String(s.id || '').toLowerCase().includes(search);
-        const matchKelas = (filterKelas === 'SEMUA') || (s.kelas === filterKelas);
-        const matchGuru = (filterGuru === 'SEMUA') || (s.guruWali === filterGuru);
+        const matchKelas = filterKelas === 'SEMUA' || s.kelas === filterKelas;
+        const matchGuru = filterGuru === 'SEMUA' || s.guruWali === filterGuru;
         return matchSearch && matchKelas && matchGuru;
     });
-    filtered.sort((a, b) => a.nama.localeCompare(b.nama));
+    filtered.sort((a, b) => String(a.nama || '').localeCompare(String(b.nama || '')));
 
-    if(filtered.length === 0) {
+    if (!filtered.length) {
         container.innerHTML = `<div class="text-center py-10 opacity-30 font-black text-[10px] uppercase">Siswa Tidak Ditemukan</div>`;
         return;
     }
@@ -2225,23 +2225,31 @@ window.renderProfilList = () => {
     container.innerHTML = filtered.map(s => {
         const r = state.attendanceSummary6m[String(s.id)] || {B:0,A:0,I:0,S:0,T:0};
         return `
-        <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-3 active:scale-95 transition-all cursor-pointer mb-3">
+        <div onclick="window.openEditor('${String(s.id).replace(/'/g, "\\'")}')" class="bg-white p-3.5 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-3 active:scale-[0.98] transition-all cursor-pointer mb-3">
             <div class="w-12 h-12 flex-shrink-0 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 font-black text-xs">${String(s.nama || '?').charAt(0)}</div>
-            <div class="flex-grow min-w-0">
-                <h4 class="text-[11px] font-black text-slate-800 uppercase truncate">${s.nama}</h4>
-                <div class="flex gap-2 mt-1 truncate">
-                    <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">${s.kelas || '-'}</span>
-                    ${s.guruWali && s.guruWali !== '-' ? `<span class="text-[7px] font-black text-blue-500 uppercase truncate">GW: ${s.guruWali}</span>` : ''}
+
+            <div class="flex-1 min-w-0">
+                <h4 class="text-[11px] font-black text-slate-800 uppercase truncate leading-tight">${s.nama || '-'}</h4>
+                <div class="text-[7px] font-bold text-slate-400 uppercase tracking-widest truncate mt-1">
+                    ${s.kelas || '-'}${s.guruWali && s.guruWali !== '-' ? ` • GW: ${s.guruWali}` : ''}
                 </div>
-                <div class="flex items-center gap-1.5 mt-2 flex-wrap">
-                    <span class="text-[7px] font-black text-orange-600 bg-orange-50 px-1.5 py-1 rounded-md">B ${r.B}</span>
-                    <span class="text-[7px] font-black text-red-600 bg-red-50 px-1.5 py-1 rounded-md">A ${r.A}</span>
-                    <span class="text-[7px] font-black text-blue-600 bg-blue-50 px-1.5 py-1 rounded-md">I ${r.I}</span>
-                    <span class="text-[7px] font-black text-green-600 bg-green-50 px-1.5 py-1 rounded-md">S ${r.S}</span>
+            </div>
+
+            <!-- Ketidakhadiran tetap di kanan dan hanya 2 baris -->
+            <div class="flex-shrink-0 w-[118px]">
+                <div class="grid grid-cols-4 gap-1 mb-1">
+                    <span class="text-[7px] font-black text-orange-600 bg-orange-50 px-1 py-1 rounded-md text-center">B ${r.B}</span>
+                    <span class="text-[7px] font-black text-red-600 bg-red-50 px-1 py-1 rounded-md text-center">A ${r.A}</span>
+                    <span class="text-[7px] font-black text-blue-600 bg-blue-50 px-1 py-1 rounded-md text-center">I ${r.I}</span>
+                    <span class="text-[7px] font-black text-green-600 bg-green-50 px-1 py-1 rounded-md text-center">S ${r.S}</span>
+                </div>
+                <div class="flex justify-end items-center gap-1">
+                    <span class="text-[7px] font-black text-slate-500 uppercase">Ketidakhadiran</span>
                     <span class="text-[7px] font-black text-white bg-red-600 px-1.5 py-1 rounded-md">T ${r.T}</span>
                 </div>
             </div>
-            <i class="fas fa-chevron-right text-slate-200 text-xs flex-shrink-0"></i>
+
+            <i class="fas fa-chevron-right text-slate-200 text-[10px] flex-shrink-0"></i>
         </div>`;
     }).join('');
 };
@@ -2256,6 +2264,91 @@ window.toggleNoteForm = () => {
     } else {
         form.classList.add('hidden');
         btn.classList.remove('hidden');
+    }
+};
+
+// --- HELPER CATATAN PEMBINAAN ---
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, ch => ({
+        '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'
+    }[ch]));
+}
+
+async function readStudentHistory(id) {
+    const ref = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', String(id));
+    const snap = await getDoc(ref);
+    return { ref, history: snap.exists() && Array.isArray(snap.data().history) ? snap.data().history : [] };
+}
+
+window.editNote = async (id, noteId) => {
+    try {
+        const { ref, history } = await readStudentHistory(id);
+        const index = history.findIndex((n, i) => (n.id || `legacy-${i}`) === noteId);
+        if (index < 0) { showToast('❌ Catatan tidak ditemukan'); return; }
+
+        const current = history[index];
+        const newPeran = prompt('Peran pembina:', current.peran || 'Kesiswaan');
+        if (newPeran === null) return;
+        const newText = prompt('Isi catatan pembinaan:', current.text || '');
+        if (newText === null) return;
+
+        const cleanPeran = newPeran.trim() || current.peran || 'Kesiswaan';
+        const cleanText = newText.trim();
+
+        await runTransaction(db, async transaction => {
+            const snap = await transaction.get(ref);
+            const latest = snap.exists() && Array.isArray(snap.data().history) ? snap.data().history : [];
+            const latestIndex = latest.findIndex((n, i) => (n.id || `legacy-${i}`) === noteId);
+            if (latestIndex < 0) throw new Error('Catatan sudah berubah atau dihapus oleh pengguna lain.');
+
+            latest[latestIndex] = {
+                ...latest[latestIndex],
+                peran: cleanPeran,
+                text: cleanText,
+                updatedAt: Date.now()
+            };
+            transaction.set(ref, { history: latest, lastUpdate: Date.now() }, { merge: true });
+        });
+
+        showToast('✅ Catatan berhasil diperbarui');
+        await window.openEditor(id);
+    } catch (e) {
+        console.error('Gagal edit catatan:', e);
+        showToast('❌ Gagal mengedit: ' + (e.message || 'Kesalahan sistem'));
+    }
+};
+
+window.deleteNote = async (id, noteId) => {
+    if (!confirm('Hapus catatan pembinaan ini?')) return;
+    try {
+        const { ref } = await readStudentHistory(id);
+        let removedPhoto = null;
+
+        await runTransaction(db, async transaction => {
+            const snap = await transaction.get(ref);
+            const history = snap.exists() && Array.isArray(snap.data().history) ? snap.data().history : [];
+            const index = history.findIndex((n, i) => (n.id || `legacy-${i}`) === noteId);
+            if (index < 0) throw new Error('Catatan tidak ditemukan.');
+
+            removedPhoto = history[index]?.photo || null;
+            history.splice(index, 1);
+
+            if (history.length) {
+                transaction.set(ref, { history, lastUpdate: Date.now() }, { merge: true });
+            } else {
+                transaction.set(ref, { history: [], lastUpdate: Date.now() }, { merge: true });
+            }
+        });
+
+        if (removedPhoto?.path) {
+            try { await deleteObject(storageRef(storage, removedPhoto.path)); } catch (_) {}
+        }
+
+        showToast('✅ Catatan berhasil dihapus');
+        await window.openEditor(id);
+    } catch (e) {
+        console.error('Gagal hapus catatan:', e);
+        showToast('❌ Gagal menghapus: ' + (e.message || 'Kesalahan sistem'));
     }
 };
 
@@ -2327,25 +2420,41 @@ window.openEditor = async (id) => {
     // 5. LOAD RIWAYAT (FIREBASE)
     const container = document.getElementById('history-container');
     container.innerHTML = '<div class="text-center py-10 text-[10px] text-slate-300 italic">Memuat riwayat pembinaan...</div>';
-    
+
     try {
-        const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id));
-        if (docSnap.exists() && docSnap.data().history) {
+        const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', String(id)));
+        if (docSnap.exists() && Array.isArray(docSnap.data().history) && docSnap.data().history.length) {
             const history = docSnap.data().history;
-            container.innerHTML = history.slice().reverse().map(n => `
-                <div class="p-5 bg-slate-50 border border-slate-100 rounded-[2rem] border-l-4 ${getNoteColor(n.peran)}">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[8px] font-black uppercase text-slate-400">${n.peran}</span>
-                        <span class="text-[8px] font-bold text-slate-300">${new Date(n.date).toLocaleString('id-ID')}</span>
+            container.innerHTML = history.slice().reverse().map((n, reverseIndex) => {
+                const originalIndex = history.length - 1 - reverseIndex;
+                const noteId = n.id || `legacy-${originalIndex}`;
+                return `
+                <div class="p-5 bg-slate-50 border border-slate-100 rounded-[2rem] border-l-4 ${getNoteColor(n.peran)}" data-note-id="${noteId}">
+                    <div class="flex justify-between items-start gap-3 mb-2">
+                        <div>
+                            <span class="text-[8px] font-black uppercase text-slate-400">${escapeHtml(n.peran || '-')}</span>
+                            <span class="block text-[8px] font-bold text-slate-300 mt-0.5">${n.date ? new Date(n.date).toLocaleString('id-ID') : '-'}</span>
+                        </div>
+                        <div class="flex gap-1 flex-shrink-0">
+                            <button type="button" onclick="window.editNote('${String(id).replace(/'/g, "\\'")}','${String(noteId).replace(/'/g, "\\'")}')" class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100" title="Edit">
+                                <i class="fas fa-pen text-[9px]"></i>
+                            </button>
+                            <button type="button" onclick="window.deleteNote('${String(id).replace(/'/g, "\\'")}','${String(noteId).replace(/'/g, "\\'")}')" class="w-8 h-8 rounded-xl bg-red-50 text-red-600 hover:bg-red-100" title="Hapus">
+                                <i class="fas fa-trash text-[9px]"></i>
+                            </button>
+                        </div>
                     </div>
-                    ${n.text ? `<p class="text-[11px] font-bold text-slate-700 leading-relaxed">${n.text}</p>` : ""}
+                    ${n.text ? `<p class="text-[11px] font-bold text-slate-700 leading-relaxed whitespace-pre-line">${escapeHtml(n.text)}</p>` : ""}
                     ${n.photo?.url ? `<a href="${n.photo.url}" target="_blank" rel="noopener" class="mt-3 block rounded-2xl overflow-hidden border border-slate-200 bg-white"><img src="${n.photo.url}" loading="lazy" class="w-full max-h-72 object-cover" alt="Foto pembinaan"></a>` : ""}
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         } else {
             container.innerHTML = '<div class="text-center py-10 text-[10px] text-slate-300 italic bg-slate-50 rounded-[2rem] border border-dashed">Belum ada catatan pembinaan.</div>';
         }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+        console.error('Gagal memuat riwayat pembinaan:', e);
+        container.innerHTML = '<div class="text-center py-10 text-[10px] text-red-400 italic bg-red-50 rounded-[2rem]">Riwayat gagal dimuat. Silakan coba lagi.</div>';
+    }
 
     // Reset Form & Tampilkan Modal
     document.getElementById('wrapper-note-form').classList.add('hidden');
@@ -2412,38 +2521,78 @@ window.clearNotePhoto = () => {
 };
 
 window.addNewNote = async () => {
-    const id = document.getElementById('edit-id').value;
+    const id = String(document.getElementById('edit-id').value || '').trim();
     const peran = document.getElementById('select-peran').value;
     const text = document.getElementById('new-note-text').value.trim();
     const photoFile = window.notePhotoFile;
+
+    if (!id) { showToast('❌ Siswa belum dipilih'); return; }
     if (!text && !photoFile) { showToast('⚠️ Isi catatan atau pilih foto'); return; }
+
     let uploadedPhoto = null;
+    let saved = false;
+
     try {
-        showToast(photoFile ? '⏳ Mengompres & mengunggah foto...' : '⏳ Menyimpan...');
+        const saveButton = document.querySelector('#wrapper-note-form button[onclick*="addNewNote"]');
+        if (saveButton) {
+            saveButton.disabled = true;
+            saveButton.dataset.oldText = saveButton.innerText;
+            saveButton.innerText = 'MENYIMPAN...';
+        }
+
+        showToast(photoFile ? '⏳ Mengompres & mengunggah foto...' : '⏳ Menyimpan catatan...');
+
         if (photoFile) {
             const compressed = await window.compressNotePhoto(photoFile);
             const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.webp`;
             const path = `student_notes/${id}/${fileName}`;
             const photoRef = storageRef(storage, path);
-            await uploadBytes(photoRef, compressed, { contentType: 'image/webp', cacheControl: 'public,max-age=31536000' });
+            await uploadBytes(photoRef, compressed, {
+                contentType: 'image/webp',
+                cacheControl: 'public,max-age=31536000'
+            });
             const url = await getDownloadURL(photoRef);
             uploadedPhoto = { url, path, size: compressed.size, type: 'image/webp' };
         }
+
         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id);
-        const docSnap = await getDoc(docRef);
-        let history = docSnap.exists() ? (docSnap.data().history || []) : [];
-        const note = { peran, text, date: Date.now() };
+        const note = {
+            id: `${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+            peran,
+            text,
+            date: Date.now()
+        };
         if (uploadedPhoto) note.photo = uploadedPhoto;
-        history.push(note);
-        await setDoc(docRef, { history, lastUpdate: Date.now() }, { merge: true });
+
+        // Transaction mencegah catatan baru menimpa catatan lain
+        // jika dua pengguna menyimpan hampir bersamaan.
+        await runTransaction(db, async transaction => {
+            const snap = await transaction.get(docRef);
+            const history = snap.exists() && Array.isArray(snap.data().history) ? [...snap.data().history] : [];
+            history.push(note);
+            transaction.set(docRef, {
+                history,
+                lastUpdate: Date.now()
+            }, { merge: true });
+        });
+
+        saved = true;
         showToast('✅ Catatan tersimpan');
         document.getElementById('new-note-text').value = '';
         window.clearNotePhoto();
-        window.openEditor(id);
+        await window.openEditor(id);
     } catch (e) {
-        console.error(e);
-        if (uploadedPhoto?.path) { try { await deleteObject(storageRef(storage, uploadedPhoto.path)); } catch (_) {} }
+        console.error('Gagal menyimpan catatan:', e);
+        if (!saved && uploadedPhoto?.path) {
+            try { await deleteObject(storageRef(storage, uploadedPhoto.path)); } catch (_) {}
+        }
         showToast('❌ Gagal menyimpan: ' + (e.message || 'Kesalahan sistem'));
+    } finally {
+        const saveButton = document.querySelector('#wrapper-note-form button[onclick*="addNewNote"]');
+        if (saveButton) {
+            saveButton.disabled = false;
+            saveButton.innerText = saveButton.dataset.oldText || 'SIMPAN CATATAN';
+        }
     }
 };
 
