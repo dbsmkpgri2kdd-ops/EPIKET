@@ -1539,7 +1539,7 @@ function getMonthYearSiswa() {
     return {
         month: document.getElementById('download-month').value,
         year: document.getElementById('download-year').value,
-        kelas: document.getElementById('download-filter-kelas').value
+        kelas: document.getElementById('download-class-siswa').value
     };
 }
 
@@ -2554,7 +2554,6 @@ window.addNewNote = async () => {
             // Jaga agar dokumen Firestore tetap di bawah batas 1 MiB.
             if (String(base64).length > 850000) throw new Error('Foto masih terlalu besar setelah kompresi. Pilih foto lain.');
             note.photoBase64 = base64;
-        }
         }
 
         if (editingIndex >= 0 && history[editingIndex]) history[editingIndex] = note;
