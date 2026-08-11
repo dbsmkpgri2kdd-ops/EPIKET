@@ -2371,9 +2371,6 @@ window.renderProfilList = () => {
                     <span class="profil-attendance-pill bg-red-50 text-red-600">A ${r.A || 0}</span>
                     <span class="profil-attendance-pill bg-blue-50 text-blue-600">I ${r.I || 0}</span>
                     <span class="profil-attendance-pill bg-green-50 text-green-600">S ${r.S || 0}</span>
-                </div>
-                <div class="profil-attendance-total">
-                    <span class="profil-attendance-label">Ketidakhadiran</span>
                     <span class="profil-attendance-total-badge">T ${r.T || 0}</span>
                 </div>
             </div>
@@ -2381,6 +2378,7 @@ window.renderProfilList = () => {
         </div>`;
     }).join('');
 };
+
 // --- TOGGLE FORM CATATAN ---
 window.toggleNoteForm = () => {
     const form = document.getElementById('wrapper-note-form');
