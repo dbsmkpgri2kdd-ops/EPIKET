@@ -546,309 +546,6 @@
 }
 </style>
 
-
-<style>
-/* =========================================================
-   PROFIL SISWA DESKTOP — ONE PAGE / NO PAGE SCROLL
-   Mobile tidak diubah.
-   Desktop: seluruh Profil & Pembinaan dibuat ringkas,
-   rapi, dan muat dalam satu viewport.
-   ========================================================= */
-@media (min-width: 1024px) {
-
-    /* Modal profil: tinggi mengikuti viewport */
-    #editor-modal {
-        padding: 12px !important;
-        align-items: center !important;
-        justify-content: center !important;
-        overflow: hidden !important;
-    }
-
-    #editor-modal > .flex.justify-between {
-        height: 52px !important;
-        min-height: 52px !important;
-        padding: 8px 16px !important;
-        flex-shrink: 0 !important;
-    }
-
-    #editor-modal > .flex.justify-between h3 {
-        font-size: 10px !important;
-        letter-spacing: .18em !important;
-    }
-
-    #editor-modal > .flex.justify-between button {
-        width: 34px !important;
-        height: 34px !important;
-    }
-
-    /* Panel utama: tidak boleh menghasilkan scroll halaman */
-    #editor-modal > .flex-grow {
-        overflow: hidden !important;
-        min-height: 0 !important;
-    }
-
-    /* Area isi dibuat menjadi 2 kolom dan 2 baris */
-    #editor-modal > .flex-grow > .p-6 {
-        height: 100% !important;
-        min-height: 0 !important;
-        box-sizing: border-box !important;
-        padding: 12px 16px 14px !important;
-        gap: 12px !important;
-
-        display: grid !important;
-        grid-template-columns: minmax(360px, .95fr) minmax(420px, 1.05fr) !important;
-        grid-template-rows: minmax(190px, 1fr) minmax(150px, .82fr) !important;
-        overflow: hidden !important;
-    }
-
-    /* ===== KARTU IDENTITAS ===== */
-    #editor-modal > .flex-grow > .p-6 > .bg-red-600 {
-        grid-column: 1 !important;
-        grid-row: 1 !important;
-        margin: 0 !important;
-        padding: 14px !important;
-        border-radius: 18px !important;
-        min-height: 0 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: space-between !important;
-        gap: 8px !important;
-    }
-
-    #editor-modal #display-foto {
-        width: 72px !important;
-        height: 72px !important;
-        border-radius: 18px !important;
-        border-width: 3px !important;
-    }
-
-    #editor-modal #edit-nama-display {
-        font-size: 16px !important;
-        margin-bottom: 0 !important;
-    }
-
-    #editor-modal #display-nis {
-        font-size: 8px !important;
-        margin-bottom: 6px !important;
-        letter-spacing: .14em !important;
-    }
-
-    #editor-modal .bg-red-600 .flex.items-center.justify-center.gap-2 span {
-        padding: 5px 10px !important;
-        font-size: 8px !important;
-    }
-
-    #editor-modal .bg-red-600 .grid.grid-cols-5 {
-        gap: 5px !important;
-    }
-
-    #editor-modal .bg-red-600 .grid.grid-cols-5 > div {
-        padding: 7px 4px !important;
-        border-radius: 12px !important;
-    }
-
-    #editor-modal .bg-red-600 .grid.grid-cols-5 p {
-        font-size: 6px !important;
-        margin-bottom: 2px !important;
-    }
-
-    #editor-modal .bg-red-600 .grid.grid-cols-5 p[id^="rekap-"] {
-        font-size: 13px !important;
-    }
-
-    /* ===== KONTAK SISWA / ORANG TUA ===== */
-    #editor-modal > .flex-grow > .p-6 > .bg-slate-900 {
-        grid-column: 2 !important;
-        grid-row: 1 !important;
-        margin: 0 !important;
-        padding: 12px !important;
-        border-radius: 18px !important;
-        min-height: 0 !important;
-        display: grid !important;
-        grid-template-rows: repeat(4, minmax(0, 1fr)) !important;
-        gap: 7px !important;
-    }
-
-    #editor-modal > .flex-grow > .p-6 > .bg-slate-900 > div {
-        min-height: 0 !important;
-        padding: 8px 10px !important;
-        border-radius: 12px !important;
-    }
-
-    #editor-modal > .flex-grow > .p-6 > .bg-slate-900 i {
-        font-size: 14px !important;
-    }
-
-    #editor-modal > .flex-grow > .p-6 > .bg-slate-900 p {
-        font-size: 8px !important;
-        line-height: 1.2 !important;
-    }
-
-    #editor-modal > .flex-grow > .p-6 > .bg-slate-900 a {
-        padding: 6px 10px !important;
-        font-size: 7px !important;
-        border-radius: 9px !important;
-    }
-
-    /* ===== KESISWAAN / TIM PEMBINAAN ===== */
-    #editor-modal > .flex-grow > .p-6 > .bg-slate-50 {
-        grid-column: 1 !important;
-        grid-row: 2 !important;
-        margin: 0 !important;
-        padding: 12px !important;
-        border-radius: 18px !important;
-        min-height: 0 !important;
-        gap: 7px !important;
-        align-content: stretch !important;
-    }
-
-    #editor-modal > .flex-grow > .p-6 > .bg-slate-50 > div {
-        min-height: 0 !important;
-        justify-content: center !important;
-    }
-
-    #editor-modal > .flex-grow > .p-6 > .bg-slate-50 span {
-        font-size: 7px !important;
-        line-height: 1.15 !important;
-    }
-
-    #editor-modal > .flex-grow > .p-6 > .bg-slate-50 span[id^="display-"] {
-        font-size: 9px !important;
-    }
-
-    /* ===== RIWAYAT PEMBINAAN ===== */
-    #editor-modal > .flex-grow > .p-6 > .space-y-4 {
-        grid-column: 2 !important;
-        grid-row: 2 !important;
-        min-height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 7px !important;
-        overflow: hidden !important;
-    }
-
-    #editor-modal > .flex-grow > .p-6 > .space-y-4 > h4 {
-        flex: 0 0 auto !important;
-        margin: 0 !important;
-        padding: 0 4px !important;
-        font-size: 8px !important;
-    }
-
-    #editor-modal #history-container {
-        flex: 1 1 auto !important;
-        min-height: 0 !important;
-        max-height: none !important;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        padding-right: 3px !important;
-    }
-
-    #editor-modal #history-container > div {
-        padding: 9px 11px !important;
-        border-radius: 12px !important;
-        margin-bottom: 6px !important;
-    }
-
-    #editor-modal #history-container p {
-        font-size: 8px !important;
-        line-height: 1.35 !important;
-    }
-
-    #editor-modal #history-container span {
-        font-size: 6px !important;
-    }
-
-    /* Tombol tambah catatan tetap terlihat di bawah */
-    #editor-modal > .flex-grow > .p-6 > .space-y-4 > .pt-4 {
-        flex: 0 0 auto !important;
-        padding-top: 0 !important;
-    }
-
-    #editor-modal #btn-toggle-note {
-        padding: 9px 12px !important;
-        border-radius: 11px !important;
-        font-size: 8px !important;
-    }
-
-    /* Jika form catatan dibuka, dibuat compact agar tetap satu halaman */
-    #editor-modal #wrapper-note-form {
-        margin-top: 6px !important;
-        padding: 10px !important;
-        border-radius: 14px !important;
-        max-height: 190px !important;
-        overflow-y: auto !important;
-    }
-
-    #editor-modal #wrapper-note-form > div {
-        margin-bottom: 7px !important;
-    }
-
-    #editor-modal #wrapper-note-form select {
-        padding: 8px !important;
-        margin-bottom: 7px !important;
-        font-size: 8px !important;
-    }
-
-    #editor-modal #wrapper-note-form textarea {
-        min-height: 55px !important;
-        height: 55px !important;
-        padding: 9px !important;
-        margin-bottom: 7px !important;
-        font-size: 8px !important;
-    }
-
-    #editor-modal #wrapper-note-form button {
-        padding: 9px !important;
-        font-size: 8px !important;
-    }
-
-    /* Scrollbar riwayat dibuat tipis */
-    #editor-modal #history-container::-webkit-scrollbar,
-    #editor-modal #wrapper-note-form::-webkit-scrollbar {
-        width: 4px;
-    }
-
-    #editor-modal #history-container::-webkit-scrollbar-thumb,
-    #editor-modal #wrapper-note-form::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 10px;
-    }
-}
-
-/* Monitor lebar: beri ruang sedikit lebih proporsional */
-@media (min-width: 1280px) {
-    #editor-modal > .flex-grow > .p-6 {
-        grid-template-columns: minmax(430px, .92fr) minmax(520px, 1.08fr) !important;
-        grid-template-rows: minmax(205px, 1fr) minmax(165px, .82fr) !important;
-    }
-}
-
-/* Monitor tinggi rendah: tetap satu viewport */
-@media (min-width: 1024px) and (max-height: 700px) {
-    #editor-modal > .flex-grow > .p-6 {
-        grid-template-rows: minmax(175px, 1fr) minmax(135px, .78fr) !important;
-        gap: 9px !important;
-        padding: 9px 12px 10px !important;
-    }
-
-    #editor-modal > .flex-grow > .p-6 > .bg-red-600 {
-        padding: 10px !important;
-    }
-
-    #editor-modal > .flex-grow > .p-6 > .bg-slate-900,
-    #editor-modal > .flex-grow > .p-6 > .bg-slate-50 {
-        padding: 9px !important;
-    }
-
-    #editor-modal #display-foto {
-        width: 62px !important;
-        height: 62px !important;
-    }
-}
-</style>
-
 </head>
 <body class="text-slate-900">
 
@@ -1077,7 +774,22 @@
                             <option value="Guru Wali">GURU WALI</option>
                             <option value="Guru Mapel">GURU MAPEL</option>
                         </select>
-                        <textarea id="new-note-text" placeholder="Detail pembinaan..." class="w-full bg-white/10 text-white p-5 rounded-3xl text-[11px] min-h-[120px] border-none outline-none mb-6 focus:ring-2 focus:ring-red-600 placeholder:text-white/10 resize-none"></textarea>
+                        <textarea id="new-note-text" placeholder="Detail pembinaan..." class="w-full bg-white/10 text-white p-5 rounded-3xl text-[11px] min-h-[120px] border-none outline-none mb-4 focus:ring-2 focus:ring-red-600 placeholder:text-white/10 resize-none"></textarea>
+
+                        <div class="mb-5">
+                            <p class="text-[8px] font-black text-white/30 uppercase tracking-widest mb-2">Lampiran Foto (opsional)</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" onclick="document.getElementById('note-photo-upload').click()" class="py-3 rounded-2xl bg-white/10 text-white text-[9px] font-black uppercase border border-white/10 active:scale-95 transition"><i class="fas fa-upload mr-1"></i> Upload Foto</button>
+                                <button type="button" onclick="document.getElementById('note-photo-camera').click()" class="py-3 rounded-2xl bg-white/10 text-white text-[9px] font-black uppercase border border-white/10 active:scale-95 transition"><i class="fas fa-camera mr-1"></i> Ambil Foto</button>
+                            </div>
+                            <input id="note-photo-upload" type="file" accept="image/*" class="hidden" onchange="window.handleNotePhoto(this)">
+                            <input id="note-photo-camera" type="file" accept="image/*" capture="environment" class="hidden" onchange="window.handleNotePhoto(this)">
+                            <div id="note-photo-preview" class="hidden mt-3 relative rounded-2xl overflow-hidden border border-white/10 bg-white/5">
+                                <img id="note-photo-preview-img" class="w-full max-h-56 object-cover" alt="Preview foto pembinaan">
+                                <button type="button" onclick="window.clearNotePhoto()" class="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 text-white"><i class="fas fa-times text-xs"></i></button>
+                                <p id="note-photo-size" class="px-3 py-2 text-[8px] text-white/50 font-bold"></p>
+                            </div>
+                        </div>
                         <button onclick="window.addNewNote()" class="w-full bg-red-600 text-white py-5 rounded-3xl font-black text-[11px] uppercase shadow-xl active:scale-95 transition-all">Simpan Catatan</button>
                     </div>
                 </div>
@@ -1433,6 +1145,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 	import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, deleteDoc, getDocs, query, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
         // --- KONFIGURASI FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyC8KQzupwLouy6zSxiz5V5-kB6jPvigCII",
@@ -1447,6 +1160,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app);
         const appId = 'stm-pgri2-kdd-v3';
 
 
@@ -1596,6 +1310,7 @@ window.switchTab = (tab) => {
 
 // Tambahkan di global state
 window.state.cachedPopularHTML = "";
+window.state.attendanceSummary6m = {};
 window.state.popularDataReady = false;
 
 window.calculatePopularData = () => {
@@ -1637,6 +1352,13 @@ window.calculatePopularData = () => {
     .map(([id, data]) => ({ id, ...data }))
     .sort((a, b) => b.T - a.T)
     .slice(0, state.master?.siswa?.length || 99);
+
+    // Ringkasan 6 bulan yang sama dengan Data Populer, dipakai juga pada daftar Profil.
+    state.attendanceSummary6m = {};
+    for (const s of siswa) {
+        const id = String(s.id);
+        state.attendanceSummary6m[id] = agg[id] || { B: 0, A: 0, I: 0, S: 0, T: 0 };
+    }
 
     state.cachedPopularHTML = sorted.map(item => {
         const s = siswa.find(siswaItem => String(siswaItem.id) === String(item.id) );
@@ -2482,37 +2204,46 @@ window.renderProfilList = () => {
     const search = document.getElementById('search-profil').value.toLowerCase();
     const filterKelas = document.getElementById('filter-profil-kelas').value;
     const filterGuru = document.getElementById('filter-profil-guru').value;
-    
-    // 1. Logika Filter Bertingkat (Search + Kelas + Guru Wali)
+
+    if (!state.attendanceSummary6m || Object.keys(state.attendanceSummary6m).length !== (state.master.siswa || []).length) {
+        if (typeof window.calculatePopularData === 'function') window.calculatePopularData();
+    }
+
     let filtered = state.master.siswa.filter(s => {
-        const matchSearch = s.nama.toLowerCase().includes(search) || s.id.includes(search);
+        const matchSearch = String(s.nama || '').toLowerCase().includes(search) || String(s.id || '').toLowerCase().includes(search);
         const matchKelas = (filterKelas === 'SEMUA') || (s.kelas === filterKelas);
         const matchGuru = (filterGuru === 'SEMUA') || (s.guruWali === filterGuru);
-        
         return matchSearch && matchKelas && matchGuru;
     });
-
-    // 2. Urutkan berdasarkan Nama secara default
     filtered.sort((a, b) => a.nama.localeCompare(b.nama));
-    
+
     if(filtered.length === 0) {
         container.innerHTML = `<div class="text-center py-10 opacity-30 font-black text-[10px] uppercase">Siswa Tidak Ditemukan</div>`;
         return;
     }
 
-    container.innerHTML = filtered.map(s => `
-        <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-4 active:scale-95 transition-all cursor-pointer mb-3">
-            <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 font-black text-xs">${s.nama.charAt(0)}</div>
-            <div class="flex-grow">
-                <h4 class="text-[11px] font-black text-slate-800 uppercase">${s.nama}</h4>
-                <div class="flex gap-2 mt-1">
-                    <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">${s.kelas}</span>
-                    ${s.guruWali && s.guruWali !== '-' ? `<span class="text-[7px] font-black text-blue-500 uppercase">GW: ${s.guruWali}</span>` : ''}
+    container.innerHTML = filtered.map(s => {
+        const r = state.attendanceSummary6m[String(s.id)] || {B:0,A:0,I:0,S:0,T:0};
+        return `
+        <div onclick="window.openEditor('${s.id}')" class="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-3 active:scale-95 transition-all cursor-pointer mb-3">
+            <div class="w-12 h-12 flex-shrink-0 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 font-black text-xs">${String(s.nama || '?').charAt(0)}</div>
+            <div class="flex-grow min-w-0">
+                <h4 class="text-[11px] font-black text-slate-800 uppercase truncate">${s.nama}</h4>
+                <div class="flex gap-2 mt-1 truncate">
+                    <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">${s.kelas || '-'}</span>
+                    ${s.guruWali && s.guruWali !== '-' ? `<span class="text-[7px] font-black text-blue-500 uppercase truncate">GW: ${s.guruWali}</span>` : ''}
+                </div>
+                <div class="flex items-center gap-1.5 mt-2 flex-wrap">
+                    <span class="text-[7px] font-black text-orange-600 bg-orange-50 px-1.5 py-1 rounded-md">B ${r.B}</span>
+                    <span class="text-[7px] font-black text-red-600 bg-red-50 px-1.5 py-1 rounded-md">A ${r.A}</span>
+                    <span class="text-[7px] font-black text-blue-600 bg-blue-50 px-1.5 py-1 rounded-md">I ${r.I}</span>
+                    <span class="text-[7px] font-black text-green-600 bg-green-50 px-1.5 py-1 rounded-md">S ${r.S}</span>
+                    <span class="text-[7px] font-black text-white bg-red-600 px-1.5 py-1 rounded-md">T ${r.T}</span>
                 </div>
             </div>
-            <i class="fas fa-chevron-right text-slate-200 text-xs"></i>
-        </div>
-    `).join('');
+            <i class="fas fa-chevron-right text-slate-200 text-xs flex-shrink-0"></i>
+        </div>`;
+    }).join('');
 };
 
 // --- TOGGLE FORM CATATAN ---
@@ -2607,7 +2338,8 @@ window.openEditor = async (id) => {
                         <span class="text-[8px] font-black uppercase text-slate-400">${n.peran}</span>
                         <span class="text-[8px] font-bold text-slate-300">${new Date(n.date).toLocaleString('id-ID')}</span>
                     </div>
-                    <p class="text-[11px] font-bold text-slate-700 leading-relaxed">${n.text}</p>
+                    ${n.text ? `<p class="text-[11px] font-bold text-slate-700 leading-relaxed">${n.text}</p>` : ""}
+                    ${n.photo?.url ? `<a href="${n.photo.url}" target="_blank" rel="noopener" class="mt-3 block rounded-2xl overflow-hidden border border-slate-200 bg-white"><img src="${n.photo.url}" loading="lazy" class="w-full max-h-72 object-cover" alt="Foto pembinaan"></a>` : ""}
                 </div>
             `).join('');
         } else {
@@ -2629,24 +2361,90 @@ window.closeEditor = () => {
     document.body.style.overflow = 'auto'; // Unlock background scroll
 };
 
+window.notePhotoFile = null;
+window.notePhotoPreviewUrl = null;
+
+window.compressNotePhoto = (file, maxSize = 1280, quality = 0.72) => new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith('image/')) return reject(new Error('File bukan gambar'));
+    const reader = new FileReader();
+    reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+            const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(img.width * scale));
+            canvas.height = Math.max(1, Math.round(img.height * scale));
+            const ctx = canvas.getContext('2d', { alpha: false });
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Gagal kompres foto')), 'image/webp', quality);
+        };
+        img.onerror = () => reject(new Error('Foto tidak dapat dibaca'));
+        img.src = reader.result;
+    };
+    reader.onerror = () => reject(new Error('Gagal membaca foto'));
+    reader.readAsDataURL(file);
+});
+
+window.handleNotePhoto = (input) => {
+    const file = input?.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { showToast('❌ Foto maksimal 10 MB sebelum diproses'); input.value = ''; return; }
+    window.notePhotoFile = file;
+    const preview = document.getElementById('note-photo-preview');
+    const img = document.getElementById('note-photo-preview-img');
+    const size = document.getElementById('note-photo-size');
+    if (window.notePhotoPreviewUrl) URL.revokeObjectURL(window.notePhotoPreviewUrl);
+    window.notePhotoPreviewUrl = URL.createObjectURL(file);
+    img.src = window.notePhotoPreviewUrl;
+    size.innerText = `${file.name} • ${(file.size / 1024 / 1024).toFixed(2)} MB • akan dikompres sebelum upload`;
+    preview.classList.remove('hidden');
+};
+
+window.clearNotePhoto = () => {
+    window.notePhotoFile = null;
+    if (window.notePhotoPreviewUrl) URL.revokeObjectURL(window.notePhotoPreviewUrl);
+    window.notePhotoPreviewUrl = null;
+    document.getElementById('note-photo-preview')?.classList.add('hidden');
+    const upload = document.getElementById('note-photo-upload');
+    const camera = document.getElementById('note-photo-camera');
+    if (upload) upload.value = '';
+    if (camera) camera.value = '';
+};
+
 window.addNewNote = async () => {
     const id = document.getElementById('edit-id').value;
     const peran = document.getElementById('select-peran').value;
     const text = document.getElementById('new-note-text').value.trim();
-    if (!text) return;
-
+    const photoFile = window.notePhotoFile;
+    if (!text && !photoFile) { showToast('⚠️ Isi catatan atau pilih foto'); return; }
+    let uploadedPhoto = null;
     try {
-        showToast("⏳ Menyimpan...");
+        showToast(photoFile ? '⏳ Mengompres & mengunggah foto...' : '⏳ Menyimpan...');
+        if (photoFile) {
+            const compressed = await window.compressNotePhoto(photoFile);
+            const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.webp`;
+            const path = `student_notes/${id}/${fileName}`;
+            const photoRef = storageRef(storage, path);
+            await uploadBytes(photoRef, compressed, { contentType: 'image/webp', cacheControl: 'public,max-age=31536000' });
+            const url = await getDownloadURL(photoRef);
+            uploadedPhoto = { url, path, size: compressed.size, type: 'image/webp' };
+        }
         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id);
         const docSnap = await getDoc(docRef);
         let history = docSnap.exists() ? (docSnap.data().history || []) : [];
-        history.push({ peran, text, date: Date.now() });
+        const note = { peran, text, date: Date.now() };
+        if (uploadedPhoto) note.photo = uploadedPhoto;
+        history.push(note);
         await setDoc(docRef, { history, lastUpdate: Date.now() }, { merge: true });
-        
-        showToast("✅ Tersimpan");
+        showToast('✅ Catatan tersimpan');
         document.getElementById('new-note-text').value = '';
-        window.openEditor(id); // Refresh data
-    } catch (e) { showToast("❌ Gagal"); }
+        window.clearNotePhoto();
+        window.openEditor(id);
+    } catch (e) {
+        console.error(e);
+        if (uploadedPhoto?.path) { try { await deleteObject(storageRef(storage, uploadedPhoto.path)); } catch (_) {} }
+        showToast('❌ Gagal menyimpan: ' + (e.message || 'Kesalahan sistem'));
+    }
 };
 
 function getNoteColor(peran) {
