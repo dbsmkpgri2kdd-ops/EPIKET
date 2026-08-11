@@ -546,107 +546,130 @@
 }
 
 /* =========================================================
-   PROFIL LIST — FINAL RESPONSIVE POLISH
+   PROFIL LIST — MODERN RE-DESIGN
    ========================================================= */
 #profil-list-container {
-    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 5px 2px;
 }
 
 .profil-student-card {
-    width: 100%;
-    min-height: 68px;
     display: grid;
-    grid-template-columns: 42px minmax(0, 1fr) 112px 14px;
+    grid-template-columns: 52px minmax(0, 1fr) auto 15px;
     align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    margin-bottom: 9px;
-    background: #fff;
-    border: 1px solid #e8edf3;
-    border-radius: 18px;
-    box-shadow: 0 3px 12px rgba(15,23,42,.045);
-    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    gap: 15px;
+    padding: 14px;
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 22px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
 }
-.profil-student-card:active { transform: scale(.985); }
-.profil-student-card:hover { border-color: #dbe3ec; box-shadow: 0 7px 18px rgba(15,23,42,.07); }
+
+.profil-student-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.05);
+    border-color: #e2e8f0;
+}
+
+.profil-student-card:active { transform: scale(0.97); }
+
 .profil-avatar {
-    width: 42px; height: 42px; border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    background: #fff1f2; color: #dc2626; font-size: 11px; font-weight: 900;
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+    color: #dc2626;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 16px;
+    border: 1.5px solid #fecaca;
+    flex-shrink: 0;
 }
+
 .profil-student-name {
-    min-width: 0; font-size: 10px; line-height: 1.2; font-weight: 900;
-    color: #1e293b; text-transform: uppercase; white-space: nowrap;
-    overflow: hidden; text-overflow: ellipsis;
+    font-size: 13px;
+    font-weight: 800;
+    color: #0f172a;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin-bottom: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
+
 .profil-student-meta {
-    min-width: 0; margin-top: 4px; font-size: 6.5px; line-height: 1.15;
-    font-weight: 800; letter-spacing: .055em; text-transform: uppercase;
-    color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-size: 10px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
-.profil-attendance { width: 112px; min-width: 0; }
-.profil-attendance-pills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; }
+
+.profil-attendance-pills {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
 .profil-attendance-pill {
-    min-width: 0; height: 18px; padding: 0 2px; border-radius: 5px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 6.5px; line-height: 1; font-weight: 900; white-space: nowrap;
+    width: 34px;
+    height: 38px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: 1px solid transparent;
 }
-.profil-attendance-total {
-    display: flex; align-items: center; justify-content: flex-end; gap: 4px;
-    margin-top: 3px; white-space: nowrap;
-}
-.profil-attendance-label { font-size: 5.5px; font-weight: 900; color: #64748b; text-transform: uppercase; }
+
+.pill-label { font-size: 7px; font-weight: 900; opacity: 0.6; margin-bottom: 1px; }
+.pill-value { font-size: 11px; font-weight: 900; }
+
 .profil-attendance-total-badge {
-    min-width: 18px; height: 17px; padding: 0 5px; border-radius: 5px;
-    display: inline-flex; align-items: center; justify-content: center;
-    background: #dc2626; color: #fff; font-size: 6.5px; font-weight: 900;
+    background: #dc2626;
+    color: #ffffff;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+    box-shadow: 0 6px 12px rgba(220, 38, 38, 0.25);
 }
-.profil-chevron { color: #cbd5e1; font-size: 9px; text-align: center; }
 
-@media (max-width: 767px) {
-    #tab-profil { padding-bottom: 78px; }
-    #tab-profil > div { padding-left: 0 !important; padding-right: 0 !important; }
-    #profil-list-container { padding: 0 1px; }
-    .profil-student-card {
-        grid-template-columns: 36px minmax(0, 1fr) 104px 10px;
-        gap: 7px;
-        min-height: 62px;
-        padding: 9px 9px;
-        border-radius: 17px;
-        margin-bottom: 7px;
+.total-label { font-size: 7px; font-weight: 900; opacity: 0.8; }
+.total-value { font-size: 14px; font-weight: 900; }
+
+.profil-chevron { color: #cbd5e1; font-size: 12px; }
+
+/* Mobile Optimization */
+@media (max-width: 640px) {
+    .profil-student-card { 
+        padding: 10px; 
+        gap: 10px;
+        grid-template-columns: 46px minmax(0, 1fr) auto 10px;
     }
-    .profil-avatar { width: 36px; height: 36px; border-radius: 12px; font-size: 10px; }
-    .profil-student-name { font-size: 9px; }
-    .profil-student-meta { font-size: 5.8px; margin-top: 3px; letter-spacing: .04em; }
-    .profil-attendance { width: 104px; }
-    .profil-attendance-pill { height: 17px; font-size: 6px; }
-    .profil-attendance-label { font-size: 5px; }
-    .profil-attendance-total-badge { height: 16px; min-width: 17px; font-size: 6px; }
-    .profil-chevron { font-size: 8px; }
+    .profil-avatar { width: 46px; height: 46px; font-size: 14px; }
+    .profil-attendance-pill { width: 28px; height: 34px; }
+    .profil-attendance-total-badge { width: 38px; height: 38px; }
+    .total-value { font-size: 12px; }
+    .profil-student-name { font-size: 11px; }
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
-    .profil-student-card { max-width: 900px; margin-left: auto; margin-right: auto; }
-}
 
-@media (min-width: 1024px) {
-    #tab-profil > div { padding-left: 0 !important; padding-right: 0 !important; }
-    #profil-list-container { max-width: 1180px !important; margin: 14px auto 0; }
-    .profil-student-card {
-        grid-template-columns: 44px minmax(0, 1fr) 132px 16px;
-        min-height: 70px;
-        padding: 11px 14px;
-        border-radius: 18px;
-        gap: 12px;
-    }
-    .profil-avatar { width: 44px; height: 44px; border-radius: 14px; }
-    .profil-student-name { font-size: 10px; }
-    .profil-student-meta { font-size: 6.5px; }
-    .profil-attendance { width: 132px; }
-    .profil-attendance-pill { height: 19px; font-size: 6.5px; }
-    .profil-attendance-label { font-size: 5.5px; }
-    .profil-attendance-total-badge { height: 18px; font-size: 6.5px; }
-}
 
 /* =========================================================
    FIREBASE STORAGE / SERVICE WORKER SAFETY
@@ -2338,7 +2361,8 @@ window.renderProfilList = () => {
     const filterKelas = document.getElementById('filter-profil-kelas')?.value || 'SEMUA';
     const filterGuru = document.getElementById('filter-profil-guru')?.value || 'SEMUA';
 
-    if (!state.attendanceSummary6m || Object.keys(state.attendanceSummary6m).length !== (state.master.siswa || []).length) {
+    // Pastikan data rekap sudah siap
+    if (!state.attendanceSummary6m || Object.keys(state.attendanceSummary6m).length === 0) {
         if (typeof window.calculatePopularData === 'function') window.calculatePopularData();
     }
 
@@ -2348,33 +2372,66 @@ window.renderProfilList = () => {
         const matchGuru = filterGuru === 'SEMUA' || s.guruWali === filterGuru;
         return matchSearch && matchKelas && matchGuru;
     });
+
     filtered.sort((a, b) => String(a.nama || '').localeCompare(String(b.nama || '')));
 
     if (!filtered.length) {
-        container.innerHTML = `<div class="text-center py-10 opacity-30 font-black text-[10px] uppercase">Siswa Tidak Ditemukan</div>`;
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-20 opacity-30">
+                <i class="fas fa-user-slash text-4xl mb-3"></i>
+                <p class="font-black text-[10px] uppercase tracking-widest">Siswa Tidak Ditemukan</p>
+            </div>`;
         return;
     }
 
     container.innerHTML = filtered.map(s => {
         const r = state.attendanceSummary6m[String(s.id)] || {B:0,A:0,I:0,S:0,T:0};
         const studentId = String(s.id).replace(/'/g, "\\'");
+        
+        // Ambil 2 huruf awal jika ada 2 kata
+        const nameParts = s.nama ? s.nama.split(' ') : ['?'];
+        const initials = nameParts.length > 1 
+            ? (nameParts[0][0] + nameParts[1][0]).toUpperCase()
+            : nameParts[0][0].toUpperCase();
+
         return `
-        <div onclick="window.openEditor('${studentId}')" class="profil-student-card cursor-pointer" role="button" tabindex="0">
-            <div class="profil-avatar">${String(s.nama || '?').charAt(0)}</div>
+        <div onclick="window.openEditor('${studentId}')" class="profil-student-card cursor-pointer">
+            <div class="profil-avatar">${initials}</div>
+            
             <div class="min-w-0">
                 <div class="profil-student-name">${escapeHtml(s.nama || '-')}</div>
-                <div class="profil-student-meta">${escapeHtml(s.kelas || '-')} ${s.guruWali && s.guruWali !== '-' ? `• GW: ${escapeHtml(s.guruWali)}` : ''}</div>
-            </div>
-            <div class="profil-attendance" aria-label="Ringkasan ketidakhadiran">
-                <div class="profil-attendance-pills">
-                    <span class="profil-attendance-pill bg-orange-50 text-orange-600">B ${r.B || 0}</span>
-                    <span class="profil-attendance-pill bg-red-50 text-red-600">A ${r.A || 0}</span>
-                    <span class="profil-attendance-pill bg-blue-50 text-blue-600">I ${r.I || 0}</span>
-                    <span class="profil-attendance-pill bg-green-50 text-green-600">S ${r.S || 0}</span>
-                    <span class="profil-attendance-total-badge">T ${r.T || 0}</span>
+                <div class="profil-student-meta">
+                    <span class="bg-slate-100 px-2 py-0.5 rounded-md text-slate-600">${escapeHtml(s.kelas || '-')}</span>
                 </div>
             </div>
-            <i class="fas fa-chevron-right profil-chevron"></i>
+
+            <div class="profil-attendance">
+                <div class="profil-attendance-pills">
+                    <div class="profil-attendance-pill bg-orange-50 text-orange-600 border-orange-100">
+                        <span class="pill-label">B</span>
+                        <span class="pill-value">${r.B || 0}</span>
+                    </div>
+                    <div class="profil-attendance-pill bg-red-50 text-red-600 border-red-100">
+                        <span class="pill-label">A</span>
+                        <span class="pill-value">${r.A || 0}</span>
+                    </div>
+                    <div class="profil-attendance-pill bg-blue-50 text-blue-600 border-blue-100">
+                        <span class="pill-label">I</span>
+                        <span class="pill-value">${r.I || 0}</span>
+                    </div>
+                    <div class="profil-attendance-pill bg-green-50 text-green-600 border-green-100">
+                        <span class="pill-label">S</span>
+                        <span class="pill-value">${r.S || 0}</span>
+                    </div>
+                    
+                    <div class="profil-attendance-total-badge">
+                        <span class="total-label">TOTAL</span>
+                        <span class="total-value">${r.T || 0}</span>
+                    </div>
+                </div>
+            </div>
+
+            <i class="fas fa-chevron-right profil-chevron ml-auto"></i>
         </div>`;
     }).join('');
 };
