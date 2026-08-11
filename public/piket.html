@@ -544,6 +544,214 @@
         color: #111827 !important;
     }
 }
+
+
+/* =========================================================
+   RIWAYAT PEMBINAAN — RESPONSIVE POLISH
+   Desktop + tablet + mobile, tanpa mengubah fungsi utama.
+   ========================================================= */
+.note-card {
+    position: relative;
+    background: #fff;
+    border: 1px solid #e8edf3;
+    border-left-width: 4px;
+    border-radius: 22px;
+    padding: 16px;
+    box-shadow: 0 6px 18px rgba(15,23,42,.045);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.note-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 26px rgba(15,23,42,.07);
+}
+.note-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.note-role {
+    display: block;
+    color: #475569;
+    font-size: 8px;
+    line-height: 1.2;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .11em;
+}
+.note-date {
+    display: block;
+    margin-top: 4px;
+    color: #94a3b8;
+    font-size: 8px;
+    line-height: 1.2;
+    font-weight: 700;
+}
+.note-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+}
+.note-action-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    font-size: 10px;
+    transition: all .16s ease;
+}
+.note-action-btn:hover { transform: translateY(-1px); }
+.note-edit { color: #2563eb; }
+.note-edit:hover { background: #eff6ff; border-color: #bfdbfe; }
+.note-delete { color: #dc2626; }
+.note-delete:hover { background: #fef2f2; border-color: #fecaca; }
+.note-text {
+    color: #334155;
+    font-size: 11px;
+    line-height: 1.7;
+    font-weight: 700;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.note-photo-wrap {
+    display: block;
+    position: relative;
+    margin-top: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 17px;
+    background: #f8fafc;
+}
+.note-photo {
+    display: block;
+    width: 100%;
+    max-height: 330px;
+    object-fit: cover;
+}
+.note-photo-label {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    padding: 6px 9px;
+    border-radius: 999px;
+    background: rgba(15,23,42,.72);
+    color: white;
+    font-size: 7px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    backdrop-filter: blur(8px);
+}
+
+/* Editor modal: nyaman pada layar besar */
+#editor-modal > div:first-child {
+    min-height: 66px;
+}
+#editor-modal .no-scrollbar > div {
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+    #editor-modal {
+        background: rgba(15,23,42,.48);
+        padding: 20px;
+    }
+    #editor-modal > div:first-child {
+        border-radius: 18px 18px 0 0;
+    }
+    #editor-modal > .flex-grow {
+        border-radius: 0 0 18px 18px;
+        max-width: 1180px;
+        width: min(1180px, calc(100vw - 40px));
+        margin: 0 auto;
+        box-shadow: 0 24px 70px rgba(15,23,42,.22);
+    }
+    #editor-modal > .flex-grow > div {
+        padding: 28px 34px 60px;
+        max-width: 1040px;
+    }
+    #editor-modal .note-photo {
+        max-height: 380px;
+    }
+}
+
+@media (max-width: 767px) {
+    #editor-modal > div:first-child {
+        min-height: 58px;
+        padding: 10px 14px;
+    }
+    #editor-modal > .flex-grow > div {
+        padding: 14px 14px 100px;
+    }
+    #editor-modal .bg-red-600 {
+        border-radius: 24px !important;
+        padding: 18px !important;
+    }
+    #editor-modal .grid.grid-cols-5 {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 5px;
+    }
+    #editor-modal .grid.grid-cols-5 > div {
+        padding: 9px 4px !important;
+        border-radius: 14px !important;
+    }
+    #editor-modal #history-container {
+        gap: 10px;
+    }
+    .note-card {
+        padding: 13px;
+        border-radius: 18px;
+    }
+    .note-card-head {
+        gap: 8px;
+    }
+    .note-action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+    }
+    .note-text {
+        font-size: 10px;
+        line-height: 1.65;
+    }
+    .note-photo {
+        max-height: 260px;
+    }
+    #wrapper-note-form {
+        padding: 14px !important;
+        border-radius: 22px !important;
+    }
+    #wrapper-note-form textarea {
+        min-height: 105px;
+        padding: 13px !important;
+        border-radius: 18px !important;
+    }
+    #wrapper-note-form select {
+        padding: 13px !important;
+        border-radius: 16px !important;
+    }
+    #wrapper-note-form .grid.grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 380px) {
+    #editor-modal .grid.grid-cols-5 > div p:first-child {
+        font-size: 6px;
+    }
+    #editor-modal .grid.grid-cols-5 > div p:last-child {
+        font-size: 13px;
+    }
+    .note-date { font-size: 7px; }
+}
 </style>
 
 </head>
@@ -764,7 +972,7 @@
 
                     <div id="wrapper-note-form" class="hidden bg-slate-950 p-6 rounded-[2.5rem] shadow-2xl mt-4">
                         <div class="flex justify-between items-center mb-6 px-1">
-                            <h4 class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Input Baru</h4>
+                            <h4 id="note-form-title" class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Catatan Baru</h4>
                             <button onclick="window.toggleNoteForm()" class="text-white/20 p-2"><i class="fas fa-times"></i></button>
                         </div>
                         <select id="select-peran" class="w-full bg-white/10 text-white p-4 rounded-2xl text-[11px] font-bold mb-4 border-none outline-none focus:ring-2 focus:ring-red-600 appearance-none shadow-inner">
@@ -790,7 +998,7 @@
                                 <p id="note-photo-size" class="px-3 py-2 text-[8px] text-white/50 font-bold"></p>
                             </div>
                         </div>
-                        <button onclick="window.addNewNote()" class="w-full bg-red-600 text-white py-5 rounded-3xl font-black text-[11px] uppercase shadow-xl active:scale-95 transition-all">Simpan Catatan</button>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2"><button type="button" onclick="window.cancelEditNote()" id="btn-cancel-edit-note" class="hidden py-4 rounded-2xl bg-white/10 text-white/70 border border-white/10 text-[10px] font-black uppercase">Batal Edit</button><button type="button" onclick="window.addNewNote()" id="btn-save-note" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase shadow-xl active:scale-95 transition-all">Simpan Catatan</button></div>
                     </div>
                 </div>
             </div>
@@ -1172,6 +1380,9 @@
                 siswa: JSON.parse(localStorage.getItem('absensi_siswa')) || []
             },
             records: {},
+            // State sementara untuk editor catatan pembinaan.
+            editingNoteIndex: null,
+            recentNoteActivities: [],
             // Index master data untuk pencarian O(1) berdasarkan ID.
             peopleById: {},
             currentMode: 'siswa',
@@ -2247,10 +2458,24 @@ window.renderProfilList = () => {
 };
 
 // --- TOGGLE FORM CATATAN ---
+window.resetNoteForm = () => {
+    state.editingNoteIndex = null;
+    const title = document.getElementById('note-form-title');
+    const saveBtn = document.getElementById('btn-save-note');
+    const cancelBtn = document.getElementById('btn-cancel-edit-note');
+    if (title) title.textContent = 'Catatan Baru';
+    if (saveBtn) saveBtn.textContent = 'Simpan Catatan';
+    if (cancelBtn) cancelBtn.classList.add('hidden');
+    document.getElementById('select-peran').value = 'Kesiswaan';
+    document.getElementById('new-note-text').value = '';
+    window.clearNotePhoto();
+};
+
 window.toggleNoteForm = () => {
     const form = document.getElementById('wrapper-note-form');
     const btn = document.getElementById('btn-toggle-note');
     if (form.classList.contains('hidden')) {
+        window.resetNoteForm();
         form.classList.remove('hidden');
         btn.classList.add('hidden');
     } else {
@@ -2259,12 +2484,26 @@ window.toggleNoteForm = () => {
     }
 };
 
+window.cancelEditNote = () => {
+    window.resetNoteForm();
+    document.getElementById('wrapper-note-form')?.classList.add('hidden');
+    document.getElementById('btn-toggle-note')?.classList.remove('hidden');
+};
+
+window.escapeHtml = (value) => String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
 // --- OPEN EDITOR (FULL SCREEN MODE) ---
 window.openEditor = async (id) => {
     const student = state.master.siswa.find(s => s.id === id);
     if (!student) return;
 
     // 1. DATA DASAR
+    window.resetNoteForm();
     document.getElementById('edit-id').value = id;
     document.getElementById('edit-nama-display').innerText = student.nama;
     document.getElementById('display-nis').innerText = `NIS: ${student.id}`;
@@ -2332,16 +2571,34 @@ window.openEditor = async (id) => {
         const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id));
         if (docSnap.exists() && docSnap.data().history) {
             const history = docSnap.data().history;
-            container.innerHTML = history.slice().reverse().map(n => `
-                <div class="p-5 bg-slate-50 border border-slate-100 rounded-[2rem] border-l-4 ${getNoteColor(n.peran)}">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[8px] font-black uppercase text-slate-400">${n.peran}</span>
-                        <span class="text-[8px] font-bold text-slate-300">${new Date(n.date).toLocaleString('id-ID')}</span>
+            container.innerHTML = history.slice().reverse().map((n, reverseIndex) => {
+                const originalIndex = history.length - 1 - reverseIndex;
+                const noteRef = n.id || `legacy-${originalIndex}`;
+                const noteText = window.escapeHtml(n.text || '');
+                const roleText = window.escapeHtml(n.peran || 'CATATAN');
+                const dateText = new Date(n.date || Date.now()).toLocaleString('id-ID', {
+                    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+                return `
+                <article class="note-card ${getNoteColor(n.peran)}">
+                    <div class="note-card-head">
+                        <div class="min-w-0">
+                            <span class="note-role">${roleText}</span>
+                            <span class="note-date">${dateText}</span>
+                        </div>
+                        <div class="note-actions">
+                            <button type="button" title="Edit catatan" onclick="window.editNote('${id}', '${noteRef}')" class="note-action-btn note-edit"><i class="fas fa-pen"></i></button>
+                            <button type="button" title="Hapus catatan" onclick="window.deleteNote('${id}', '${noteRef}')" class="note-action-btn note-delete"><i class="fas fa-trash"></i></button>
+                        </div>
                     </div>
-                    ${n.text ? `<p class="text-[11px] font-bold text-slate-700 leading-relaxed">${n.text}</p>` : ""}
-                    ${n.photo?.url ? `<a href="${n.photo.url}" target="_blank" rel="noopener" class="mt-3 block rounded-2xl overflow-hidden border border-slate-200 bg-white"><img src="${n.photo.url}" loading="lazy" class="w-full max-h-72 object-cover" alt="Foto pembinaan"></a>` : ""}
-                </div>
-            `).join('');
+                    ${noteText ? `<p class="note-text">${noteText}</p>` : ''}
+                    ${n.photo?.url ? `
+                        <a href="${n.photo.url}" target="_blank" rel="noopener" class="note-photo-wrap">
+                            <img src="${n.photo.url}" loading="lazy" class="note-photo" alt="Foto pembinaan">
+                            <span class="note-photo-label"><i class="fas fa-expand"></i> Lihat foto</span>
+                        </a>` : ''}
+                </article>`;
+            }).join('');
         } else {
             container.innerHTML = '<div class="text-center py-10 text-[10px] text-slate-300 italic bg-slate-50 rounded-[2rem] border border-dashed">Belum ada catatan pembinaan.</div>';
         }
@@ -2416,34 +2673,199 @@ window.addNewNote = async () => {
     const peran = document.getElementById('select-peran').value;
     const text = document.getElementById('new-note-text').value.trim();
     const photoFile = window.notePhotoFile;
-    if (!text && !photoFile) { showToast('⚠️ Isi catatan atau pilih foto'); return; }
+    const editingIndex = state.editingNoteIndex;
+
+    if (!text && !photoFile && editingIndex === null) {
+        showToast('⚠️ Isi catatan atau pilih foto');
+        return;
+    }
+
     let uploadedPhoto = null;
+    let oldPhoto = null;
+
     try {
-        showToast(photoFile ? '⏳ Mengompres & mengunggah foto...' : '⏳ Menyimpan...');
+        showToast(editingIndex !== null
+            ? (photoFile ? '⏳ Mengganti foto & memperbarui...' : '⏳ Memperbarui catatan...')
+            : (photoFile ? '⏳ Mengompres & mengunggah foto...' : '⏳ Menyimpan...'));
+
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id);
+        const docSnap = await getDoc(docRef);
+        let history = docSnap.exists() ? (docSnap.data().history || []) : [];
+
+        if (editingIndex !== null) {
+            const index = Number(editingIndex);
+            if (!Number.isInteger(index) || !history[index]) {
+                throw new Error('Catatan yang akan diedit tidak ditemukan');
+            }
+            oldPhoto = history[index]?.photo || null;
+        }
+
         if (photoFile) {
             const compressed = await window.compressNotePhoto(photoFile);
             const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.webp`;
             const path = `student_notes/${id}/${fileName}`;
             const photoRef = storageRef(storage, path);
-            await uploadBytes(photoRef, compressed, { contentType: 'image/webp', cacheControl: 'public,max-age=31536000' });
+            await uploadBytes(photoRef, compressed, {
+                contentType: 'image/webp',
+                cacheControl: 'public,max-age=31536000'
+            });
             const url = await getDownloadURL(photoRef);
             uploadedPhoto = { url, path, size: compressed.size, type: 'image/webp' };
         }
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', id);
-        const docSnap = await getDoc(docRef);
-        let history = docSnap.exists() ? (docSnap.data().history || []) : [];
-        const note = { peran, text, date: Date.now() };
-        if (uploadedPhoto) note.photo = uploadedPhoto;
-        history.push(note);
+
+        if (editingIndex !== null) {
+            const current = history[editingIndex];
+            const updated = {
+                ...current,
+                peran,
+                text,
+                date: Date.now(),
+                id: current.id || (window.makeNoteId ? window.makeNoteId() : `${Date.now()}-${Math.random().toString(36).slice(2,8)}`)
+            };
+
+            if (uploadedPhoto) updated.photo = uploadedPhoto;
+            history[editingIndex] = updated;
+        } else {
+            history.push({
+                id: window.makeNoteId ? window.makeNoteId() : `${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+                peran,
+                text,
+                date: Date.now(),
+                ...(uploadedPhoto ? { photo: uploadedPhoto } : {})
+            });
+        }
+
         await setDoc(docRef, { history, lastUpdate: Date.now() }, { merge: true });
-        showToast('✅ Catatan tersimpan');
-        document.getElementById('new-note-text').value = '';
-        window.clearNotePhoto();
+
+        // Hapus foto lama hanya setelah Firestore berhasil diperbarui.
+        if (editingIndex !== null && uploadedPhoto && oldPhoto?.path && oldPhoto.path !== uploadedPhoto.path) {
+            try { await deleteObject(storageRef(storage, oldPhoto.path)); } catch (_) {}
+        }
+
+        state.editingNoteIndex = null;
+        state.recentNoteActivities = state.recentNoteActivities || [];
+        const student = state.peopleById[String(id)] || state.master.siswa.find(s => String(s.id) === String(id));
+        state.recentNoteActivities.unshift({
+            studentId: id,
+            studentName: student?.nama || 'Siswa',
+            peran,
+            text: text || 'Menambahkan foto pembinaan',
+            date: Date.now(),
+            photo: uploadedPhoto || null,
+            action: editingIndex !== null ? 'edit' : 'add'
+        });
+        state.recentNoteActivities = state.recentNoteActivities.slice(0, 20);
+        if (typeof window.renderRecentLogs === 'function') window.renderRecentLogs();
+        window.resetNoteForm();
+        showToast(editingIndex !== null ? '✅ Catatan diperbarui' : '✅ Catatan tersimpan');
         window.openEditor(id);
     } catch (e) {
         console.error(e);
-        if (uploadedPhoto?.path) { try { await deleteObject(storageRef(storage, uploadedPhoto.path)); } catch (_) {} }
+        if (uploadedPhoto?.path) {
+            try { await deleteObject(storageRef(storage, uploadedPhoto.path)); } catch (_) {}
+        }
         showToast('❌ Gagal menyimpan: ' + (e.message || 'Kesalahan sistem'));
+    }
+};
+
+window.makeNoteId = () => {
+    if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+    return `${Date.now()}-${Math.random().toString(36).slice(2,10)}`;
+};
+
+window.editNote = async (studentId, noteRef) => {
+    try {
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', studentId);
+        const snap = await getDoc(docRef);
+        if (!snap.exists()) {
+            showToast('⚠️ Data catatan tidak ditemukan');
+            return;
+        }
+
+        const history = snap.data().history || [];
+        let index = -1;
+        if (String(noteRef).startsWith('legacy-')) {
+            index = Number(String(noteRef).replace('legacy-', ''));
+        } else {
+            index = history.findIndex(n => String(n.id) === String(noteRef));
+        }
+
+        if (index < 0 || !history[index]) {
+            showToast('⚠️ Catatan tidak ditemukan');
+            return;
+        }
+
+        const note = history[index];
+        state.editingNoteIndex = index;
+
+        document.getElementById('select-peran').value = note.peran || 'Kesiswaan';
+        document.getElementById('new-note-text').value = note.text || '';
+        document.getElementById('edit-id').value = studentId;
+
+        // Tampilkan foto lama sebagai referensi, tetapi jangan mengunduh ulang sebagai File.
+        window.clearNotePhoto();
+        if (note.photo?.url) {
+            const preview = document.getElementById('note-photo-preview');
+            const img = document.getElementById('note-photo-preview-img');
+            const size = document.getElementById('note-photo-size');
+            img.src = note.photo.url;
+            size.textContent = 'Foto tersimpan • pilih foto baru jika ingin mengganti';
+            preview.classList.remove('hidden');
+        }
+
+        document.getElementById('note-form-title').textContent = 'Edit Catatan';
+        document.getElementById('btn-save-note').textContent = 'Simpan Perubahan';
+        document.getElementById('btn-cancel-edit-note').classList.remove('hidden');
+        document.getElementById('wrapper-note-form').classList.remove('hidden');
+        document.getElementById('btn-toggle-note').classList.add('hidden');
+        document.getElementById('new-note-text').focus();
+
+        const form = document.getElementById('wrapper-note-form');
+        form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (e) {
+        console.error(e);
+        showToast('❌ Gagal membuka catatan');
+    }
+};
+
+window.deleteNote = async (studentId, noteRef) => {
+    const yakin = window.confirm('Hapus catatan pembinaan ini? Tindakan ini tidak dapat dibatalkan.');
+    if (!yakin) return;
+
+    try {
+        showToast('⏳ Menghapus catatan...');
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'student_notes', studentId);
+        const snap = await getDoc(docRef);
+        if (!snap.exists()) throw new Error('Data catatan tidak ditemukan');
+
+        const history = snap.data().history || [];
+        let index = -1;
+        if (String(noteRef).startsWith('legacy-')) {
+            index = Number(String(noteRef).replace('legacy-', ''));
+        } else {
+            index = history.findIndex(n => String(n.id) === String(noteRef));
+        }
+
+        if (index < 0 || !history[index]) throw new Error('Catatan tidak ditemukan');
+
+        const removed = history[index];
+        history.splice(index, 1);
+
+        await setDoc(docRef, {
+            history,
+            lastUpdate: Date.now()
+        }, { merge: true });
+
+        if (removed.photo?.path) {
+            try { await deleteObject(storageRef(storage, removed.photo.path)); } catch (_) {}
+        }
+
+        state.editingNoteIndex = null;
+        showToast('✅ Catatan dihapus');
+        window.openEditor(studentId);
+    } catch (e) {
+        console.error(e);
+        showToast('❌ Gagal menghapus: ' + (e.message || 'Kesalahan sistem'));
     }
 };
 
