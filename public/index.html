@@ -471,7 +471,223 @@
             }
         }
 
-    </style>
+    
+
+/* Siluet wajah manusia untuk kamera absensi */
+#face-silhouette-svg {
+    filter: drop-shadow(0 0 10px rgba(255,255,255,.16));
+    opacity: .9;
+}
+#face-silhouette {
+    z-index: 2;
+}
+#face-silhouette-svg.text-green-500 {
+    filter: drop-shadow(0 0 18px rgba(34,197,94,.75));
+}
+
+
+/* ===== PANDUAN WAJAH ±50 CM ===== */
+.face-distance-guide {
+    position: absolute;
+    width: min(54%, 330px);
+    aspect-ratio: 0.78;
+    max-height: 82%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 1;
+}
+.face-guide-ring {
+    position: absolute;
+    inset: 3% 7%;
+    border: 2px solid rgba(255,255,255,.42);
+    border-radius: 48% 48% 45% 45% / 42% 42% 56% 56%;
+    box-shadow: 0 0 0 1px rgba(59,130,246,.14), 0 0 25px rgba(59,130,246,.12);
+}
+.face-guide-ring::before,
+.face-guide-ring::after {
+    content: "";
+    position: absolute;
+    left: 12%;
+    right: 12%;
+    height: 1px;
+    background: rgba(255,255,255,.18);
+}
+.face-guide-ring::before { top: 38%; }
+.face-guide-ring::after { top: 62%; }
+
+.face-guide-label {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(2,6,23,.72);
+    backdrop-filter: blur(7px);
+    color: rgba(255,255,255,.92);
+    font-size: clamp(8px, 1.7vw, 11px);
+    font-weight: 900;
+    letter-spacing: .03em;
+    white-space: nowrap;
+    box-shadow: 0 5px 18px rgba(0,0,0,.22);
+}
+.face-distance-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #3b82f6;
+    box-shadow: 0 0 9px rgba(59,130,246,.9);
+}
+.face-distance-guide.distance-good .face-guide-ring {
+    border-color: rgba(34,197,94,.88);
+    box-shadow: 0 0 0 3px rgba(34,197,94,.08), 0 0 30px rgba(34,197,94,.18);
+}
+.face-distance-guide.distance-good .face-distance-dot {
+    background: #22c55e;
+    box-shadow: 0 0 11px rgba(34,197,94,1);
+}
+.face-distance-guide.distance-warning .face-guide-ring {
+    border-color: rgba(250,204,21,.9);
+    box-shadow: 0 0 0 3px rgba(250,204,21,.08), 0 0 28px rgba(250,204,21,.18);
+}
+.face-distance-guide.distance-warning .face-distance-dot {
+    background: #facc15;
+    box-shadow: 0 0 11px rgba(250,204,21,1);
+}
+
+/* Kamera HP: panduan wajah sedikit lebih besar agar nyaman pada jarak ±50 cm. */
+@media (max-width: 640px) {
+    .face-distance-guide {
+        width: min(62%, 290px);
+        max-height: 78%;
+    }
+    #face-silhouette-svg {
+        width: 82%;
+        height: 82%;
+        max-width: 290px;
+        max-height: 340px;
+    }
+}
+
+/* Kamera desktop tetap lebih proporsional. */
+@media (min-width: 641px) {
+    .face-distance-guide {
+        width: min(38%, 300px);
+    }
+}
+
+/* ===== PRO FACE SCANNER UI ===== */
+.face-scanner-pro {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    background: #05070b;
+    min-height: 280px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 14px 35px rgba(15,23,42,.18);
+}
+.face-scanner-pro video {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    object-fit: cover;
+    display: block;
+    transform: scaleX(-1);
+}
+.face-scanner-pro::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(to bottom, rgba(0,0,0,.22), transparent 25%, transparent 75%, rgba(0,0,0,.35)),
+        radial-gradient(circle at center, transparent 35%, rgba(0,0,0,.20) 100%);
+}
+.face-scan-corners {
+    position: absolute;
+    inset: 12% 22%;
+    border: 2px solid rgba(255,255,255,.28);
+    border-radius: 42%;
+    pointer-events: none;
+    z-index: 3;
+    transition: .25s ease;
+}
+.face-scan-corners::before {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 0;
+    height: 2px;
+    background: rgba(59,130,246,.9);
+    box-shadow: 0 0 14px rgba(59,130,246,.85);
+    animation: faceScanLine 2.2s ease-in-out infinite;
+}
+.face-scan-status {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    border-radius: 12px;
+    background: rgba(2,6,23,.72);
+    backdrop-filter: blur(8px);
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .02em;
+}
+.face-scan-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: #3b82f6;
+    box-shadow: 0 0 10px rgba(59,130,246,.8);
+    flex: 0 0 auto;
+}
+.face-scanner-pro.scan-found .face-scan-corners {
+    border-color: rgba(250,204,21,.9);
+    box-shadow: 0 0 0 4px rgba(250,204,21,.08), 0 0 28px rgba(250,204,21,.18);
+}
+.face-scanner-pro.scan-found .face-scan-dot {
+    background: #facc15;
+    box-shadow: 0 0 12px rgba(250,204,21,.9);
+}
+.face-scanner-pro.scan-success .face-scan-corners {
+    border-color: rgba(34,197,94,.95);
+    box-shadow: 0 0 0 5px rgba(34,197,94,.10), 0 0 35px rgba(34,197,94,.35);
+    transform: scale(1.02);
+}
+.face-scanner-pro.scan-success .face-scan-dot {
+    background: #22c55e;
+    box-shadow: 0 0 14px rgba(34,197,94,1);
+}
+.face-scan-name {
+    margin-left: auto;
+    font-weight: 900;
+    color: #86efac;
+    max-width: 48%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+@keyframes faceScanLine {
+    0%, 100% { top: 4%; opacity: .35; }
+    50% { top: 94%; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .face-scan-corners::before { animation: none; }
+}
+
+</style>
 
     <script>
         if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js')
@@ -573,10 +789,71 @@
 			<!-- Overlay Pemindai Baru -->
     			<div class="face-mask-overlay"></div> 
 			<div id="face-silhouette" class="absolute inset-0 flex items-center justify-center pointer-events-none">
-	                <svg id="face-silhouette-svg" class="w-64 h-64 text-white/30 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.5">
-	                    <!-- Garis Kepala --><path d="M12 21C16.4183 21 20 17.4183 20 13C20 8.58172 16.4183 5 12 5C7.58172 5 4 8.58172 4 13C4 17.4183 7.58172 21 12 21Z" />
-	                    <!-- Area Mata & Hidung --><path d="M12 18C14.2091 18 16 16.2091 16 14C16 11.7909 14.2091 10 12 10C9.79086 10 8 11.7909 8 14C8 16.2091 9.79086 18 12 18Z" />
-	                    <!-- Garis Senyum --><path d="M9 13C9 13 10 12 12 12C14 12 15 13 15 13" /></svg>
+                    <div id="face-distance-guide" class="face-distance-guide">
+                        <div class="face-guide-ring"></div>
+                        <div class="face-guide-label">
+                            <span id="face-distance-dot" class="face-distance-dot"></span>
+                            <span id="face-distance-text">POSISIKAN WAJAH ±50 CM</span>
+                        </div>
+                    </div>
+	                <svg id="face-silhouette-svg" class="w-64 h-64 text-white/35 transition-all duration-300" viewBox="0 0 300 360" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- Siluet kepala manusia realistis -->
+                    <path d="M150 28
+                             C96 28 58 70 58 128
+                             C58 177 77 212 104 232
+                             L104 260
+                             C104 275 93 286 75 292
+                             C48 301 29 318 22 344
+                             H278
+                             C271 318 252 301 225 292
+                             C207 286 196 275 196 260
+                             L196 232
+                             C223 212 242 177 242 128
+                             C242 70 204 28 150 28 Z"
+                          stroke-width="4"/>
+
+                    <!-- Telinga -->
+                    <path d="M59 125 C39 120 34 142 45 160 C50 168 56 170 63 166" stroke-width="4"/>
+                    <path d="M241 125 C261 120 266 142 255 160 C250 168 244 170 237 166" stroke-width="4"/>
+
+                    <!-- Rambut / garis kepala -->
+                    <path d="M67 111 C72 63 105 42 150 42 C195 42 228 63 233 111"
+                          stroke-width="5"/>
+                    <path d="M79 91 C101 66 126 58 150 58 C174 58 199 66 221 91"
+                          stroke-width="2.5" opacity=".75"/>
+
+                    <!-- Mata manusia -->
+                    <path d="M91 126 C103 117 117 117 129 126 C117 134 103 134 91 126 Z"
+                          stroke-width="3"/>
+                    <path d="M171 126 C183 117 197 117 209 126 C197 134 183 134 171 126 Z"
+                          stroke-width="3"/>
+                    <circle cx="110" cy="126" r="4" fill="currentColor" stroke="none"/>
+                    <circle cx="190" cy="126" r="4" fill="currentColor" stroke="none"/>
+
+                    <!-- Alis -->
+                    <path d="M91 108 C103 101 117 101 128 107" stroke-width="3"/>
+                    <path d="M172 107 C183 101 197 101 209 108" stroke-width="3"/>
+
+                    <!-- Hidung -->
+                    <path d="M150 124 C147 143 143 157 139 166 C143 171 150 173 158 169"
+                          stroke-width="3"/>
+
+                    <!-- Mulut -->
+                    <path d="M119 190 C135 201 165 201 181 190"
+                          stroke-width="3"/>
+                    <path d="M127 190 C139 195 161 195 173 190"
+                          stroke-width="2" opacity=".65"/>
+
+                    <!-- Rahang / dagu -->
+                    <path d="M105 209 C118 226 134 235 150 235 C166 235 182 226 195 209"
+                          stroke-width="3" opacity=".8"/>
+
+                    <!-- Leher dan bahu -->
+                    <path d="M105 232 L105 265 C105 278 93 286 76 292"/>
+                    <path d="M195 232 L195 265 C195 278 207 286 224 292"/>
+                    <path d="M76 292 C55 300 35 317 26 342"/>
+                    <path d="M224 292 C245 300 265 317 274 342"/>
+                </svg>
 	            </div>
 	        </div>
 
@@ -620,7 +897,15 @@
                             </div>
                         </div>
                         <div class="bg-orange-50 dark:bg-orange-900/10 border-2 border-dashed border-orange-200 dark:border-orange-800 p-6 text-center rounded-2xl">
-        	            <div id="camera-placeholder-reg" class="mb-4 rounded-xl overflow-hidden bg-black aspect-video hidden border-2 border-orange-200"></div>
+        	            <div id="camera-placeholder-reg" class="face-scanner-pro mb-4 border-2 border-orange-200">
+                                <video id="reg-video" autoplay muted playsinline></video>
+                                <div class="face-scan-corners"></div>
+                                <div class="face-scan-status">
+                                    <span class="face-scan-dot"></span>
+                                    <span id="reg-camera-status">KAMERA AKTIF • ARAHKAN WAJAH</span>
+                                    <span id="reg-camera-name" class="face-scan-name"></span>
+                                </div>
+                            </div>
                             <button onclick="registerFace()" class="w-full bg-orange-500 text-white px-6 py-4 rounded-xl font-black shadow-lg hover:bg-orange-600 transition transform active:scale-95 text-xs uppercase">Ambil Data Wajah</button>
                             <div id="reg-status" class="mt-4 font-bold text-sm min-h-[1.5rem]"></div>
                         </div>
@@ -688,7 +973,7 @@ const ABSENSI_PATH = `artifacts/${APP_PATH}/public/records`;
 
 let siswaData = [], settings = {}, isLocationValid = false;
 let faceMatcher = null, lastAttendance = {};
-let currentFacingMode = "user", currentStream = null;
+let currentFacingMode = "user", currentStream = null, regStream = null;
 let watchId = null, isProcessing = false;
 let lastX = 0, lastY = 0; 
 let currentTab = 'absensi'; // Tracker tab aktif
@@ -910,6 +1195,79 @@ async function initFaceDetection() {
     };
 }
 
+
+
+let lastRegSpokenName = "";
+let lastRegSpokenAt = 0;
+
+function updateRegCameraUI(state, nama = "") {
+    const box = document.getElementById("camera-placeholder-reg");
+    const status = document.getElementById("reg-camera-status");
+    const name = document.getElementById("reg-camera-name");
+    if (!box || !status || !name) return;
+
+    box.classList.remove("scan-found", "scan-success");
+
+    if (state === "success") {
+        box.classList.add("scan-success");
+        status.innerText = "WAJAH DIKENALI • ABSEN BERHASIL";
+        name.innerText = nama || "";
+    } else if (state === "found") {
+        box.classList.add("scan-found");
+        status.innerText = "WAJAH TERDETEKSI • MEMERIKSA...";
+        name.innerText = "";
+    } else if (state === "error") {
+        status.innerText = "KAMERA / WAJAH PERLU DIPERIKSA";
+        name.innerText = "";
+    } else {
+        status.innerText = "KAMERA AKTIF • ARAHKAN WAJAH";
+        name.innerText = "";
+    }
+}
+
+function speakRegSuccess(nama) {
+    const now = Date.now();
+    if (!nama || (nama === lastRegSpokenName && now - lastRegSpokenAt < 10000)) return;
+    lastRegSpokenName = nama;
+    lastRegSpokenAt = now;
+
+    if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(`${nama} berhasil absen`);
+        utterance.lang = "id-ID";
+        utterance.rate = 0.95;
+        utterance.pitch = 1;
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
+// Kamera khusus Pendaftaran Wajah.
+async function startRegistrationCamera() {
+    const regVideo = document.getElementById('reg-video');
+    const regBox = document.getElementById('camera-placeholder-reg');
+    if (!regVideo || !regBox) return;
+
+    try {
+        if (regStream) regStream.getTracks().forEach(t => t.stop());
+
+        regStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: currentFacingMode, width: 640, height: 480 },
+            audio: false
+        });
+
+        regVideo.srcObject = regStream;
+        regBox.classList.remove('hidden');
+        updateRegCameraUI("idle");
+        await regVideo.play();
+    } catch (e) {
+        regBox.classList.remove('hidden');
+        const status = document.getElementById('reg-status');
+        updateRegCameraUI("error");
+        if (status) status.innerText = "❌ IZINKAN AKSES KAMERA DI BROWSER";
+        showToast("Kamera pendaftaran tidak dapat dibuka: " + e.message, "error");
+    }
+}
+
 // 4. PERBAIKAN FUNGSI REGISTER (UPDATE DEXIE SECARA INSTAN)
 async function registerFace() {
     const nama = document.getElementById('reg-siswa').value;
@@ -927,11 +1285,18 @@ async function registerFace() {
 
     try {
         // Gunakan detektor yang lebih akurat khusus pendaftaran
-        const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 320 }))
+        const regVideo = document.getElementById("reg-video");
+        if (!regVideo || !regVideo.srcObject) await startRegistrationCamera();
+        if (!regVideo || !regVideo.srcObject) throw new Error("Kamera pendaftaran belum aktif.");
+        const detection = await faceapi.detectSingleFace(regVideo, new faceapi.TinyFaceDetectorOptions({ inputSize: 320 }))
             .withFaceLandmarks()
             .withFaceDescriptor();
 
-        if (!detection) throw new Error("Wajah tidak jelas, coba lagi.");
+        if (!detection) {
+            updateRegCameraUI("idle");
+            throw new Error("Wajah tidak jelas, coba lagi.");
+        }
+        updateRegCameraUI("found", nama);
 
         const nisSiswa = siswaData.find(s => s.nama === nama)?.nis;
         const descriptorArray = Array.from(detection.descriptor);
@@ -949,6 +1314,8 @@ async function registerFace() {
 
         showToast("REGISTRASI BERHASIL", "success");
         regStatus.innerText = "✅ SELESAI";
+        updateRegCameraUI("success", nama);
+        speakRegSuccess(nama);
         
         // Refresh matcher agar siswa bisa langsung absen
         await syncFaceDatabase(); 
@@ -956,6 +1323,36 @@ async function registerFace() {
     } catch (e) {
         showToast(e.message, "error");
         regStatus.innerText = "❌ GAGAL";
+    }
+}
+
+
+// Panduan jarak wajah untuk penggunaan HP sekitar ±50 cm.
+// Ukuran wajah di frame digunakan sebagai indikator relatif, bukan pengukuran cm absolut.
+function updateFaceDistanceGuide(detection) {
+    const guide = document.getElementById("face-distance-guide");
+    const label = document.getElementById("face-distance-text");
+    if (!guide || !label || !detection?.box) return;
+
+    const box = detection.box;
+    const video = document.getElementById("video");
+    const vw = video?.videoWidth || 640;
+    const vh = video?.videoHeight || 480;
+
+    const faceRatio = Math.max(box.width / vw, box.height / vh);
+
+    guide.classList.remove("distance-good", "distance-warning");
+
+    // Target visual untuk posisi wajah yang nyaman sekitar 50 cm.
+    if (faceRatio >= 0.24 && faceRatio <= 0.42) {
+        guide.classList.add("distance-good");
+        label.innerText = "JARAK IDEAL • ±50 CM";
+    } else if (faceRatio < 0.24) {
+        guide.classList.add("distance-warning");
+        label.innerText = "WAJAH TERLALU JAUH • DEKAT SEDIKIT";
+    } else {
+        guide.classList.add("distance-warning");
+        label.innerText = "WAJAH TERLALU DEKAT • MUNDUR SEDIKIT";
     }
 }
 
@@ -1293,6 +1690,15 @@ function toggleDarkMode() {
 }
 
 async function switchTab(id) {
+    if (id === 'pengaturan') {
+        setTimeout(() => startRegistrationCamera(), 100);
+    } else if (regStream) {
+        regStream.getTracks().forEach(t => t.stop());
+        regStream = null;
+        const regVideo = document.getElementById('reg-video');
+        if (regVideo) regVideo.srcObject = null;
+    }
+
     if (id === 'pengaturan') {
         const pass = prompt("Password Admin:");
         if (pass !== "pengaturan123") return showToast("Akses Ditolak!", "error");
