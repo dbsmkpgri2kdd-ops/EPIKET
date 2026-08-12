@@ -25,9 +25,59 @@
         .tab-content.active { display: block; }
         #log-content::-webkit-scrollbar { width: 4px; }
         #log-content::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-	    #face-silhouette svg { animation: pulse 2s infinite; }
-	    .face-mask-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); -webkit-mask-image: radial-gradient(ellipse 45% 60% at 50% 50%, transparent 100%, black 100%); mask-image: radial-gradient(ellipse 45% 60% at 50% 50%, transparent 100%, black 100%); pointer-events: none; z-index: 5; }
-	    @keyframes pulse {0% { opacity: 0.3; transform: scale(0.95); } 50% { opacity: 0.6; transform: scale(1); } 100% { opacity: 0.3; transform: scale(0.95); } }
+	    /* ===== PROFESSIONAL PHONE FACE GUIDE (SINGLE OVERLAY) ===== */
+        #face-silhouette { z-index: 4; }
+        #face-silhouette-svg { display:none !important; }
+        .face-guide {
+            position: relative;
+            width: min(58vw, 250px);
+            height: min(74vw, 315px);
+            max-width: 250px;
+            max-height: 315px;
+            border: 2px solid rgba(255,255,255,.78);
+            border-radius: 48% 48% 45% 45% / 43% 43% 54% 54%;
+            box-shadow: 0 0 0 1px rgba(59,130,246,.35), 0 0 28px rgba(59,130,246,.18);
+            background: linear-gradient(to bottom, rgba(59,130,246,.04), rgba(0,0,0,.02));
+        }
+        .face-guide::before {
+            content:"";
+            position:absolute;
+            left:10%; right:10%; top:50%; height:2px;
+            background:linear-gradient(90deg, transparent, rgba(59,130,246,.95), transparent);
+            box-shadow:0 0 14px rgba(59,130,246,.9);
+            animation: faceGuideScan 2.2s ease-in-out infinite;
+        }
+        .face-guide::after {
+            content:"POSISIKAN WAJAH DI SINI";
+            position:absolute; left:50%; bottom:-34px;
+            transform:translateX(-50%); width:max-content;
+            padding:7px 11px; border-radius:999px;
+            background:rgba(2,6,23,.72); color:#fff;
+            font-size:9px; font-weight:900; letter-spacing:.08em;
+            white-space:nowrap; backdrop-filter:blur(7px);
+        }
+        .face-guide-corner {
+            position:absolute; width:24px; height:24px;
+            border-color:#60a5fa; border-style:solid;
+            filter:drop-shadow(0 0 5px rgba(96,165,250,.65));
+        }
+        .face-guide-corner.tl {top:-2px;left:-2px;border-width:3px 0 0 3px;border-radius:12px 0 0 0}
+        .face-guide-corner.tr {top:-2px;right:-2px;border-width:3px 3px 0 0;border-radius:0 12px 0 0}
+        .face-guide-corner.bl {bottom:-2px;left:-2px;border-width:0 0 3px 3px;border-radius:0 0 0 12px}
+        .face-guide-corner.br {bottom:-2px;right:-2px;border-width:0 3px 3px 0;border-radius:0 0 12px 0}
+        .face-guide.scan-success {
+            border-color:rgba(34,197,94,.95);
+            box-shadow:0 0 0 5px rgba(34,197,94,.10), 0 0 35px rgba(34,197,94,.35);
+            transform:scale(1.02);
+        }
+        @keyframes faceGuideScan {0%,100%{top:10%;opacity:.35}50%{top:88%;opacity:1}}
+        @media (max-width:480px) {
+            .face-guide { width:190px; height:250px; }
+            .face-guide::after { font-size:8px; bottom:-31px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .face-guide::before { animation:none; top:50%; }
+        }
 
         /* ================== PROFESSIONAL DESKTOP LAYOUT ================== */
         :root {
@@ -578,6 +628,206 @@
     .face-scan-corners::before { animation: none; }
 }
 
+
+        #registered-faces-list button { min-height: 40px; }
+        @media (max-width:640px) {
+            #edit-face-modal > div { max-height:92vh; overflow-y:auto; }
+        }
+
+        /* ================== SETTINGS 3 TAB ================== */
+        .settings-shell { width:100%; }
+        .settings-tabs {
+            display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px;
+            margin-bottom:16px; padding:8px; background:#eef2f7; border:1px solid #e2e8f0;
+            border-radius:18px;
+        }
+        .settings-tab {
+            display:flex; align-items:center; gap:11px; min-width:0; text-align:left;
+            padding:12px 14px; border:1px solid transparent; border-radius:14px;
+            background:transparent; color:#64748b; transition:.2s; cursor:pointer;
+        }
+        .settings-tab:hover { background:#fff; color:#1d4ed8; }
+        .settings-tab.active { background:#fff; color:#0f172a; border-color:#dbeafe; box-shadow:0 5px 18px rgba(15,23,42,.07); }
+        .settings-tab-icon { width:38px;height:38px;display:grid;place-items:center;flex:0 0 38px;border-radius:11px;background:#e2e8f0;font-size:17px; }
+        .settings-tab.active .settings-tab-icon { background:#dbeafe; }
+        .settings-tab strong { display:block;font-size:12px;font-weight:950; }
+        .settings-tab small { display:block;margin-top:3px;font-size:9px;font-weight:700;color:#94a3b8; }
+        .settings-pane { display:none; }
+        .settings-pane.active { display:block; }
+        .settings-section-head { display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px; }
+        .settings-kicker { display:block;font-size:9px;font-weight:950;letter-spacing:.14em;color:#2563eb;text-transform:uppercase;margin-bottom:4px; }
+        .settings-section-head h3 { font-size:22px;font-weight:950;letter-spacing:-.025em;color:#0f172a; }
+        .settings-section-head p { margin-top:4px;font-size:11px;color:#64748b; }
+        .settings-status-badge { white-space:nowrap;padding:8px 11px;border-radius:999px;background:#ecfdf5;color:#15803d;font-size:9px;font-weight:950; }
+        .settings-refresh { padding:10px 14px;border-radius:11px;background:#2563eb;color:#fff;font-size:10px;font-weight:950;box-shadow:0 8px 18px rgba(37,99,235,.18); }
+        .settings-register-grid,.settings-config-grid { display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.75fr);gap:16px; }
+        .settings-camera-card,.settings-form-card,.settings-config-card {
+            background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:18px;
+            box-shadow:0 10px 30px rgba(15,23,42,.045);
+        }
+        .settings-camera-title { display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;font-size:12px;font-weight:950;color:#0f172a; }
+        .settings-camera-title small { color:#94a3b8;font-size:9px;font-weight:700; }
+        .settings-reg-camera { position:relative;width:100%;height:min(55vh,520px);min-height:300px;background:#020617;border-radius:16px;overflow:hidden;display:grid;place-items:center; }
+        .settings-reg-camera video { width:100%;height:100%;object-fit:cover;transform:scaleX(-1); }
+        .reg-face-guide { position:absolute;width:min(38%,230px);height:min(78%,330px);border:2px solid rgba(255,255,255,.8);border-radius:48% 48% 45% 45% / 43% 43% 54% 54%;box-shadow:0 0 0 1px rgba(59,130,246,.3),0 0 28px rgba(59,130,246,.18);pointer-events:none; }
+        .reg-face-guide:before { content:"";position:absolute;left:9%;right:9%;top:50%;height:2px;background:linear-gradient(90deg,transparent,#60a5fa,transparent);animation:faceGuideScan 2.2s ease-in-out infinite; }
+        .reg-guide-label { position:absolute;left:50%;bottom:-32px;transform:translateX(-50%);white-space:nowrap;background:rgba(2,6,23,.75);padding:7px 10px;border-radius:999px;color:#fff;font-size:8px;font-weight:950;letter-spacing:.08em; }
+        .reg-guide-corner { position:absolute;width:20px;height:20px;border:3px solid #60a5fa;filter:drop-shadow(0 0 5px rgba(96,165,250,.6)); }
+        .reg-guide-corner.tl{top:-2px;left:-2px;border-right:0;border-bottom:0;border-radius:10px 0 0 0}.reg-guide-corner.tr{top:-2px;right:-2px;border-left:0;border-bottom:0;border-radius:0 10px 0 0}.reg-guide-corner.bl{bottom:-2px;left:-2px;border-right:0;border-top:0;border-radius:0 0 0 10px}.reg-guide-corner.br{bottom:-2px;right:-2px;border-left:0;border-top:0;border-radius:0 0 10px 0}
+        .settings-camera-status { margin-top:10px;padding:9px 11px;border-radius:10px;background:#f8fafc;color:#64748b;font-size:9px;font-weight:800;text-align:center; }
+        .settings-form-title { margin-bottom:16px;font-size:13px;font-weight:950;color:#0f172a; }
+        .settings-label { display:block;margin:0 0 6px 2px;font-size:9px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8; }
+        .settings-input { width:100%;padding:12px;border:1px solid #dbe2ea;border-radius:11px;background:#f8fafc;color:#0f172a;outline:none;font-size:12px; }
+        .settings-input:focus { border-color:#60a5fa;box-shadow:0 0 0 3px rgba(59,130,246,.1);background:#fff; }
+        .settings-tip { margin-top:16px;padding:11px 12px;border-radius:12px;background:#fff7ed;color:#9a3412;font-size:9px;line-height:1.55; }
+        .database-toolbar { display:grid;grid-template-columns:minmax(0,1fr) 150px 170px;gap:10px;margin-bottom:12px; }
+        .database-search { display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid #dbe2ea;border-radius:11px;background:#fff; }
+        .database-search span { font-size:18px;color:#94a3b8; }.database-search input { width:100%;border:0;outline:0;padding:11px 0;font-size:11px; }
+        .database-filter { padding:11px;border:1px solid #dbe2ea;border-radius:11px;background:#fff;font-size:10px;font-weight:800;color:#475569; }
+        .database-summary { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px; }
+        .database-summary span { padding:7px 10px;border-radius:999px;background:#f1f5f9;color:#475569;font-size:9px;font-weight:900; }
+        .database-list { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px; }
+        .database-list > div { border-radius:15px !important; }
+        .settings-save-bar { display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px;padding:15px 17px;background:#eff6ff;border:1px solid #dbeafe;border-radius:16px; }
+        .settings-save-bar strong { display:block;font-size:11px;font-weight:950;color:#1e3a8a; }.settings-save-bar span { display:block;margin-top:3px;font-size:9px;color:#64748b; }
+        .dark .settings-tabs { background:#0f172a;border-color:#1e293b; }.dark .settings-tab.active,.dark .settings-camera-card,.dark .settings-form-card,.dark .settings-config-card { background:#0f172a;border-color:#1e293b; }
+        .dark .settings-tab.active,.dark .settings-section-head h3,.dark .settings-camera-title,.dark .settings-form-title { color:#fff; }.dark .settings-input,.dark .database-filter,.dark .database-search { background:#0f172a;border-color:#334155;color:#fff; }.dark .database-search input { background:transparent;color:#fff; }.dark .settings-camera-status { background:#1e293b; }
+        @media(max-width:767px){
+            .settings-tabs { grid-template-columns:repeat(3,1fr);gap:5px;padding:5px;border-radius:14px; }
+            .settings-tab { justify-content:center;padding:10px 5px; }.settings-tab-icon{width:34px;height:34px;flex-basis:34px}.settings-tab span:last-child{display:none}
+            .settings-section-head{align-items:flex-start;}.settings-section-head h3{font-size:18px}.settings-section-head p{font-size:10px;line-height:1.5}.settings-status-badge{font-size:8px;padding:7px 9px}
+            .settings-register-grid,.settings-config-grid { grid-template-columns:1fr; }
+            .settings-reg-camera { min-height:270px;height:62vw;max-height:390px; }
+            .reg-face-guide { width:190px;height:250px;max-width:65%;max-height:82%; }
+            .database-toolbar { grid-template-columns:1fr 1fr; }.database-search{grid-column:1/-1}.database-list{grid-template-columns:1fr}
+            .settings-save-bar { flex-direction:column;align-items:stretch; }
+        }
+        @media(min-width:768px) and (max-width:1023px){
+            .settings-register-grid,.settings-config-grid{grid-template-columns:1fr 1fr}.database-list{grid-template-columns:1fr 1fr}
+        }
+
+
+        /* ================== REPORT CENTER ================== */
+        .report-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+        .report-card { display:flex; gap:15px; padding:19px; background:#fff; border:1px solid #e2e8f0; border-radius:20px; box-shadow:0 10px 30px rgba(15,23,42,.045); }
+        .report-card-icon { width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;border-radius:14px;background:#eff6ff;font-size:21px; }
+        .report-card-body { min-width:0;flex:1; }
+        .report-kicker { display:block;font-size:9px;font-weight:950;letter-spacing:.12em;color:#2563eb; }
+        .report-card h4 { margin-top:4px;font-size:16px;font-weight:950;color:#0f172a; }
+        .report-card p { margin-top:5px;font-size:10px;line-height:1.55;color:#64748b; }
+        .report-form-row { display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;align-items:end;margin-top:15px; }
+        .report-form-grid { display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:15px; }
+        .report-download-btn { min-height:43px;padding:0 15px;border:0;border-radius:11px;background:#2563eb;color:#fff;font-size:10px;font-weight:950;box-shadow:0 8px 18px rgba(37,99,235,.18);cursor:pointer;transition:.15s;white-space:nowrap; }
+        .report-download-btn:hover { background:#1d4ed8; }
+        .report-download-btn:active { transform:scale(.98); }
+        .report-download-wide { width:100%;margin-top:12px; }
+        .report-note { display:flex;gap:10px;align-items:center;margin-top:16px;padding:13px 15px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:15px;font-size:9px;color:#64748b; }
+        .report-note strong { color:#334155;white-space:nowrap; }
+        .dark .report-card { background:#0f172a;border-color:#1e293b; }
+        .dark .report-card h4 { color:#fff; }
+        .dark .report-note { background:#0f172a;border-color:#1e293b; }
+        .dark .report-note strong { color:#e2e8f0; }
+        @media(max-width:767px) {
+            .settings-tabs { grid-template-columns:repeat(4,1fr); }
+            .report-grid { grid-template-columns:1fr; }
+            .report-card { padding:15px; }
+            .report-form-row { grid-template-columns:1fr; }
+            .report-form-grid { grid-template-columns:1fr; }
+            .report-download-btn { width:100%;min-height:46px; }
+            .report-note { align-items:flex-start;flex-direction:column; }
+        }
+
+
+/* ================== ABSENSI CAMERA SIZE V4 ==================
+   Kamera absensi disamakan lebih dekat dengan karakter kamera pendaftaran:
+   besar, fokus, responsif, dan nyaman untuk Android.
+*/
+@media (min-width: 1024px) {
+    #absensi > .max-w-2xl {
+        max-width: 1120px !important;
+        padding: 20px !important;
+    }
+    #absensi #camera-wrapper {
+        max-width: none !important;
+        width: 100% !important;
+        min-height: 560px !important;
+        aspect-ratio: 16 / 10 !important;
+    }
+    #absensi #camera-wrapper video {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+    }
+    /* Perbesar panduan wajah agar proporsional dengan kamera */
+    #absensi #face-silhouette {
+        transform: scale(1.08);
+    }
+}
+
+@media (max-width: 1023px) {
+    #absensi > .max-w-2xl {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 14px !important;
+    }
+    #absensi #camera-wrapper {
+        width: 100% !important;
+        max-width: none !important;
+        min-height: 0 !important;
+        height: min(72vh, 620px) !important;
+        aspect-ratio: auto !important;
+        border-radius: 18px !important;
+    }
+    #absensi #camera-wrapper video {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+    }
+}
+
+@media (max-width: 767px) {
+    #absensi > header {
+        margin-bottom: 10px !important;
+    }
+    #absensi > header > div {
+        min-height: 110px !important;
+        padding: 18px !important;
+    }
+    #absensi > header h2 {
+        font-size: 23px !important;
+    }
+    #absensi > .max-w-2xl {
+        padding: 10px !important;
+        border-radius: 18px !important;
+    }
+    #absensi #camera-wrapper {
+        height: min(70vh, 560px) !important;
+        min-height: 390px !important;
+        border-width: 3px !important;
+        border-radius: 16px !important;
+    }
+    #absensi #face-silhouette {
+        transform: scale(1.02);
+    }
+    #absensi .flex.justify-center.gap-3.mt-4 button {
+        min-height: 48px !important;
+        padding: 11px 15px !important;
+    }
+}
+
+/* Saat desktop-absensi-mode aktif, jangan biarkan grid lama mengecilkan kamera */
+@media (min-width: 1024px) {
+    body.desktop-absensi-mode #absensi > .max-w-2xl {
+        grid-template-columns: minmax(0, 1fr) 300px !important;
+        max-width: none !important;
+    }
+    body.desktop-absensi-mode #camera-wrapper {
+        min-height: 0 !important;
+        height: 100% !important;
+        aspect-ratio: auto !important;
+    }
+}
+
 </style>
 
     <script>
@@ -678,13 +928,14 @@
 	            <div class="video-container bg-black rounded-2xl overflow-hidden border-4 border-gray-100 dark:border-slate-800 aspect-video shadow-inner relative" id="camera-wrapper">
 			<video id="video" class="w-full h-full object-cover" autoplay muted playsinline></video>
 			<!-- Overlay Pemindai Baru -->
-    			<div class="face-mask-overlay"></div> 
-			<div id="face-silhouette" class="absolute inset-0 flex items-center justify-center pointer-events-none">
-	                <svg id="face-silhouette-svg" class="w-64 h-64 text-white/30 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.5">
-	                    <!-- Garis Kepala --><path d="M12 21C16.4183 21 20 17.4183 20 13C20 8.58172 16.4183 5 12 5C7.58172 5 4 8.58172 4 13C4 17.4183 7.58172 21 12 21Z" />
-	                    <!-- Area Mata & Hidung --><path d="M12 18C14.2091 18 16 16.2091 16 14C16 11.7909 14.2091 10 12 10C9.79086 10 8 11.7909 8 14C8 16.2091 9.79086 18 12 18Z" />
-	                    <!-- Garis Senyum --><path d="M9 13C9 13 10 12 12 12C14 12 15 13 15 13" /></svg>
-	            </div>
+    			<div id="face-silhouette" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div class="face-guide" aria-label="Panduan posisi wajah">
+                        <span class="face-guide-corner tl"></span>
+                        <span class="face-guide-corner tr"></span>
+                        <span class="face-guide-corner bl"></span>
+                        <span class="face-guide-corner br"></span>
+                    </div>
+                </div>
 	        </div>
 
     	    <div class="flex justify-center gap-3 mt-4">
@@ -712,69 +963,268 @@
 	</div>
 
         <div id="pengaturan" class="tab-content">
-            <div class="max-w-5xl mx-auto space-y-6">
-                <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800">
-                    <h2 class="text-xl font-bold mb-6 text-orange-600 flex items-center"><span class="mr-2">👤</span> Pendaftaran Wajah Siswa</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                        <div class="space-y-4">
+    <header class="mb-6">
+        <div class="bg-gradient-to-r from-slate-900 via-blue-900 to-blue-700 text-white p-6 md:p-8 rounded-3xl shadow-lg">
+            <div class="relative z-10">
+                <span class="inline-block bg-white/10 border border-white/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3">ADMIN PANEL</span>
+                <h2 class="text-2xl md:text-4xl font-black tracking-tight">Pengaturan Sistem</h2>
+                <p class="text-blue-100 text-xs md:text-sm mt-2 max-w-2xl">Kelola pendaftaran wajah, database pengguna terdaftar, dan konfigurasi BioScan dari satu halaman.</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="settings-shell">
+        <div class="settings-tabs" role="tablist" aria-label="Pengaturan BioScan">
+            <button type="button" class="settings-tab active" data-settings-tab="pendaftaran" onclick="switchSettingsTab('pendaftaran')">
+                <span class="settings-tab-icon">📸</span>
+                <span><strong>Pendaftaran Wajah</strong><small>Daftarkan wajah baru</small></span>
+            </button>
+            <button type="button" class="settings-tab" data-settings-tab="database" onclick="switchSettingsTab('database')">
+                <span class="settings-tab-icon">👥</span>
+                <span><strong>Database Terdaftar</strong><small>Kelola siswa & guru</small></span>
+            </button>
+            <button type="button" class="settings-tab" data-settings-tab="konfigurasi" onclick="switchSettingsTab('konfigurasi')">
+                <span class="settings-tab-icon">⚙️</span>
+                <span><strong>Konfigurasi</strong><small>Pengaturan sistem</small></span>
+            </button>
+            <button type="button" class="settings-tab" data-settings-tab="laporan" onclick="switchSettingsTab('laporan')">
+                <span class="settings-tab-icon">📊</span>
+                <span><strong>Laporan</strong><small>Unduh laporan absensi</small></span>
+            </button>
+        </div>
+
+        <!-- TAB 1: PENDAFTARAN WAJAH -->
+        <section id="settings-pane-pendaftaran" class="settings-pane active">
+            <div class="settings-section-head">
+                <div>
+                    <span class="settings-kicker">REGISTRASI</span>
+                    <h3>Pendaftaran Wajah</h3>
+                    <p>Ambil data wajah satu kali dengan posisi wajah berada di dalam panduan kamera.</p>
+                </div>
+                <span class="settings-status-badge">● Siap digunakan</span>
+            </div>
+
+            <div class="settings-register-grid">
+                <div class="settings-camera-card">
+                    <div class="settings-camera-title">
+                        <span>📷 Kamera Pendaftaran</span>
+                        <small>Gunakan pencahayaan yang cukup</small>
+                    </div>
+                    <div id="reg-camera-wrapper" class="settings-reg-camera">
+                        <video id="reg-video" autoplay muted playsinline></video>
+                        <div class="reg-face-guide" aria-label="Panduan wajah pendaftaran">
+                            <span class="reg-guide-corner tl"></span><span class="reg-guide-corner tr"></span>
+                            <span class="reg-guide-corner bl"></span><span class="reg-guide-corner br"></span>
+                            <span class="reg-guide-label">POSISIKAN WAJAH DI SINI</span>
+                        </div>
+                    </div>
+                    <div id="reg-camera-status" class="settings-camera-status">Kamera akan aktif saat menu pendaftaran dibuka.</div>
+                </div>
+
+                <div class="settings-form-card">
+                    <div class="settings-form-title">Identitas Pendaftar</div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="settings-label">Jenis Pendaftar</label>
+                            <select id="reg-role" class="settings-input">
+                                <option value="Siswa">Siswa</option>
+                                <option value="Guru">Guru</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="settings-label">Kelas</label>
+                            <select id="reg-kelas" onchange="updateRegNama()" class="settings-input">
+                                <option value="">-- Pilih Kelas --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="settings-label">Nama / Identitas</label>
+                            <select id="reg-siswa" class="settings-input">
+                                <option value="">-- Pilih Nama --</option>
+                            </select>
+                        </div>
+                        <button type="button" onclick="registerFace()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-3.5 rounded-xl shadow-lg active:scale-[.98] transition">
+                            📸 SIMPAN WAJAH
+                        </button>
+                    </div>
+                    <div class="settings-tip">
+                        <strong>Tips:</strong> lepaskan masker/topi, lihat kamera secara lurus, dan pastikan wajah tidak terlalu dekat atau jauh.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: DATABASE -->
+        <section id="settings-pane-database" class="settings-pane">
+            <div class="settings-section-head">
+                <div>
+                    <span class="settings-kicker">DATABASE</span>
+                    <h3>Data Terdaftar</h3>
+                    <p>Kelola data wajah yang sudah tersimpan. Gunakan filter jenis dan kelas untuk pencarian cepat.</p>
+                </div>
+                <button type="button" onclick="loadRegisteredFaces()" class="settings-refresh">↻ Refresh</button>
+            </div>
+
+            <div class="database-toolbar">
+                <div class="database-search">
+                    <span>⌕</span>
+                    <input id="registered-face-search" oninput="renderRegisteredFaces()" type="search" placeholder="Cari nama, NIS, kelas...">
+                </div>
+                <select id="registered-face-role-filter" onchange="renderRegisteredFaces()" class="database-filter">
+                    <option value="SEMUA">Semua</option>
+                    <option value="Siswa">Siswa</option>
+                    <option value="Guru">Guru</option>
+                </select>
+                <select id="registered-face-class-filter" onchange="renderRegisteredFaces()" class="database-filter">
+                    <option value="SEMUA">Semua Kelas</option>
+                </select>
+            </div>
+
+            <div id="registered-face-summary" class="database-summary"></div>
+            <div id="registered-faces-list" class="database-list">
+                <div class="text-center py-10 text-xs text-slate-400">Memuat data wajah terdaftar...</div>
+            </div>
+        </section>
+
+        <!-- TAB 3: KONFIGURASI -->
+        <section id="settings-pane-konfigurasi" class="settings-pane">
+            <div class="settings-section-head">
+                <div>
+                    <span class="settings-kicker">SYSTEM</span>
+                    <h3>Konfigurasi</h3>
+                    <p>Atur sumber data siswa, backend sinkronisasi, dan lokasi yang diizinkan untuk absensi.</p>
+                </div>
+            </div>
+
+            <div class="settings-config-grid">
+                <div class="settings-config-card">
+                    <div class="settings-form-title">🔗 Sumber Data</div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="settings-label">URL CSV Data Siswa</label>
+                            <input id="csv-url" type="url" class="settings-input" placeholder="https://...">
+                        </div>
+                        <div>
+                            <label class="settings-label">URL Backend / Endpoint</label>
+                            <input id="endpoint-url" type="url" class="settings-input" placeholder="https://...">
+                        </div>
+                        <button type="button" onclick="fetchSiswa()" class="w-full py-3 rounded-xl bg-slate-900 text-white font-black text-xs hover:bg-blue-700 transition">↻ SINKRON DATA SISWA</button>
+                    </div>
+                </div>
+
+                <div class="settings-config-card">
+                    <div class="settings-form-title">📍 Lokasi Absensi</div>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Pilih Kelas</label>
-                                <select id="reg-kelas" onchange="updateRegNama()" class="w-full p-3 border dark:border-slate-700 rounded-xl outline-none text-sm bg-gray-50 dark:bg-slate-800 dark:text-white"><option value="">-- Pilih Kelas --</option></select>
+                                <label class="settings-label">Latitude</label>
+                                <input id="target-lat" type="number" step="any" class="settings-input" placeholder="-6.">
                             </div>
                             <div>
-                                <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Pilih Nama Siswa</label>
-                                <select id="reg-siswa" class="w-full p-3 border dark:border-slate-700 rounded-xl outline-none text-sm bg-gray-50 dark:bg-slate-800 dark:text-white"><option value="">-- Pilih Nama --</option></select>
+                                <label class="settings-label">Longitude</label>
+                                <input id="target-lng" type="number" step="any" class="settings-input" placeholder="106.">
                             </div>
                         </div>
-                        <div class="bg-orange-50 dark:bg-orange-900/10 border-2 border-dashed border-orange-200 dark:border-orange-800 p-6 text-center rounded-2xl">
-        	            <div id="camera-placeholder-reg" class="face-scanner-pro mb-4 border-2 border-orange-200">
-                                <video id="reg-video" autoplay muted playsinline></video>
-                                <div class="face-scan-corners"></div>
-                                <div class="face-scan-status">
-                                    <span class="face-scan-dot"></span>
-                                    <span id="reg-camera-status">KAMERA AKTIF • ARAHKAN WAJAH</span>
-                                    <span id="reg-camera-name" class="face-scan-name"></span>
-                                </div>
+                        <div>
+                            <label class="settings-label">Radius (meter)</label>
+                            <input id="target-radius" type="number" min="1" class="settings-input" value="50">
+                        </div>
+                        <button type="button" onclick="setCurrentLocation()" class="w-full py-3 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 font-black text-xs hover:bg-blue-100 transition">⌖ GUNAKAN LOKASI SAYA</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-save-bar">
+                <div><strong>Pengaturan Global</strong><span>Perubahan akan disimpan dan disinkronkan ke perangkat.</span></div>
+                <button type="button" onclick="saveSettings()" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-lg">💾 SIMPAN KONFIGURASI</button>
+            </div>
+        </section>
+    </div>
+
+
+        <!-- TAB 4: LAPORAN -->
+        <section id="settings-pane-laporan" class="settings-pane">
+            <div class="settings-section-head">
+                <div>
+                    <span class="settings-kicker">REPORT CENTER</span>
+                    <h3>Unduh Laporan</h3>
+                    <p>Unduh laporan absensi harian atau rekap bulanan berdasarkan kelas.</p>
+                </div>
+            </div>
+
+            <div class="report-grid">
+                <div class="report-card">
+                    <div class="report-card-icon">📅</div>
+                    <div class="report-card-body">
+                        <span class="report-kicker">LAPORAN HARIAN</span>
+                        <h4>Unduh Laporan Harian</h4>
+                        <p>Pilih tanggal untuk mengunduh seluruh data absensi pada hari tersebut.</p>
+                        <div class="report-form-row">
+                            <div class="report-field">
+                                <label class="settings-label">Tanggal</label>
+                                <input id="report-daily-date" type="date" class="settings-input">
                             </div>
-                            <button onclick="registerFace()" class="w-full bg-orange-500 text-white px-6 py-4 rounded-xl font-black shadow-lg hover:bg-orange-600 transition transform active:scale-95 text-xs uppercase">Ambil Data Wajah</button>
-                            <div id="reg-status" class="mt-4 font-bold text-sm min-h-[1.5rem]"></div>
+                            <button type="button" onclick="downloadDailyReport()" class="report-download-btn">
+                                ⬇️ Unduh CSV
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800">
-                    <h2 class="text-xl font-bold mb-6 text-blue-700 flex items-center"><span class="mr-2">⚙️</span> Konfigurasi Sistem</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-			<div class="space-y-4">
-			    <div>
-		   	     <label class="block text-[10px] font-bold text-gray-400 uppercase">Link CSV G-Sheets</label>
-		     	   <input type="text" id="csv-url" class="w-full p-3 border dark:border-slate-700 rounded-xl outline-none text-sm dark:bg-slate-800 dark:text-white" placeholder="https://...">
-			    </div>
-			    <div>
-			        <label class="block text-[10px] font-bold text-blue-500 uppercase">URL Apps Script Backend</label>
-			        <input type="text" id="endpoint-url" class="w-full p-3 border border-blue-200 dark:border-blue-900/50 rounded-xl outline-none text-sm dark:bg-slate-800 dark:text-white" placeholder="https://script.google.com/...">
-			    </div>
-			</div>
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-2 gap-3">
-                                <div><label class="block text-[10px] font-bold text-gray-400 uppercase">Latitude</label><input type="number" id="target-lat" class="w-full p-3 border dark:border-slate-700 rounded-xl text-sm dark:bg-slate-800 dark:text-white" step="any"></div>
-                                <div><label class="block text-[10px] font-bold text-gray-400 uppercase">Longitude</label><input type="number" id="target-lng" class="w-full p-3 border dark:border-slate-700 rounded-xl text-sm dark:bg-slate-800 dark:text-white" step="any"></div>
+                <div class="report-card">
+                    <div class="report-card-icon">📚</div>
+                    <div class="report-card-body">
+                        <span class="report-kicker">REKAP BULANAN PER KELAS</span>
+                        <h4>Unduh Laporan Bulanan</h4>
+                        <p>Rekap kehadiran satu bulan untuk kelas yang dipilih.</p>
+                        <div class="report-form-grid">
+                            <div class="report-field">
+                                <label class="settings-label">Bulan</label>
+                                <input id="report-month" type="month" class="settings-input">
                             </div>
-                            <div class="flex gap-3">
-                                <div class="flex-1"><label class="block text-[10px] font-bold text-gray-400 uppercase">Radius (Meter)</label><input type="number" id="target-radius" class="w-full p-3 border dark:border-slate-700 rounded-xl text-sm dark:bg-slate-800 dark:text-white" value="50"></div>
-                                <button onclick="setCurrentLocation()" class="mt-5 bg-gray-100 dark:bg-slate-800 text-blue-600 px-4 rounded-xl text-[10px] font-bold uppercase">Set GPS</button>
+                            <div class="report-field">
+                                <label class="settings-label">Kelas</label>
+                                <select id="report-month-class" class="settings-input">
+                                    <option value="SEMUA">Semua Kelas</option>
+                                </select>
                             </div>
                         </div>
-       		 </div>
-		<div class="mt-6 p-6 bg-blue-50 dark:bg-blue-900/10 rounded-2xl border border-blue-100 dark:border-blue-800">
-		    <h3 class="text-sm font-bold text-blue-700 dark:text-blue-400 mb-3 uppercase flex items-center">
-		        <span class="mr-2">📥</span> Ekspor Data
-		    </h3>
-		    <button onclick="exportLaporan()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold text-xs transition uppercase tracking-wider shadow-md">
-	   	     Unduh Laporan Hari Ini (.CSV)</button></div>
-                    </div><button onclick="saveSettings()" class="w-full bg-slate-900 dark:bg-blue-700 text-white py-4 rounded-2xl font-bold hover:bg-black dark:hover:bg-blue-800 shadow-md mt-8 transition uppercase tracking-widest text-sm">Simpan dan Sikron Pengaturan</button></div>
+                        <button type="button" onclick="downloadMonthlyClassReport()" class="report-download-btn report-download-wide">
+                            ⬇️ Unduh Rekap Bulanan
+                        </button>
+                    </div>
+                </div>
             </div>
 
+            <div class="report-note">
+                <strong>ℹ️ Format laporan</strong>
+                <span>Laporan diunduh dalam format CSV sehingga dapat dibuka di Excel, Google Sheets, atau aplikasi spreadsheet lainnya.</span>
+            </div>
+        </section>
+
+    <!-- Modal Edit Data -->
+    <div id="edit-face-modal" class="hidden fixed inset-0 z-[10000] bg-slate-950/60 backdrop-blur-sm p-4 flex items-center justify-center">
+        <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl">
+            <div class="flex items-center justify-between mb-5">
+                <div><h3 class="text-lg font-black text-slate-900 dark:text-white">Edit Data Terdaftar</h3><p class="text-[10px] text-slate-400 mt-1">Data wajah tetap, identitas dapat diperbarui.</p></div>
+                <button type="button" onclick="closeEditFaceModal()" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500">✕</button>
+            </div>
+            <input type="hidden" id="edit-face-doc-id">
+            <div class="space-y-3">
+                <div><label class="settings-label">Jenis</label><select id="edit-face-role" class="settings-input"><option value="Siswa">Siswa</option><option value="Guru">Guru</option></select></div>
+                <div><label class="settings-label">Nama</label><input id="edit-face-name" class="settings-input"></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="settings-label">NIS / ID</label><input id="edit-face-nis" class="settings-input"></div>
+                    <div><label class="settings-label">Kelas / Jabatan</label><input id="edit-face-class" class="settings-input"></div>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button type="button" onclick="closeEditFaceModal()" class="flex-1 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs">Batal</button>
+                <button type="button" onclick="saveEditedFace()" class="flex-1 py-3 rounded-xl bg-blue-600 text-white font-black text-xs">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+</div>
     </main>
 
 
@@ -802,6 +1252,7 @@ const SETTINGS_PATH = `artifacts/${APP_PATH}/public/config/settings`;
 const ABSENSI_PATH = `artifacts/${APP_PATH}/public/records`;
 
 let siswaData = [], settings = {}, isLocationValid = false;
+let registeredFaces = [];
 let faceMatcher = null, lastAttendance = {};
 let currentFacingMode = "user", currentStream = null, regStream = null;
 let watchId = null, isProcessing = false;
@@ -863,49 +1314,45 @@ localDB.version(1).stores({
 async function syncFaceDatabase() {
     addLog("🔄 Mengecek Database Wajah...");
     try {
-        // 1. Cek jumlah data lokal
-        const localCount = await localDB.faces.count();
-        
-        // 2. Ambil data terbaru dari Firestore
         const snapshot = await db.collection("artifacts").doc(APP_PATH)
-                                  .collection("public").doc("biometrics")
-                                  .collection("face_data").get();
-        
-        if (snapshot.size !== localCount) {
-            addLog("📥 Mengunduh Data Wajah Baru...");
-            const faceDataArray = [];
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                faceDataArray.push({
-                    nis: data.nis,
-                    nama: data.nama,
-                    kelas: data.kelas,
-                    descriptor: JSON.parse(data.descriptor)
-                });
+            .collection("public").doc("biometrics").collection("face_data").get();
+
+        const faceDataArray = [];
+        registeredFaces = [];
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            let descriptor = [];
+            try { descriptor = JSON.parse(data.descriptor || "[]"); } catch (_) {}
+            const matchedStudent = siswaData.find(s => String(s.nis) === String(data.nis));
+            const role = data.jenis || data.role || (matchedStudent ? "Siswa" : "Guru");
+
+            registeredFaces.push({
+                docId: doc.id,
+                nis: data.nis || doc.id,
+                nama: data.nama || "-",
+                kelas: data.kelas || "-",
+                jenis: role,
+                descriptor
             });
+            faceDataArray.push({ nis: data.nis || doc.id, nama: data.nama || "-", kelas: data.kelas || "-", descriptor });
+        });
 
-            await localDB.faces.clear();
-            await localDB.faces.bulkPut(faceDataArray);
-            addLog(`✅ ${faceDataArray.length} Wajah Tersimpan Lokal.`);
-        }
+        await localDB.faces.clear();
+        if (faceDataArray.length) await localDB.faces.bulkPut(faceDataArray);
 
-        // 3. Load ke FaceMatcher
         const allFaces = await localDB.faces.toArray();
-        const labeled = allFaces.map(f => 
-            new faceapi.LabeledFaceDescriptors(f.nis, [new Float32Array(f.descriptor)])
-        );
+        const labeled = allFaces.filter(f => Array.isArray(f.descriptor) && f.descriptor.length)
+            .map(f => new faceapi.LabeledFaceDescriptors(String(f.nis), [new Float32Array(f.descriptor)]));
 
-        if (labeled.length > 0) {
-            faceMatcher = new faceapi.FaceMatcher(labeled, 0.45);
-            addLog("Ready: AI siap mengenali wajah.");
-        } else {
-            addLog("⚠️ Database Wajah Kosong.");
-        }
+        faceMatcher = labeled.length ? new faceapi.FaceMatcher(labeled, 0.45) : null;
+        addLog(labeled.length ? `✅ ${labeled.length} Wajah siap dikenali.` : "⚠️ Database Wajah Kosong.");
+
+        if (currentTab === "pengaturan") renderRegisteredFaces();
     } catch (e) {
         addLog("❌ Sync Gagal: " + e.message);
     }
 }
-
 // 1. TAMBAHKAN FUNGSI TOAST (WAJIB ADA)
 function showToast(msg, type = "info") {
     const toast = document.createElement("div");
@@ -1102,6 +1549,7 @@ async function startRegistrationCamera() {
 async function registerFace() {
     const nama = document.getElementById('reg-siswa').value;
     const kelas = document.getElementById('reg-kelas').value;
+    const jenis = document.getElementById('reg-role')?.value || 'Siswa';
     
     if (!nama) {
         showToast("Pilih nama siswa dulu!", "error");
@@ -1134,7 +1582,7 @@ async function registerFace() {
         await db.collection("artifacts").doc(APP_PATH)
             .collection("public").doc("biometrics")
             .collection("face_data").doc(nisSiswa).set({
-                nis: nisSiswa, nama, kelas,
+                nis: nisSiswa, nama, kelas, jenis,
                 descriptor: JSON.stringify(descriptorArray),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
@@ -1184,7 +1632,7 @@ async function recordAttendance(nis) {
     };
 
     // Feedback Visual: Ubah warna siluet & animasi
-    const silhouette = document.getElementById('face-silhouette-svg');
+    const silhouette = document.querySelector('.face-guide');
     if (silhouette) {
         silhouette.classList.remove('text-white/30');
         silhouette.classList.add('text-green-500', 'scale-110');
@@ -1469,6 +1917,285 @@ function updateRegNama() {
         filtered.map(s => `<option value="${s.nama}">${s.nama}</option>`).join('');
 }
 
+
+
+// ================== MANAJEMEN DATA WAJAH TERDAFTAR ==================
+function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]));
+}
+
+async function loadRegisteredFaces() {
+    const container = document.getElementById("registered-faces-list");
+    if (container) container.innerHTML = '<div class="text-center py-8 text-xs text-slate-400">⏳ Memuat data...</div>';
+    await syncFaceDatabase();
+    renderRegisteredFaces();
+}
+
+function renderRegisteredFaces() {
+    const container = document.getElementById("registered-faces-list");
+    if (!container) return;
+    const search = (document.getElementById("registered-face-search")?.value || "").toLowerCase().trim();
+    const role = document.getElementById("registered-face-role-filter")?.value || "SEMUA";
+    const classFilter = document.getElementById("registered-face-class-filter")?.value || "SEMUA";
+    updateRegisteredClassFilter();
+
+    const filtered = registeredFaces.filter(item => {
+        const haystack = `${item.nama} ${item.nis} ${item.kelas} ${item.jenis}`.toLowerCase();
+        return (!search || haystack.includes(search))
+            && (role === "SEMUA" || item.jenis === role)
+            && (classFilter === "SEMUA" || item.kelas === classFilter);
+    });
+
+    const summary = document.getElementById("registered-face-summary");
+    if (summary) {
+        const total = registeredFaces.length;
+        const siswa = registeredFaces.filter(x => x.jenis === "Siswa").length;
+        const guru = registeredFaces.filter(x => x.jenis === "Guru").length;
+        summary.innerHTML = `<span>Total ${total}</span><span>👨‍🎓 Siswa ${siswa}</span><span>👨‍🏫 Guru ${guru}</span><span>Ditampilkan ${filtered.length}</span>`;
+    }
+
+    if (!filtered.length) {
+        container.innerHTML = '<div class="text-center py-10 text-xs text-slate-400">Belum ada data wajah yang sesuai.</div>';
+        return;
+    }
+
+    container.innerHTML = filtered.map(item => `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+            <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                    <div class="font-black text-sm text-slate-900 dark:text-white truncate">${escapeHtml(item.nama)}</div>
+                    <span class="px-2 py-1 rounded-full text-[9px] font-black uppercase ${item.jenis === "Guru" ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300" : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"}">${escapeHtml(item.jenis)}</span>
+                </div>
+                <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">${escapeHtml(item.nis)} • ${escapeHtml(item.kelas)}</div>
+            </div>
+            <div class="flex gap-2 shrink-0">
+                <button type="button" onclick="openEditFaceModal('${escapeHtml(item.docId)}')" class="px-3 py-2 rounded-xl bg-blue-600 text-white text-[10px] font-black uppercase">✏️ Edit</button>
+                <button type="button" onclick="deleteRegisteredFace('${escapeHtml(item.docId)}','${escapeHtml(item.nama)}')" class="px-3 py-2 rounded-xl bg-red-600 text-white text-[10px] font-black uppercase">🗑 Hapus</button>
+            </div>
+        </div>
+    `).join("");
+}
+
+function openEditFaceModal(docId) {
+    const item = registeredFaces.find(x => x.docId === docId);
+    if (!item) return;
+    document.getElementById("edit-face-doc-id").value = item.docId;
+    document.getElementById("edit-face-role").value = item.jenis || "Siswa";
+    document.getElementById("edit-face-name").value = item.nama || "";
+    document.getElementById("edit-face-nis").value = item.nis || "";
+    document.getElementById("edit-face-class").value = item.kelas || "";
+    document.getElementById("edit-face-modal").classList.remove("hidden");
+}
+
+function closeEditFaceModal() {
+    document.getElementById("edit-face-modal")?.classList.add("hidden");
+}
+
+async function saveEditedFace() {
+    const docId = document.getElementById("edit-face-doc-id").value;
+    const nama = document.getElementById("edit-face-name").value.trim();
+    const nis = document.getElementById("edit-face-nis").value.trim();
+    const kelas = document.getElementById("edit-face-class").value.trim();
+    const jenis = document.getElementById("edit-face-role").value;
+    if (!docId || !nama || !nis) return showToast("Nama dan NIS/ID wajib diisi.", "error");
+
+    try {
+        const ref = db.collection("artifacts").doc(APP_PATH).collection("public").doc("biometrics").collection("face_data").doc(docId);
+        const old = registeredFaces.find(x => x.docId === docId);
+        const payload = { nama, nis, kelas, jenis, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+
+        if (docId === nis) {
+            await ref.set(payload, { merge: true });
+        } else {
+            if (!old?.descriptor?.length) throw new Error("Descriptor wajah tidak ditemukan.");
+            await db.collection("artifacts").doc(APP_PATH).collection("public").doc("biometrics").collection("face_data").doc(nis)
+                .set({...payload, descriptor: JSON.stringify(old.descriptor)});
+            await ref.delete();
+        }
+
+        closeEditFaceModal();
+        showToast("DATA BERHASIL DIPERBARUI", "success");
+        await syncFaceDatabase();
+    } catch (e) {
+        showToast("Gagal mengubah data: " + e.message, "error");
+    }
+}
+
+async function deleteRegisteredFace(docId, nama) {
+    if (!confirm(`Hapus data wajah "${nama}"?\n\nData wajah akan dihapus dari database.`)) return;
+    try {
+        await db.collection("artifacts").doc(APP_PATH).collection("public").doc("biometrics").collection("face_data").doc(docId).delete();
+        await localDB.faces.delete(docId);
+        showToast("DATA WAJAH DIHAPUS", "success");
+        await syncFaceDatabase();
+    } catch (e) {
+        showToast("Gagal menghapus data: " + e.message, "error");
+    }
+}
+
+
+function switchSettingsTab(tab) {
+    document.querySelectorAll(".settings-tab").forEach(btn => btn.classList.toggle("active", btn.dataset.settingsTab === tab));
+    document.querySelectorAll(".settings-pane").forEach(pane => pane.classList.remove("active"));
+    const pane = document.getElementById(`settings-pane-${tab}`);
+    if (pane) pane.classList.add("active");
+    if (tab === "database") setTimeout(() => loadRegisteredFaces(), 50);
+    if (tab === "laporan") setTimeout(() => { setReportDefaults(); updateReportClassOptions(); }, 50);
+    if (tab === "pendaftaran") setTimeout(() => { try { startRegistrationCamera(); } catch (_) {} }, 50);
+}
+
+function updateRegisteredClassFilter() {
+    const select = document.getElementById("registered-face-class-filter");
+    if (!select) return;
+    const current = select.value || "SEMUA";
+    const classes = [...new Set(registeredFaces.map(x => x.kelas).filter(x => x && x !== "-"))].sort((a,b) => a.localeCompare(b, "id"));
+    select.innerHTML = '<option value="SEMUA">Semua Kelas</option>' + classes.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join("");
+    if (classes.includes(current)) select.value = current;
+}
+
+
+// ================== REPORT CENTER ==================
+function setReportDefaults() {
+    const now = new Date();
+    const pad = n => String(n).padStart(2, "0");
+    const daily = document.getElementById("report-daily-date");
+    const month = document.getElementById("report-month");
+    if (daily && !daily.value) daily.value = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+    if (month && !month.value) month.value = `${now.getFullYear()}-${pad(now.getMonth()+1)}`;
+    updateReportClassOptions();
+}
+
+function updateReportClassOptions() {
+    const select = document.getElementById("report-month-class");
+    if (!select) return;
+    const current = select.value || "SEMUA";
+    const classes = [...new Set(
+        (registeredFaces || []).map(x => x.kelas).filter(x => x && x !== "-")
+    )].sort((a,b) => a.localeCompare(b, "id"));
+    select.innerHTML = '<option value="SEMUA">Semua Kelas</option>' +
+        classes.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join("");
+    if (classes.includes(current)) select.value = current;
+}
+
+function csvCell(value) {
+    const text = value == null ? "" : String(value);
+    return `"${text.replace(/"/g, '""')}"`;
+}
+
+function downloadCsv(filename, rows) {
+    if (!rows || !rows.length) {
+        showToast("Tidak ada data untuk diunduh.", "error");
+        return;
+    }
+    const csv = "\ufeff" + rows.map(row => row.map(csvCell).join(",")).join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+}
+
+function normalizeAttendanceRecord(data, docId) {
+    const timestamp = data.timestamp || data.waktu || data.createdAt || data.date || "";
+    let dateText = data.tanggal || data.dateText || "";
+    if (!dateText && timestamp?.toDate) {
+        const d = timestamp.toDate();
+        dateText = d.toISOString().slice(0,10);
+    } else if (!dateText && timestamp) {
+        dateText = String(timestamp).slice(0,10);
+    }
+    return {
+        id: docId,
+        tanggal: dateText,
+        waktu: data.waktu || "",
+        nis: data.nis || data.idSiswa || data.id || "",
+        nama: data.nama || data.namaSiswa || "",
+        kelas: data.kelas || "",
+        jenis: data.jenis || data.role || "Siswa",
+        status: data.status || "Hadir",
+        keterangan: data.keterangan || ""
+    };
+}
+
+async function getAttendanceRecordsForRange(startDate, endDateExclusive) {
+    const results = [];
+    try {
+        const ref = db.collection("artifacts").doc(APP_PATH).collection("public").doc("data").collection("absensi");
+        const snap = await ref.get();
+        snap.forEach(doc => {
+            const rec = normalizeAttendanceRecord(doc.data(), doc.id);
+            if (rec.tanggal && rec.tanggal >= startDate && rec.tanggal < endDateExclusive) results.push(rec);
+        });
+    } catch (e) {
+        addLog("⚠️ Pengambilan laporan: " + e.message);
+    }
+    return results;
+}
+
+async function downloadDailyReport() {
+    const date = document.getElementById("report-daily-date")?.value;
+    if (!date) return showToast("Pilih tanggal laporan terlebih dahulu.", "error");
+
+    showToast("MENYIAPKAN LAPORAN HARIAN...", "info");
+    const next = new Date(date + "T00:00:00");
+    next.setDate(next.getDate() + 1);
+    const end = next.toISOString().slice(0,10);
+    const records = await getAttendanceRecordsForRange(date, end);
+
+    const rows = [
+        ["LAPORAN ABSENSI HARIAN"],
+        ["Tanggal", date],
+        [],
+        ["No","NIS / ID","Nama","Kelas","Jenis","Waktu","Status","Keterangan"],
+        ...records.map((r,i) => [i+1,r.nis,r.nama,r.kelas,r.jenis,r.waktu,r.status,r.keterangan])
+    ];
+    downloadCsv(`laporan_absensi_${date}.csv`, rows);
+    if (records.length) showToast(`${records.length} DATA BERHASIL DIUNDUH`, "success");
+}
+
+async function downloadMonthlyClassReport() {
+    const month = document.getElementById("report-month")?.value;
+    const selectedClass = document.getElementById("report-month-class")?.value || "SEMUA";
+    if (!month) return showToast("Pilih bulan laporan terlebih dahulu.", "error");
+
+    const [year, mon] = month.split("-").map(Number);
+    const start = `${year}-${String(mon).padStart(2,"0")}-01`;
+    const nextMonth = new Date(year, mon, 1);
+    const end = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth()+1).padStart(2,"0")}-01`;
+
+    showToast("MENYIAPKAN REKAP BULANAN...", "info");
+    let records = await getAttendanceRecordsForRange(start, end);
+    if (selectedClass !== "SEMUA") records = records.filter(r => r.kelas === selectedClass);
+
+    const grouped = {};
+    records.forEach(r => {
+        const key = `${r.nis}|||${r.nama}|||${r.kelas}|||${r.jenis}`;
+        if (!grouped[key]) grouped[key] = { ...r, hadir:0, izin:0, sakit:0, alpa:0, total:0 };
+        const status = String(r.status || "").toLowerCase();
+        grouped[key].total++;
+        if (status.includes("hadir")) grouped[key].hadir++;
+        else if (status.includes("izin")) grouped[key].izin++;
+        else if (status.includes("sakit")) grouped[key].sakit++;
+        else if (status.includes("alpa") || status.includes("alpha")) grouped[key].alpa++;
+    });
+
+    const rows = [
+        ["REKAP ABSENSI BULANAN PER KELAS"],
+        ["Bulan", month],
+        ["Kelas", selectedClass === "SEMUA" ? "Semua Kelas" : selectedClass],
+        [],
+        ["No","NIS / ID","Nama","Kelas","Jenis","Hadir","Izin","Sakit","Alpa","Total Catatan"],
+        ...Object.values(grouped).sort((a,b) => String(a.kelas).localeCompare(String(b.kelas),"id") || String(a.nama).localeCompare(String(b.nama),"id"))
+            .map((r,i) => [i+1,r.nis,r.nama,r.kelas,r.jenis,r.hadir,r.izin,r.sakit,r.alpa,r.total])
+    ];
+
+    downloadCsv(`rekap_bulanan_${month}_${selectedClass === "SEMUA" ? "semua_kelas" : selectedClass}.csv`, rows);
+    if (records.length) showToast(`${records.length} CATATAN BERHASIL DIREKAP`, "success");
+}
 
 
 // ================== UI HELPERS ==================
