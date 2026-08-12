@@ -472,115 +472,6 @@
         }
 
     
-
-/* Siluet wajah manusia untuk kamera absensi */
-#face-silhouette-svg {
-    filter: drop-shadow(0 0 10px rgba(255,255,255,.16));
-    opacity: .9;
-}
-#face-silhouette {
-    z-index: 2;
-}
-#face-silhouette-svg.text-green-500 {
-    filter: drop-shadow(0 0 18px rgba(34,197,94,.75));
-}
-
-
-/* ===== PANDUAN WAJAH ±50 CM ===== */
-.face-distance-guide {
-    position: absolute;
-    width: min(54%, 330px);
-    aspect-ratio: 0.78;
-    max-height: 82%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    z-index: 1;
-}
-.face-guide-ring {
-    position: absolute;
-    inset: 3% 7%;
-    border: 2px solid rgba(255,255,255,.42);
-    border-radius: 48% 48% 45% 45% / 42% 42% 56% 56%;
-    box-shadow: 0 0 0 1px rgba(59,130,246,.14), 0 0 25px rgba(59,130,246,.12);
-}
-.face-guide-ring::before,
-.face-guide-ring::after {
-    content: "";
-    position: absolute;
-    left: 12%;
-    right: 12%;
-    height: 1px;
-    background: rgba(255,255,255,.18);
-}
-.face-guide-ring::before { top: 38%; }
-.face-guide-ring::after { top: 62%; }
-
-.face-guide-label {
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 7px 10px;
-    border-radius: 999px;
-    background: rgba(2,6,23,.72);
-    backdrop-filter: blur(7px);
-    color: rgba(255,255,255,.92);
-    font-size: clamp(8px, 1.7vw, 11px);
-    font-weight: 900;
-    letter-spacing: .03em;
-    white-space: nowrap;
-    box-shadow: 0 5px 18px rgba(0,0,0,.22);
-}
-.face-distance-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #3b82f6;
-    box-shadow: 0 0 9px rgba(59,130,246,.9);
-}
-.face-distance-guide.distance-good .face-guide-ring {
-    border-color: rgba(34,197,94,.88);
-    box-shadow: 0 0 0 3px rgba(34,197,94,.08), 0 0 30px rgba(34,197,94,.18);
-}
-.face-distance-guide.distance-good .face-distance-dot {
-    background: #22c55e;
-    box-shadow: 0 0 11px rgba(34,197,94,1);
-}
-.face-distance-guide.distance-warning .face-guide-ring {
-    border-color: rgba(250,204,21,.9);
-    box-shadow: 0 0 0 3px rgba(250,204,21,.08), 0 0 28px rgba(250,204,21,.18);
-}
-.face-distance-guide.distance-warning .face-distance-dot {
-    background: #facc15;
-    box-shadow: 0 0 11px rgba(250,204,21,1);
-}
-
-/* Kamera HP: panduan wajah sedikit lebih besar agar nyaman pada jarak ±50 cm. */
-@media (max-width: 640px) {
-    .face-distance-guide {
-        width: min(62%, 290px);
-        max-height: 78%;
-    }
-    #face-silhouette-svg {
-        width: 82%;
-        height: 82%;
-        max-width: 290px;
-        max-height: 340px;
-    }
-}
-
-/* Kamera desktop tetap lebih proporsional. */
-@media (min-width: 641px) {
-    .face-distance-guide {
-        width: min(38%, 300px);
-    }
-}
-
 /* ===== PRO FACE SCANNER UI ===== */
 .face-scanner-pro {
     position: relative;
@@ -789,71 +680,10 @@
 			<!-- Overlay Pemindai Baru -->
     			<div class="face-mask-overlay"></div> 
 			<div id="face-silhouette" class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div id="face-distance-guide" class="face-distance-guide">
-                        <div class="face-guide-ring"></div>
-                        <div class="face-guide-label">
-                            <span id="face-distance-dot" class="face-distance-dot"></span>
-                            <span id="face-distance-text">POSISIKAN WAJAH ±50 CM</span>
-                        </div>
-                    </div>
-	                <svg id="face-silhouette-svg" class="w-64 h-64 text-white/35 transition-all duration-300" viewBox="0 0 300 360" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Siluet kepala manusia realistis -->
-                    <path d="M150 28
-                             C96 28 58 70 58 128
-                             C58 177 77 212 104 232
-                             L104 260
-                             C104 275 93 286 75 292
-                             C48 301 29 318 22 344
-                             H278
-                             C271 318 252 301 225 292
-                             C207 286 196 275 196 260
-                             L196 232
-                             C223 212 242 177 242 128
-                             C242 70 204 28 150 28 Z"
-                          stroke-width="4"/>
-
-                    <!-- Telinga -->
-                    <path d="M59 125 C39 120 34 142 45 160 C50 168 56 170 63 166" stroke-width="4"/>
-                    <path d="M241 125 C261 120 266 142 255 160 C250 168 244 170 237 166" stroke-width="4"/>
-
-                    <!-- Rambut / garis kepala -->
-                    <path d="M67 111 C72 63 105 42 150 42 C195 42 228 63 233 111"
-                          stroke-width="5"/>
-                    <path d="M79 91 C101 66 126 58 150 58 C174 58 199 66 221 91"
-                          stroke-width="2.5" opacity=".75"/>
-
-                    <!-- Mata manusia -->
-                    <path d="M91 126 C103 117 117 117 129 126 C117 134 103 134 91 126 Z"
-                          stroke-width="3"/>
-                    <path d="M171 126 C183 117 197 117 209 126 C197 134 183 134 171 126 Z"
-                          stroke-width="3"/>
-                    <circle cx="110" cy="126" r="4" fill="currentColor" stroke="none"/>
-                    <circle cx="190" cy="126" r="4" fill="currentColor" stroke="none"/>
-
-                    <!-- Alis -->
-                    <path d="M91 108 C103 101 117 101 128 107" stroke-width="3"/>
-                    <path d="M172 107 C183 101 197 101 209 108" stroke-width="3"/>
-
-                    <!-- Hidung -->
-                    <path d="M150 124 C147 143 143 157 139 166 C143 171 150 173 158 169"
-                          stroke-width="3"/>
-
-                    <!-- Mulut -->
-                    <path d="M119 190 C135 201 165 201 181 190"
-                          stroke-width="3"/>
-                    <path d="M127 190 C139 195 161 195 173 190"
-                          stroke-width="2" opacity=".65"/>
-
-                    <!-- Rahang / dagu -->
-                    <path d="M105 209 C118 226 134 235 150 235 C166 235 182 226 195 209"
-                          stroke-width="3" opacity=".8"/>
-
-                    <!-- Leher dan bahu -->
-                    <path d="M105 232 L105 265 C105 278 93 286 76 292"/>
-                    <path d="M195 232 L195 265 C195 278 207 286 224 292"/>
-                    <path d="M76 292 C55 300 35 317 26 342"/>
-                    <path d="M224 292 C245 300 265 317 274 342"/>
-                </svg>
+	                <svg id="face-silhouette-svg" class="w-64 h-64 text-white/30 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.5">
+	                    <!-- Garis Kepala --><path d="M12 21C16.4183 21 20 17.4183 20 13C20 8.58172 16.4183 5 12 5C7.58172 5 4 8.58172 4 13C4 17.4183 7.58172 21 12 21Z" />
+	                    <!-- Area Mata & Hidung --><path d="M12 18C14.2091 18 16 16.2091 16 14C16 11.7909 14.2091 10 12 10C9.79086 10 8 11.7909 8 14C8 16.2091 9.79086 18 12 18Z" />
+	                    <!-- Garis Senyum --><path d="M9 13C9 13 10 12 12 12C14 12 15 13 15 13" /></svg>
 	            </div>
 	        </div>
 
@@ -1323,36 +1153,6 @@ async function registerFace() {
     } catch (e) {
         showToast(e.message, "error");
         regStatus.innerText = "❌ GAGAL";
-    }
-}
-
-
-// Panduan jarak wajah untuk penggunaan HP sekitar ±50 cm.
-// Ukuran wajah di frame digunakan sebagai indikator relatif, bukan pengukuran cm absolut.
-function updateFaceDistanceGuide(detection) {
-    const guide = document.getElementById("face-distance-guide");
-    const label = document.getElementById("face-distance-text");
-    if (!guide || !label || !detection?.box) return;
-
-    const box = detection.box;
-    const video = document.getElementById("video");
-    const vw = video?.videoWidth || 640;
-    const vh = video?.videoHeight || 480;
-
-    const faceRatio = Math.max(box.width / vw, box.height / vh);
-
-    guide.classList.remove("distance-good", "distance-warning");
-
-    // Target visual untuk posisi wajah yang nyaman sekitar 50 cm.
-    if (faceRatio >= 0.24 && faceRatio <= 0.42) {
-        guide.classList.add("distance-good");
-        label.innerText = "JARAK IDEAL • ±50 CM";
-    } else if (faceRatio < 0.24) {
-        guide.classList.add("distance-warning");
-        label.innerText = "WAJAH TERLALU JAUH • DEKAT SEDIKIT";
-    } else {
-        guide.classList.add("distance-warning");
-        label.innerText = "WAJAH TERLALU DEKAT • MUNDUR SEDIKIT";
     }
 }
 
