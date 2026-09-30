@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bioscan-V2026.9.1';
+const CACHE_NAME = 'bioscan-v1.4.3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
