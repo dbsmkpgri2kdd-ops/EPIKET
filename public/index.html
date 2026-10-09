@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>BioScan GPS v1.4.2</title>
     <meta name="theme-color" content="#1d4ed8">
     <meta name="mobile-web-app-capable" content="yes">
@@ -15,7 +18,27 @@
     <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script> tailwind.config = {darkMode: 'class', } </script>    
+    <script> tailwind.config = {darkMode: 'class', } </script> 
+	<script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').then(reg => {
+            console.log('SW Registered');
+            reg.update(); // Paksa browser ngecek ke GitHub apakah sw.js berubah
+          }).catch(err => console.log('SW Registration Failed', err));
+        });
+
+        // Deteksi jika Service Worker baru saja ter-install, otomatis refresh UI!
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            window.location.reload();
+            refreshing = true;
+          }
+        });
+      }
+    </script>
+
     <style>
         body { transition: background-color 0.4s, color 0.4s; -webkit-tap-highlight-color: transparent; }
         .video-container { position: relative; width: 100%; max-width: 640px; margin: auto; display: flex; justify-content: center; align-items: center; overflow: hidden; border-radius: 1rem; }
@@ -830,10 +853,7 @@
 
 </style>
 
-    <script>
-        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW Registered')) .catch(err => console.log('SW Registration Failed', err)); }); }
-    </script>
+
 
 </head>
 <body class="bg-gray-50 dark:bg-slate-950 min-h-screen font-sans text-slate-900 dark:text-slate-100">
